@@ -4,7 +4,9 @@
   "features": {
     "ghcr.io/devcontainers/features/git:1": {}
   },
-  "forwardPorts": [3000],
+  "forwardPorts": [
+    3000
+  ],
   "portsAttributes": {
     "3000": {
       "label": "NuxtJS",
@@ -12,5 +14,6 @@
     },
   },
   "postCreateCommand": "npm install -g nuxi && npm install",
-  "remoteUser": "node"
+  "remoteUser": "node",
+  "runArgs": ["--add-host=host.docker.internal:host-gateway"]
 }
