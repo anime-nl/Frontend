@@ -1,13 +1,15 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 </script>
 <template>
   <UApp>
-    <Navbar />
+    <Navbar/>
 
-    <UBanner class="z-0" icon="i-lucide-info" title="This website is still under construction! If you encounter any problems with the site, please contact us via the Contact page." close />
+    <UBanner class="z-0" close
+             icon="i-lucide-info"
+             title="This website is still under construction! If you encounter any problems with the site, please contact us via the Contact page."/>
 
     <UMain>
-      <NuxtPage />
+      <NuxtPage/>
     </UMain>
   </UApp>
 </template>

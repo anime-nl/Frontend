@@ -1,3 +1,6 @@
+<script setup lang="ts">
+</script>
 <template>
-  <ProductCarousel />
+  <ShowcaseCarousel/>
+  <ProductCarousel title="New Products"/>
 </template>

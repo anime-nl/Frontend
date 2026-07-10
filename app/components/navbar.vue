@@ -1,7 +1,14 @@
-<script setup lang="ts">
-import type { NavigationMenuItem } from '@nuxt/ui'
+<script lang="ts" setup>
+import type {NavigationMenuItem} from '@nuxt/ui'
 
 const items = ref<NavigationMenuItem[]>([
+  {
+    label: 'Home',
+    icon: 'i-material-symbols:home',
+    to: '/',
+    children: [],
+    class: "px-6"
+  },
   {
     label: 'TCG',
     icon: 'i-material-symbols-light:playing-cards',
@@ -25,6 +32,12 @@ const items = ref<NavigationMenuItem[]>([
         icon: 'i-game-icons-ring-box',
         to: '/products/tcg/boosters',
       },
+      {
+        label: 'By series',
+        description: 'Buy boxes fill with packs and extra\'s.',
+        icon: 'i-mdi:search',
+        to: '/search?category=tcg',
+      },
     ]
   },
   {
@@ -32,6 +45,30 @@ const items = ref<NavigationMenuItem[]>([
     icon: 'i-game-icons-hooded-figure',
     to: '/products/figures',
     children: [
+      {
+        label: 'Prize Figures',
+        description: 'Great figures for low prices.',
+        icon: 'i-mdi:prize',
+        to: '/products/figures/prize-figures',
+      },
+      {
+        label: 'Scale Figures',
+        description: 'Great for decorating.',
+        icon: 'i-mdi:ruler',
+        to: '/products/figures/scale-figures',
+      },
+      {
+        label: 'Noodle Stoppers',
+        description: 'Figures with a function',
+        icon: 'i-mdi:cup',
+        to: '/products/figures/noodle-stoppers',
+      },
+      {
+        label: 'By series',
+        description: 'Search for figures from the series you enjoy.',
+        icon: 'i-mdi:search',
+        to: '/search?category=figures',
+      },
     ]
   },
   {
@@ -39,6 +76,12 @@ const items = ref<NavigationMenuItem[]>([
     icon: 'i-mdi-teddy-bear',
     to: '/products/plush',
     children: [
+      {
+        label: 'By series',
+        description: 'Search for plushies from the series you enjoy.',
+        icon: 'i-mdi:search',
+        to: '/search?category=plushies',
+      },
     ]
   },
   {
@@ -46,6 +89,24 @@ const items = ref<NavigationMenuItem[]>([
     icon: 'i-pinhead-key-with-house-keychain',
     to: '/products/keychains',
     children: [
+      {
+        label: 'Acrylic keychains',
+        description: 'A wide selection of cheap keychains.',
+        icon: 'i-at-icons:glass-pane',
+        to: '/products/keychains/acrylic',
+      },
+      {
+        label: 'Metal keychains',
+        description: 'Super durable keychains.',
+        icon: 'i-game-icons:metal-bar',
+        to: '/products/keychains/metal',
+      },
+      {
+        label: 'By series',
+        description: 'Search for keychains from the series you enjoy.',
+        icon: 'i-mdi:search',
+        to: '/search?category=keychains',
+      },
     ]
   },
   {
@@ -59,9 +120,10 @@ const items = ref<NavigationMenuItem[]>([
 </script>
 
 <template>
-    <div class="flex justify-center items-center w-full z-50">
-      <UNavigationMenu :items="items" />
-    </div>
+  <div class="flex justify-center items-center w-full z-50">
+    <UNavigationMenu :items="items"/>
+  </div>
+  <hr class="text-gray-600" />
 </template>
 
 <style scoped>
