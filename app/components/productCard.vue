@@ -1,7 +1,5 @@
 <script setup lang="ts">
 const props = defineProps(['product'])
-
-console.log(props.product.variants[0].prices);
 </script>
 
 <template>

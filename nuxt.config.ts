@@ -1,5 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+    ssr: true,
     modules: ['@nuxt/ui', '@nuxtjs/medusa'],
     css: ['~/assets/css/main.css'],
     compatibilityDate: '2025-07-15',
@@ -8,7 +9,8 @@ export default defineNuxtConfig({
         optimizeDeps: {
             include: [
                 '@vue/devtools-core',
-                '@vue/devtools-kit'
+                '@vue/devtools-kit',
+                'qs'
             ]
         }
     },

@@ -59,7 +59,7 @@ const items = ref<NavigationMenuItem[]>([
 </script>
 
 <template>
-    <div class="flex justify-center items-center w-full">
+    <div class="flex justify-center items-center w-full z-50">
       <UNavigationMenu :items="items" />
     </div>
 </template>
