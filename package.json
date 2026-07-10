@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "@iconify-json/lucide": "^1.2.116",
+    "@types/node": "^26.1.1",
     "@vue/devtools-core": "^8.1.5",
     "@vue/devtools-kit": "^8.1.5"
   }
