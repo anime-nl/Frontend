@@ -25,5 +25,9 @@ export default defineNuxtConfig({
             jwtTokenStorageKey: 'medusa_auth_token',
             jwtTokenStorageMethod: 'local'
         }
+    },
+    runtimeConfig: {
+        medusaUrl: process.env.MEDUSA_URL,
+        medusaPublishableKey: process.env.MEDUSA_PUBLISHABLE_KEY
     }
 })

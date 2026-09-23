@@ -1,18 +1,21 @@
-<script setup lang="ts">
-const props = defineProps(['title'])
-const client = useMedusaClient();
-const productListRef = ref<HTMLElement | null>(null);
+<script setup>
+import ProductCard from "~/components/productCard.vue";
 
-const {data} = await useAsyncData('products-key', () =>
-    client.store.product.list({
-      fields: "title,thumbnail,variants.prices.*"
-    })
-)
-const products = computed(() => data.value?.products ?? [])
-
+const { data: products, pending, error } = await useFetch('/api/products')
 </script>
+
 <template>
-  <UPageColumns>
-    <ProductCard v-for="product in products" :key="product.id" :product="product" class="snap-center"/>
-  </UPageColumns>
+  <div>
+    <p v-if="pending">Loading...</p>
+
+    <p v-if="error">Something went wrong while loading the products</p>
+
+    <div v-if="products">
+      <ProductCard
+          v-for="product in products.products"
+          :key="product.id"
+          :product="product"
+      />
+    </div>
+  </div>
 </template>

@@ -12,23 +12,12 @@ interface Collection {
   title: string
 }
 
-interface Product {
-  id: string
-  title: string
-  handle: string
-  thumbnail?: string | null
-  variants?: Array<Record<string, unknown>>
-}
-
 interface ProductFilters {
   q: string
   category: string
   collection: string
 }
 
-const client = useMedusaClient()
-
-// State
 const currentRegionId = ref<string>('')
 const availableCollections = ref<Collection[]>([])
 const availableCategories = ref<Category[]>([])
@@ -45,7 +34,6 @@ const filters = reactive<ProductFilters>({
   collection: '',
 })
 
-// DOM Elements & Observers
 const loadMoreSentinel = useTemplateRef<HTMLElement>('loadMoreSentinel')
 let observer: IntersectionObserver | null = null
 let filterTimeout: ReturnType<typeof setTimeout> | null = null
@@ -64,7 +52,7 @@ const fetchProducts = async (reset = false) => {
   }
 
   try {
-    const queryParams: Record<string, unknown> = {
+    const queryParams: Record<string, any> = {
       limit: LIMIT,
       offset: (page.value - 1) * LIMIT,
       fields: '+variants,+variants.prices',
@@ -75,13 +63,14 @@ const fetchProducts = async (reset = false) => {
     if (filters.category) queryParams.category_id = [filters.category]
     if (filters.collection) queryParams.collection_id = [filters.collection]
 
-    const { products: fetchedProducts, count } = await client.store.product.list(queryParams)
+    const response: any = await $fetch('/api/products', {
+      query: queryParams
+    })
 
-    // Stale response guard to prevent race conditions
     if (requestId !== currentRequestId) return
 
-    products.value.push(...fetchedProducts)
-    hasMore.value = products.value.length < count
+    products.value.push(...response.products)
+    hasMore.value = products.value.length < response.count
     page.value++
   } catch (error) {
     console.error('Failed to fetch products:', error)
@@ -98,7 +87,6 @@ const resetFilters = () => {
   filters.collection = ''
 }
 
-// Debounce filter changes
 watch(
     filters,
     () => {
@@ -127,21 +115,20 @@ const setupIntersectionObserver = () => {
 }
 
 onMounted(async () => {
-  // Fetch metadata concurrently
   const [categoriesRes, collectionsRes, regionsRes] = await Promise.allSettled([
-    client.store.category.list(),
-    client.store.collection.list(),
-    client.store.region.list(),
+    $fetch('/api/categories'),
+    $fetch('/api/collections'),
+    $fetch('/api/regions'),
   ])
 
   if (categoriesRes.status === 'fulfilled') {
-    availableCategories.value = categoriesRes.value.product_categories || []
+    availableCategories.value = (categoriesRes.value as any).product_categories || []
   }
   if (collectionsRes.status === 'fulfilled') {
-    availableCollections.value = collectionsRes.value.collections || []
+    availableCollections.value = (collectionsRes.value as any).collections || []
   }
-  if (regionsRes.status === 'fulfilled' && regionsRes.value.regions?.length) {
-    const firstRegion = regionsRes.value.regions?.[0]
+  if (regionsRes.status === 'fulfilled' && (regionsRes.value as any).regions?.length) {
+    const firstRegion = (regionsRes.value as any).regions?.[0]
     if (firstRegion) {
       currentRegionId.value = firstRegion.id
       await fetchProducts(true)
@@ -159,11 +146,9 @@ onUnmounted(() => {
 <template>
   <div class="max-w-screen-2xl mx-auto p-4 md:p-8 flex flex-col md:flex-row gap-8 bg-slate-900 min-h-screen text-slate-100">
 
-    <!-- Filters Sidebar -->
     <aside class="w-full md:w-72 shrink-0">
       <div class="sticky top-8 space-y-6 p-6 rounded-2xl border border-sky-200/20 bg-slate-900">
 
-        <!-- Search -->
         <div>
           <label for="search-input" class="block text-xl font-bold mb-3">Search</label>
           <input
@@ -175,7 +160,6 @@ onUnmounted(() => {
           >
         </div>
 
-        <!-- Collection -->
         <div>
           <label for="collection-select" class="block font-semibold mb-2 text-sky-200">Collection</label>
           <select
@@ -190,7 +174,6 @@ onUnmounted(() => {
           </select>
         </div>
 
-        <!-- Category -->
         <div>
           <label for="category-select" class="block font-semibold mb-2 text-sky-200">Category</label>
           <select
@@ -208,7 +191,6 @@ onUnmounted(() => {
       </div>
     </aside>
 
-    <!-- Product Grid & Infinite Scroll -->
     <main class="flex-1">
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -220,7 +202,6 @@ onUnmounted(() => {
         />
       </div>
 
-      <!-- No Results State -->
       <div v-if="!loading && products.length === 0" class="text-center py-20 text-slate-400">
         <p class="text-lg">No products found matching your criteria.</p>
         <button
@@ -231,7 +212,6 @@ onUnmounted(() => {
         </button>
       </div>
 
-      <!-- Infinite Scroll Sentinel -->
       <div ref="loadMoreSentinel" class="w-full py-12 flex justify-center items-center">
         <div v-if="loading" class="flex flex-col items-center gap-3 text-slate-400">
           <svg class="animate-spin h-8 w-8 text-sky-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
