@@ -19,7 +19,7 @@ export default defineNuxtConfig({
         global: true,
         server: false,
         debug: true,
-        publishableKey: "pk_e6017b03723f328deb2b93a2a1cf547737e9b3eeb94cc66de4214f3c8dd304c8",
+        publishableKey: process.env.MEDUSA_PUBLISHABLE_KEY,
         auth: {
             type: 'session',
             jwtTokenStorageKey: 'medusa_auth_token',
@@ -28,6 +28,7 @@ export default defineNuxtConfig({
     },
     runtimeConfig: {
         medusaUrl: process.env.MEDUSA_URL,
-        medusaPublishableKey: process.env.MEDUSA_PUBLISHABLE_KEY
+        medusaPublishableKey: process.env.MEDUSA_PUBLISHABLE_KEY,
+        medusaSalesChannelId: process.env.MEDUSA_SALES_CHANNEL_ID
     }
 })

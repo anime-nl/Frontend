@@ -28,10 +28,16 @@ const hasMore = ref(true)
 const page = ref(1)
 const LIMIT = 12
 
+const route = useRoute()
+const queryParam = (key: keyof ProductFilters) => {
+  const value = route.query[key]
+  return (Array.isArray(value) ? value[0] : value) ?? ''
+}
+
 const filters = reactive<ProductFilters>({
-  q: '',
-  category: '',
-  collection: '',
+  q: queryParam('q'),
+  category: queryParam('category'),
+  collection: queryParam('collection'),
 })
 
 const loadMoreSentinel = useTemplateRef<HTMLElement>('loadMoreSentinel')
@@ -40,7 +46,7 @@ let filterTimeout: ReturnType<typeof setTimeout> | null = null
 let currentRequestId = 0
 
 const fetchProducts = async (reset = false) => {
-  if (loading.value || (!hasMore.value && !reset)) return
+  if (!reset && (loading.value || !hasMore.value)) return
 
   const requestId = ++currentRequestId
   loading.value = true
@@ -77,6 +83,8 @@ const fetchProducts = async (reset = false) => {
   } finally {
     if (requestId === currentRequestId) {
       loading.value = false
+      await nextTick()
+      rearmObserver()
     }
   }
 }
@@ -97,6 +105,12 @@ watch(
     },
     { deep: true }
 )
+
+const rearmObserver = () => {
+  if (!observer || !loadMoreSentinel.value) return
+  observer.unobserve(loadMoreSentinel.value)
+  observer.observe(loadMoreSentinel.value)
+}
 
 const setupIntersectionObserver = () => {
   if (!loadMoreSentinel.value) return

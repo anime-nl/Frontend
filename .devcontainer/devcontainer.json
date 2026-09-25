@@ -1,8 +1,13 @@
 {
   "name": "Nuxt.js (TypeScript)",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/animenl-website",
+  "shutdownAction": "stopCompose",
   "features": {
-    "ghcr.io/devcontainers/features/git:1": {}
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {},
+    "ghcr.io/devcontainers-extra/features/bun:1": {}
   },
   "forwardPorts": [
     3000
@@ -11,9 +16,8 @@
     "3000": {
       "label": "NuxtJS",
       "onAutoForward": "notify"
-    },
+    }
   },
   "postCreateCommand": "npm install -g nuxi && npm install",
-  "remoteUser": "node",
-  "runArgs": ["--add-host=host.docker.internal:host-gateway"]
+  "remoteUser": "node"
 }
