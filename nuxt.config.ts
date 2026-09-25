@@ -30,6 +30,14 @@ export default defineNuxtConfig({
         // URL the Nuxt server uses to reach Medusa; differs from MEDUSA_URL inside the dev container
         medusaServerUrl: process.env.MEDUSA_SERVER_URL || process.env.MEDUSA_URL,
         medusaPublishableKey: process.env.MEDUSA_PUBLISHABLE_KEY,
-        medusaSalesChannelId: process.env.MEDUSA_SALES_CHANNEL_ID
+        medusaSalesChannelId: process.env.MEDUSA_SALES_CHANNEL_ID,
+        // SMTP server for the /support forms
+        smtpHost: process.env.SMTP_HOST,
+        smtpPort: Number(process.env.SMTP_PORT) || 587,
+        smtpUser: process.env.SMTP_USER,
+        smtpPass: process.env.SMTP_PASS,
+        public: {
+            supportEmail: 'info@animenl.nl'
+        }
     }
 })

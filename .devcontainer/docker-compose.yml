@@ -12,6 +12,8 @@ services:
     depends_on:
       medusa:
         condition: service_started
+      mailpit:
+        condition: service_started
     environment:
       # Browser-facing URL. *.localhost always resolves to loopback inside a container,
       # so the Nuxt server uses MEDUSA_SERVER_URL (the compose service name) instead.
@@ -19,6 +21,15 @@ services:
       MEDUSA_SERVER_URL: http://medusa:9000/
       MEDUSA_PUBLISHABLE_KEY: *publishable-key
       MEDUSA_SALES_CHANNEL_ID: ""
+      # Emails are caught by mailpit instead of being sent
+      SMTP_HOST: mailpit
+      SMTP_PORT: "1025"
+
+  # Catches the emails the site sends, inbox at http://localhost:8025
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "8025:8025"
 
   medusa:
     build:

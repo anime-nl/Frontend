@@ -109,6 +109,11 @@ const items: NavigationMenuItem[] = [
     ]
   },
   {
+    label: 'Support',
+    icon: 'i-lucide-life-buoy',
+    to: '/support',
+  },
+  {
     label: 'Trustpilot',
     icon: 'i-simple-icons-trustpilot',
     badge: '4.0',
