@@ -13,7 +13,7 @@ export async function medusaFetch<T>(event: H3Event, path: string, query?: Recor
     } catch (error) {
         // A 404 is a normal answer for an unknown product, not a failure worth a log line
         if ((error as {statusCode?: number}).statusCode !== 404) {
-            console.error(`Medusa request to store/${path} failed:`, error)
+            console.error(`Medusa request to store/${path} failed:`, error, (error as {data?: unknown}).data)
         }
         throw error
     }

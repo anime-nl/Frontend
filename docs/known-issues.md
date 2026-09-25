@@ -14,7 +14,7 @@ Format: **title** (where): what is wrong. Mark anything not yet reproduced as _u
 - **Trustpilot score is hardcoded** (`app/components/navbar.vue`, `badge: '4.0'`): it will go out of date.
 - **Support page copy needs a check by the shop owner** (`app/pages/support/index.vue`, `shared/utils/support.ts`): "2 to 3 days" does not say whether it means business days or delivery versus dispatch, and the return text does not cover who pays for return shipping or the condition of returned items.
 - **Product cards never show a price** (`app/components/productCarousel.vue`, `app/pages/products/tcg/index.vue`): the list requests `variants.prices.*`, but `productCard` reads `variants[0].calculated_price`, which needs a `region_id`. _Unverified in the browser._
-- **Product page 500 not reproduced** (`server/api/products/[id].ts`, `app/pages/product/[id]/index.vue`): a reported "500 Product not found" on client navigation and "500 Could not fetch product" on refresh. Against the dev Medusa the route and the SSR page work. `medusaFetch` now logs the real cause; check the Nuxt dev log when it happens again.
+- **Backorderable items in stock are capped at the stock quantity** (`app/pages/product/[id]/index.vue`, the `stock` computed): when `inventory_quantity > 0` it sets `max` to the quantity even if `allow_backorder` is true, so the visitor cannot order more than what is in stock. Only items that are fully out of stock get an unlimited quantity. A backorderable item should have no maximum, whatever its stock.
 - **Test debt**: no tests yet for `server/api/{categories,collections,products,regions}.ts`, `app/pages/{index,search,products}`, and the components `productCard`, `productPageHeader` and `showcaseCarousel`.
 
 ## Fixed

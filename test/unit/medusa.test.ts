@@ -46,7 +46,17 @@ describe('medusaFetch', () => {
 
         await medusaFetch(event, 'regions').catch(() => {})
 
-        expect(log).toHaveBeenCalledWith(expect.stringContaining('store/regions'), cause)
+        expect(log).toHaveBeenCalledWith(expect.stringContaining('store/regions'), cause, undefined)
+    })
+
+    it('logs the response body Medusa explained the failure with', async () => {
+        const body = {type: 'invalid_data', message: 'Inventory availability cannot be calculated'}
+        const log = vi.spyOn(console, 'error').mockImplementation(() => {})
+        fetchMock.mockRejectedValue(Object.assign(new Error('400 Bad Request'), {statusCode: 400, data: body}))
+
+        await medusaFetch(event, 'products/prod_1').catch(() => {})
+
+        expect(log).toHaveBeenCalledWith(expect.any(String), expect.any(Error), body)
     })
 
     it('does not log a 404', async () => {
