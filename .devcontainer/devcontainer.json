@@ -18,6 +18,6 @@
       "onAutoForward": "notify"
     }
   },
-  "postCreateCommand": "npm install -g nuxi && npm install",
+  "postCreateCommand": "bun install",
   "remoteUser": "node"
 }
