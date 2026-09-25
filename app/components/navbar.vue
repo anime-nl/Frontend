@@ -1,12 +1,11 @@
 <script lang="ts" setup>
 import type {NavigationMenuItem} from '@nuxt/ui'
 
-const items = ref<NavigationMenuItem[]>([
+const items: NavigationMenuItem[] = [
   {
     label: 'Home',
     icon: 'i-material-symbols:home',
     to: '/',
-    children: [],
     class: "px-6"
   },
   {
@@ -28,13 +27,13 @@ const items = ref<NavigationMenuItem[]>([
       },
       {
         label: 'Booster Boxes',
-        description: 'Buy boxes fill with packs and extra\'s.',
+        description: 'Buy boxes filled with packs and extras.',
         icon: 'i-game-icons-ring-box',
         to: '/products/tcg/boosters',
       },
       {
         label: 'By series',
-        description: 'Buy boxes fill with packs and extra\'s.',
+        description: 'Search for cards from the series you enjoy.',
         icon: 'i-mdi:search',
         to: '/search?category=tcg',
       },
@@ -116,7 +115,7 @@ const items = ref<NavigationMenuItem[]>([
     to: 'https://www.trustpilot.com/review/animenl.nl',
     target: '_blank'
   }
-])
+]
 </script>
 
 <template>
@@ -125,6 +124,3 @@ const items = ref<NavigationMenuItem[]>([
   </div>
   <hr class="text-gray-600" />
 </template>
-
-<style scoped>
-</style>

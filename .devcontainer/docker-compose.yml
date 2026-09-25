@@ -1,5 +1,4 @@
 x-dev-publishable-key: &publishable-key pk_local_dev_0000000000000000000000000000000000000000000000000000
-x-minio-image: &minio-image minio/minio:RELEASE.2025-04-22T22-12-26Z
 
 services:
   app:
@@ -9,8 +8,15 @@ services:
       - ..:/workspaces/animenl-website:cached
     extra_hosts:
       - host.docker.internal:host-gateway
+    # Starting the app service also starts the whole Medusa stack (medusa pulls in postgres and seaweedfs)
+    depends_on:
+      medusa:
+        condition: service_started
     environment:
+      # Browser-facing URL. *.localhost always resolves to loopback inside a container,
+      # so the Nuxt server uses MEDUSA_SERVER_URL (the compose service name) instead.
       MEDUSA_URL: http://medusa.localhost:9000/
+      MEDUSA_SERVER_URL: http://medusa:9000/
       MEDUSA_PUBLISHABLE_KEY: *publishable-key
       MEDUSA_SALES_CHANNEL_ID: ""
 
@@ -29,15 +35,16 @@ services:
         aliases:
           - medusa.localhost
     environment:
-      DATABASE_URL: postgres://medusa:medusa@postgres:5432/medusa
+      # sslmode=disable: Medusa forces SSL for any host other than localhost, and this postgres has none
+      DATABASE_URL: postgres://medusa:medusa@postgres:5432/medusa?sslmode=disable
       STORE_CORS: http://localhost:3000
       ADMIN_CORS: http://localhost:9000,http://medusa.localhost:9000
       AUTH_CORS: http://localhost:3000,http://localhost:9000,http://medusa.localhost:9000
       JWT_SECRET: supersecret
       COOKIE_SECRET: supersecret
       PUBLISHABLE_API_KEY: *publishable-key
-      S3_FILE_URL: http://localhost:9100/medusa
-      S3_ENDPOINT: http://minio:9000
+      S3_FILE_URL: http://localhost:9200/medusa
+      S3_ENDPOINT: http://seaweedfs:9000
       S3_ACCESS_KEY_ID: minioadmin
       S3_SECRET_ACCESS_KEY: minioadmin
       S3_BUCKET: medusa
@@ -46,8 +53,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      minio-init:
-        condition: service_completed_successfully
+      seaweedfs:
+        condition: service_started
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
       interval: 10s
@@ -69,37 +76,17 @@ services:
       timeout: 5s
       retries: 10
 
-  minio:
-    image: *minio-image
-    command: server /data --console-address ":9001"
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
-    volumes:
-      - minio_data:/data
+  # S3-compatible storage. Runs without an identities config, so any credentials are accepted and
+  # anonymous reads work. Buckets are not created automatically: medusa/start.sh creates one.
+  seaweedfs:
+    image: chrislusf/seaweedfs:4.47
+    command: server -s3 -s3.port=9000 -dir=/data
     ports:
-      - "9100:9000"
-      - "9101:9001"
-    healthcheck:
-      test: ["CMD", "mc", "ready", "local"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
-  minio-init:
-    image: *minio-image
-    depends_on:
-      minio:
-        condition: service_healthy
-    restart: "no"
-    entrypoint: ["/bin/sh", "-c"]
-    command:
-      - >
-        mc alias set local http://minio:9000 minioadmin minioadmin &&
-        mc mb --ignore-existing local/medusa &&
-        mc anonymous set download local/medusa
+      - "9200:9000"
+    volumes:
+      - seaweedfs_data:/data
 
 volumes:
   postgres_data:
-  minio_data:
+  seaweedfs_data:
   medusa_node_modules:

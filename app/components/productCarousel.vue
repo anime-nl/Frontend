@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-const props = defineProps(['title'])
-const client = useMedusaClient();
-const productListRef = ref<HTMLElement | null>(null);
+defineProps<{ title: string }>()
+const client = useMedusaClient()
+const productListRef = ref<HTMLElement | null>(null)
 
-const {data} = await useAsyncData('products-key', () =>
+const {data} = await useAsyncData('carousel-products', () =>
     client.store.product.list({
       fields: "title,thumbnail,variants.prices.*"
     })
@@ -19,7 +19,7 @@ function horizontalScroll(amount: number) {
 
 <template>
   <div class="h-full m-4">
-    <h1 class="mx-6 my-2 text-4xl">{{props.title}}</h1>
+    <h1 class="mx-6 my-2 text-4xl">{{ title }}</h1>
     <div class="flex flex-row h-full w-full items-center">
       <ClientOnly>
         <UButton class="h-96 w-16 justify-center bg-linear-to-r from-black/50 to-black/20 to-80% cursor-pointer shrink-0 rounded-l-2xl rounded-r-none" variant="ghost"
@@ -29,7 +29,7 @@ function horizontalScroll(amount: number) {
       </ClientOnly>
 
       <div ref="productListRef"
-           class="h-96 mt-6 pb-6 flex flex-row gap-5 overflow-x-auto snap-x snap-mandatory flex-1 min-w-0 smooth-scroll">
+           class="h-96 mt-6 pb-6 flex flex-row gap-5 overflow-x-auto snap-x snap-mandatory flex-1 min-w-0 scroll-smooth">
         <ProductCard v-for="product in products" :key="product.id" :product="product" class="snap-center"/>
       </div>
 
@@ -43,9 +43,3 @@ function horizontalScroll(amount: number) {
     </div>
   </div>
 </template>
-
-<style scoped>
-div[ref="productListRef"], .smooth-scroll {
-  scroll-behavior: smooth;
-}
-</style>

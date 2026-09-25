@@ -24,7 +24,3 @@ const items = [
     </UCarousel>
   </div>
 </template>
-
-<style scoped>
-
-</style>

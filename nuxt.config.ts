@@ -27,7 +27,8 @@ export default defineNuxtConfig({
         }
     },
     runtimeConfig: {
-        medusaUrl: process.env.MEDUSA_URL,
+        // URL the Nuxt server uses to reach Medusa; differs from MEDUSA_URL inside the dev container
+        medusaServerUrl: process.env.MEDUSA_SERVER_URL || process.env.MEDUSA_URL,
         medusaPublishableKey: process.env.MEDUSA_PUBLISHABLE_KEY,
         medusaSalesChannelId: process.env.MEDUSA_SALES_CHANNEL_ID
     }

@@ -17,7 +17,6 @@ export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig(event)
     const id = getRouterParam(event, 'id')
     const salesChannelId = config.medusaSalesChannelId || undefined
-    const headers = {'x-publishable-api-key': config.medusaPublishableKey}
 
     if (!id) {
         throw createError({statusCode: 400, statusMessage: 'Missing product id'})
@@ -26,19 +25,16 @@ export default defineEventHandler(async (event) => {
     let regionId = getQuery(event).region_id as string | undefined
 
     if (!regionId) {
-        const {regions} = await $fetch<{ regions: StoreRegion[] }>(`${config.medusaUrl}store/regions`, {headers})
+        const {regions} = await medusaFetch<{ regions: StoreRegion[] }>(event, 'regions')
             .catch(() => ({regions: []}))
         regionId = regions[0]?.id
     }
 
     try {
-        const {product} = await $fetch<{ product: StoreProduct }>(`${config.medusaUrl}store/products/${id}`, {
-            headers,
-            query: {
-                fields: PRODUCT_FIELDS,
-                region_id: regionId,
-                sales_channel_id: salesChannelId
-            }
+        const {product} = await medusaFetch<{ product: StoreProduct }>(event, `products/${id}`, {
+            fields: PRODUCT_FIELDS,
+            region_id: regionId,
+            sales_channel_id: salesChannelId
         })
 
         return {product, region_id: regionId, sales_channel_id: salesChannelId}

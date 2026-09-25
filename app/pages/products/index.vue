@@ -1,7 +1,5 @@
-<script setup>
-import ProductCard from "~/components/productCard.vue";
-
-const { data: products, pending, error } = await useFetch('/api/products')
+<script lang="ts" setup>
+const {data, pending, error} = await useFetch('/api/products')
 </script>
 
 <template>
@@ -10,9 +8,9 @@ const { data: products, pending, error } = await useFetch('/api/products')
 
     <p v-if="error">Something went wrong while loading the products</p>
 
-    <div v-if="products">
+    <div v-if="data">
       <ProductCard
-          v-for="product in products.products"
+          v-for="product in data.products"
           :key="product.id"
           :product="product"
       />

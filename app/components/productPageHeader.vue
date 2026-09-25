@@ -1,3 +1,11 @@
+<script lang="ts" setup>
+defineProps<{
+  badge?: string
+  title: string
+  description?: string
+}>()
+</script>
+
 <template>
   <header class="relative w-full overflow-hidden bg-gray-900 rounded-3xl shadow-2xl mb-8">
     <div class="relative px-6 py-16 md:py-24 flex flex-col items-center justify-center text-center">
@@ -21,20 +29,3 @@
     </div>
   </header>
 </template>
-
-<script setup>
-defineProps({
-  badge: {
-    type: String,
-    default: 'badge'
-  },
-  title: {
-    type: String,
-    default: 'title'
-  },
-  description: {
-    type: String,
-    default: 'description'
-  }
-})
-</script>

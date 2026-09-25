@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { ref, reactive, watch, onMounted, onUnmounted, useTemplateRef } from 'vue'
 import type {StoreProduct} from "@medusajs/types"
 
 interface Category {
@@ -58,7 +57,7 @@ const fetchProducts = async (reset = false) => {
   }
 
   try {
-    const queryParams: Record<string, any> = {
+    const queryParams: Record<string, unknown> = {
       limit: LIMIT,
       offset: (page.value - 1) * LIMIT,
       fields: '+variants,+variants.prices',
@@ -69,7 +68,7 @@ const fetchProducts = async (reset = false) => {
     if (filters.category) queryParams.category_id = [filters.category]
     if (filters.collection) queryParams.collection_id = [filters.collection]
 
-    const response: any = await $fetch('/api/products', {
+    const response = await $fetch<{ products: StoreProduct[], count: number }>('/api/products', {
       query: queryParams
     })
 
@@ -130,24 +129,23 @@ const setupIntersectionObserver = () => {
 
 onMounted(async () => {
   const [categoriesRes, collectionsRes, regionsRes] = await Promise.allSettled([
-    $fetch('/api/categories'),
-    $fetch('/api/collections'),
-    $fetch('/api/regions'),
+    $fetch<{ product_categories: Category[] }>('/api/categories'),
+    $fetch<{ collections: Collection[] }>('/api/collections'),
+    $fetch<{ regions: { id: string }[] }>('/api/regions'),
   ])
 
   if (categoriesRes.status === 'fulfilled') {
-    availableCategories.value = (categoriesRes.value as any).product_categories || []
+    availableCategories.value = categoriesRes.value.product_categories ?? []
   }
   if (collectionsRes.status === 'fulfilled') {
-    availableCollections.value = (collectionsRes.value as any).collections || []
+    availableCollections.value = collectionsRes.value.collections ?? []
   }
-  if (regionsRes.status === 'fulfilled' && (regionsRes.value as any).regions?.length) {
-    const firstRegion = (regionsRes.value as any).regions?.[0]
-    if (firstRegion) {
-      currentRegionId.value = firstRegion.id
-      await fetchProducts(true)
-      setupIntersectionObserver()
-    }
+
+  const firstRegion = regionsRes.status === 'fulfilled' ? regionsRes.value.regions?.[0] : undefined
+  if (firstRegion) {
+    currentRegionId.value = firstRegion.id
+    await fetchProducts(true)
+    setupIntersectionObserver()
   }
 })
 
