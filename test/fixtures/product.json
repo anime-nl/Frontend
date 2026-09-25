@@ -1,0 +1,183 @@
+{
+  "product": {
+    "id": "prod_01M3CXGHS7072G7K6CCJPVK9M5",
+    "title": "Acrylic Zhongli Keychain",
+    "subtitle": "6 cm",
+    "description": "Official acrylic keychain of Zhongli, with a sturdy metal clasp.",
+    "handle": "acrylic-zhongli-keychain",
+    "is_giftcard": false,
+    "discountable": true,
+    "thumbnail": "http://localhost:9200/medusa/6974096538768-1-01M3CXGGR0A065J3A6F2YKVE61.svg",
+    "collection_id": "pcol_01M3CXGGQABTNJ2RW3NT7B6HNK",
+    "type_id": "ptyp_01M3CXGGQR01D47ZTQD9CTR511",
+    "weight": 16,
+    "length": 90,
+    "height": 7,
+    "width": 73,
+    "hs_code": null,
+    "origin_country": "cn",
+    "mid_code": null,
+    "material": "Acrylic",
+    "created_at": "2026-09-25T18:33:45.007Z",
+    "updated_at": "2026-09-25T18:33:45.007Z",
+    "variants": [
+      {
+        "id": "variant_01M3CXGHVY87E0SGE8TN4NVP64",
+        "title": "Default",
+        "sku": "6974096538768",
+        "barcode": null,
+        "ean": null,
+        "upc": null,
+        "allow_backorder": false,
+        "manage_inventory": true,
+        "hs_code": null,
+        "origin_country": null,
+        "mid_code": null,
+        "material": null,
+        "weight": null,
+        "length": null,
+        "height": null,
+        "width": null,
+        "metadata": null,
+        "variant_rank": 0,
+        "thumbnail": null,
+        "product_id": "prod_01M3CXGHS7072G7K6CCJPVK9M5",
+        "created_at": "2026-09-25T18:33:45.088Z",
+        "updated_at": "2026-09-25T18:33:45.088Z",
+        "deleted_at": null,
+        "options": [
+          {
+            "id": "optval_01M3CXGHSD997X1FN0EHB3VTPQ",
+            "value": "Default",
+            "rank": null,
+            "metadata": null,
+            "option_id": "opt_01M3CXGHS843G4NHCKXK5PKVHP",
+            "option": {
+              "id": "opt_01M3CXGHS843G4NHCKXK5PKVHP",
+              "title": "Size",
+              "is_exclusive": true,
+              "metadata": null,
+              "created_at": "2026-09-25T18:33:45.007Z",
+              "updated_at": "2026-09-25T18:33:45.007Z",
+              "deleted_at": null
+            },
+            "created_at": "2026-09-25T18:33:45.008Z",
+            "updated_at": "2026-09-25T18:33:45.008Z",
+            "deleted_at": null
+          }
+        ],
+        "calculated_price": {
+          "id": "pset_01M3CXGHX7WAJ8ZAG3QPXK3XW0",
+          "is_calculated_price_price_list": false,
+          "is_calculated_price_tax_inclusive": false,
+          "calculated_amount": 10.9,
+          "raw_calculated_amount": {"value": "10.9", "precision": 20},
+          "is_original_price_price_list": false,
+          "is_original_price_tax_inclusive": false,
+          "original_amount": 10.9,
+          "raw_original_amount": {"value": "10.9", "precision": 20},
+          "currency_code": "eur",
+          "calculated_price": {
+            "id": "price_01M3CXGHX7KVBHMSZEN90KMXR6",
+            "price_list_id": null,
+            "price_list_type": null,
+            "min_quantity": null,
+            "max_quantity": null
+          },
+          "original_price": {
+            "id": "price_01M3CXGHX7KVBHMSZEN90KMXR6",
+            "price_list_id": null,
+            "price_list_type": null,
+            "min_quantity": null,
+            "max_quantity": null
+          }
+        },
+        "inventory_quantity": 25
+      }
+    ],
+    "type": {
+      "id": "ptyp_01M3CXGGQR01D47ZTQD9CTR511",
+      "value": "Keychains",
+      "external_id": null,
+      "metadata": null,
+      "created_at": "2026-09-25T18:33:43.928Z",
+      "updated_at": "2026-09-25T18:33:43.928Z",
+      "deleted_at": null
+    },
+    "collection": {
+      "id": "pcol_01M3CXGGQABTNJ2RW3NT7B6HNK",
+      "title": "Genshin Impact",
+      "handle": "genshin-impact",
+      "external_id": null,
+      "metadata": null,
+      "created_at": "2026-09-25T18:33:43.913Z",
+      "updated_at": "2026-09-25T18:33:43.913Z",
+      "deleted_at": null
+    },
+    "options": [
+      {
+        "id": "opt_01M3CXGHS843G4NHCKXK5PKVHP",
+        "title": "Size",
+        "is_exclusive": true,
+        "metadata": null,
+        "created_at": "2026-09-25T18:33:45.007Z",
+        "updated_at": "2026-09-25T18:33:45.007Z",
+        "deleted_at": null,
+        "values": [
+          {
+            "id": "optval_01M3CXGHSD997X1FN0EHB3VTPQ",
+            "value": "Default",
+            "rank": null,
+            "metadata": null,
+            "option_id": "opt_01M3CXGHS843G4NHCKXK5PKVHP",
+            "created_at": "2026-09-25T18:33:45.008Z",
+            "updated_at": "2026-09-25T18:33:45.008Z",
+            "deleted_at": null
+          }
+        ]
+      }
+    ],
+    "tags": [],
+    "images": [
+      {
+        "id": "img_01M3CXGHSAR8HW2TASSJWG4PPN",
+        "url": "http://localhost:9200/medusa/6974096538768-1-01M3CXGGR0A065J3A6F2YKVE61.svg",
+        "metadata": null,
+        "rank": 0,
+        "product_id": "prod_01M3CXGHS7072G7K6CCJPVK9M5",
+        "created_at": "2026-09-25T18:33:45.007Z",
+        "updated_at": "2026-09-25T18:33:45.007Z",
+        "deleted_at": null
+      },
+      {
+        "id": "img_01M3CXGHSAKPMV76EHJXGQWWS4",
+        "url": "http://localhost:9200/medusa/6974096538768-2-01M3CXGGR0Z9MB6MXH6PHSK999.svg",
+        "metadata": null,
+        "rank": 1,
+        "product_id": "prod_01M3CXGHS7072G7K6CCJPVK9M5",
+        "created_at": "2026-09-25T18:33:45.007Z",
+        "updated_at": "2026-09-25T18:33:45.007Z",
+        "deleted_at": null
+      }
+    ],
+    "categories": [
+      {
+        "id": "pcat_01M3CXGGQJVCKZVS2J6395PQP6",
+        "name": "Keychains",
+        "description": "",
+        "handle": "keychains",
+        "mpath": "pcat_01M3CXGGQJVCKZVS2J6395PQP6",
+        "is_active": true,
+        "is_internal": false,
+        "rank": 0,
+        "external_id": null,
+        "metadata": null,
+        "parent_category_id": null,
+        "parent_category": null,
+        "created_at": "2026-09-25T18:33:43.923Z",
+        "updated_at": "2026-09-25T18:33:43.923Z",
+        "deleted_at": null
+      }
+    ]
+  }
+}

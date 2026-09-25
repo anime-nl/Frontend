@@ -13,7 +13,9 @@ Format: **title** (where): what is wrong. Mark anything not yet reproduced as _u
 - **No rate limit on `POST /api/support`** (`server/api/support.post.ts`): only a honeypot field protects it, and every request sends an email through Brevo (free plan has a daily limit).
 - **Trustpilot score is hardcoded** (`app/components/navbar.vue`, `badge: '4.0'`): it will go out of date.
 - **Support page copy needs a check by the shop owner** (`app/pages/support/index.vue`, `shared/utils/support.ts`): "2 to 3 days" does not say whether it means business days or delivery versus dispatch, and the return text does not cover who pays for return shipping or the condition of returned items.
-- **Test debt**: no tests yet for `server/api/{categories,collections,products,regions}.ts`, `server/api/products/[id].ts`, `app/pages/{index,search,products,product}`, and the components `productCard`, `productCarousel`, `productPageHeader` and `showcaseCarousel`.
+- **Product cards never show a price** (`app/components/productCarousel.vue`, `app/pages/products/tcg/index.vue`): the list requests `variants.prices.*`, but `productCard` reads `variants[0].calculated_price`, which needs a `region_id`. _Unverified in the browser._
+- **Product page 500 not reproduced** (`server/api/products/[id].ts`, `app/pages/product/[id]/index.vue`): a reported "500 Product not found" on client navigation and "500 Could not fetch product" on refresh. Against the dev Medusa the route and the SSR page work. `medusaFetch` now logs the real cause; check the Nuxt dev log when it happens again.
+- **Test debt**: no tests yet for `server/api/{categories,collections,products,regions}.ts`, `app/pages/{index,search,products}`, and the components `productCard`, `productPageHeader` and `showcaseCarousel`.
 
 ## Fixed
 

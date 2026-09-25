@@ -1,13 +1,11 @@
 <script lang="ts" setup>
 defineProps<{title: string}>()
-const client = useMedusaClient()
 const productListRef = ref<HTMLElement | null>(null)
 
-const {data} = await useAsyncData('carousel-products', () =>
-  client.store.product.list({
-    fields: 'title,thumbnail,variants.prices.*'
-  })
-)
+const {data} = await useFetch('/api/products', {
+  key: 'carousel-products',
+  query: {fields: 'title,thumbnail,variants.prices.*'}
+})
 const products = computed(() => data.value?.products ?? [])
 
 function horizontalScroll(amount: number) {

@@ -1,11 +1,8 @@
 <script lang="ts" setup>
-const client = useMedusaClient()
-
-const {data} = await useAsyncData('tcg-products', () =>
-  client.store.product.list({
-    fields: 'title,thumbnail,variants.prices.*'
-  })
-)
+const {data} = await useFetch('/api/products', {
+  key: 'tcg-products',
+  query: {fields: 'title,thumbnail,variants.prices.*'}
+})
 const products = computed(() => data.value?.products ?? [])
 </script>
 

@@ -16,6 +16,7 @@ beforeEach(() => {
 afterEach(() => {
     vi.unstubAllGlobals()
     fetchMock.mockReset()
+    vi.restoreAllMocks()
 })
 
 describe('medusaFetch', () => {
@@ -32,8 +33,28 @@ describe('medusaFetch', () => {
     })
 
     it('passes errors on to the caller', async () => {
+        vi.spyOn(console, 'error').mockImplementation(() => {})
         fetchMock.mockRejectedValue(new Error('down'))
 
         await expect(medusaFetch(event, 'regions')).rejects.toThrow('down')
+    })
+
+    it('logs the failure with the path it was for', async () => {
+        const cause = new Error('down')
+        const log = vi.spyOn(console, 'error').mockImplementation(() => {})
+        fetchMock.mockRejectedValue(cause)
+
+        await medusaFetch(event, 'regions').catch(() => {})
+
+        expect(log).toHaveBeenCalledWith(expect.stringContaining('store/regions'), cause)
+    })
+
+    it('does not log a 404', async () => {
+        const log = vi.spyOn(console, 'error').mockImplementation(() => {})
+        fetchMock.mockRejectedValue({statusCode: 404})
+
+        await medusaFetch(event, 'products/prod_unknown').catch(() => {})
+
+        expect(log).not.toHaveBeenCalled()
     })
 })
