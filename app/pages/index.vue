@@ -1,4 +1,4 @@
 <template>
-  <ShowcaseCarousel/>
-  <ProductCarousel title="New Products"/>
+  <ShowcaseCarousel />
+  <ProductCarousel title="New Products" />
 </template>

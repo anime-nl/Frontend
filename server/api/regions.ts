@@ -1,3 +1,5 @@
+import type {StoreRegionListResponse} from '@medusajs/types'
+
 export default defineEventHandler((event) =>
-    medusaFetch(event, 'regions').catch(() => ({regions: []}))
+    medusaFetch<StoreRegionListResponse>(event, 'regions').catch(() => ({regions: []}))
 )

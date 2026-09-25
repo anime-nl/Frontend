@@ -53,9 +53,15 @@ export const supportTopics: SupportTopic[] = [
         icon: 'i-lucide-undo-2',
         description: 'Returning within 14 days, or received something damaged.',
         intro: 'You have 14 days to return an order. For damaged or wrong items, please describe what is wrong.',
-        reasons: ['I want to return an item', 'My item arrived damaged', 'I received the wrong item', 'Question about my refund'],
+        reasons: [
+            'I want to return an item',
+            'My item arrived damaged',
+            'I received the wrong item',
+            'Question about my refund'
+        ],
         orderNumberRequired: true,
-        messagePlaceholder: 'For example: which item(s) you want to return and why, or what is wrong with the item you received.'
+        messagePlaceholder:
+            'For example: which item(s) you want to return and why, or what is wrong with the item you received.'
     },
     {
         slug: 'payments',
@@ -63,7 +69,12 @@ export const supportTopics: SupportTopic[] = [
         icon: 'i-lucide-credit-card',
         description: 'iDEAL, credit card and other Mollie payment methods.',
         intro: 'We accept all payment methods supported by Mollie. If you have no order number because your payment failed, you can leave it empty.',
-        reasons: ['My payment failed', 'I was charged, but got no order confirmation', 'Question about payment methods', 'Something else'],
+        reasons: [
+            'My payment failed',
+            'I was charged, but got no order confirmation',
+            'Question about payment methods',
+            'Something else'
+        ],
         orderNumberRequired: false,
         messagePlaceholder: 'For example: which payment method you used, and what happened when you paid.'
     }
@@ -71,20 +82,24 @@ export const supportTopics: SupportTopic[] = [
 
 export const supportLimits = {name: 100, email: 254, orderNumber: 50, message: 5000}
 
-export const findSupportTopic = (slug: unknown) => supportTopics.find(topic => topic.slug === slug)
+export const findSupportTopic = (slug: unknown) => supportTopics.find((topic) => topic.slug === slug)
 
-/** Trims every field; anything that is not a string becomes an empty string */
+/**
+ * Trims every field and turns anything that is not a string into an empty string.
+ * Only the message may contain line breaks, so form input cannot fake extra lines in the email.
+ */
 export function normalizeSupportRequest(input?: Partial<Record<keyof SupportRequest, unknown>> | null): SupportRequest {
-    const text = (value: unknown) => typeof value === 'string' ? value.trim() : ''
+    const text = (value: unknown) => (typeof value === 'string' ? value.trim() : '')
+    const singleLine = (value: unknown) => text(value).replace(/\s+/g, ' ')
 
     return {
-        topic: text(input?.topic),
-        name: text(input?.name),
-        email: text(input?.email),
-        orderNumber: text(input?.orderNumber),
-        reason: text(input?.reason),
+        topic: singleLine(input?.topic),
+        name: singleLine(input?.name),
+        email: singleLine(input?.email),
+        orderNumber: singleLine(input?.orderNumber),
+        reason: singleLine(input?.reason),
         message: text(input?.message),
-        website: text(input?.website)
+        website: singleLine(input?.website)
     }
 }
 
@@ -93,12 +108,14 @@ export function validateSupportRequest(input: SupportRequest) {
     const request = normalizeSupportRequest(input)
     const {name, email, orderNumber, reason, message} = request
     const topic = findSupportTopic(request.topic)
-    const errors: { name: keyof SupportRequest, message: string }[] = []
+    const errors: {name: keyof SupportRequest; message: string}[] = []
 
     if (!topic) errors.push({name: 'topic', message: 'Unknown support topic'})
     if (!name) errors.push({name: 'name', message: 'Please enter your name'})
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.push({name: 'email', message: 'Please enter a valid email address'})
-    if (!orderNumber && topic?.orderNumberRequired) errors.push({name: 'orderNumber', message: 'Please enter your order number'})
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+        errors.push({name: 'email', message: 'Please enter a valid email address'})
+    if (!orderNumber && topic?.orderNumberRequired)
+        errors.push({name: 'orderNumber', message: 'Please enter your order number'})
     if (topic && !topic.reasons.includes(reason)) errors.push({name: 'reason', message: 'Please choose a reason'})
     if (!message) errors.push({name: 'message', message: 'Please describe how we can help'})
 

@@ -15,7 +15,6 @@ export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig(event)
     const topic = findSupportTopic(body.topic)!
     const subject = `[${topic.title}] ${body.orderNumber ? `Order ${body.orderNumber} - ` : ''}${body.reason}`
-        .replace(/\s+/g, ' ')
     const text = [
         `Topic: ${topic.title}`,
         `Reason: ${body.reason}`,
@@ -45,7 +44,7 @@ export default defineEventHandler(async (event) => {
         await transporter.sendMail({
             from: config.public.supportEmail,
             to: config.public.supportEmail,
-            replyTo: {name: body.name.replace(/[\r\n"<>]/g, ''), address: body.email},
+            replyTo: {name: body.name.replace(/["<>]/g, ''), address: body.email},
             subject,
             text
         })

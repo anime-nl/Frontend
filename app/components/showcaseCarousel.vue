@@ -11,16 +11,8 @@ const items = [
 
 <template>
   <div class="w-2/3 mx-auto my-16">
-    <UCarousel
-        v-slot="{ item }"
-        :autoplay="{ delay: 5000 }"
-        :items="items"
-        :ui="{ item: 'basis-1/3' }"
-        arrows
-        dots
-        loop
-    >
-      <img :src="item" alt="showcase" class="rounded-lg" height="500" loading="lazy" width="800">
+    <UCarousel v-slot="{item}" :autoplay="{delay: 5000}" :items="items" :ui="{item: 'basis-1/3'}" arrows dots loop>
+      <img :src="item" alt="showcase" class="rounded-lg" height="500" loading="lazy" width="800" />
     </UCarousel>
   </div>
 </template>

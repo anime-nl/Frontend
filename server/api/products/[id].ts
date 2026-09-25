@@ -1,4 +1,4 @@
-import type {StoreProduct, StoreRegion} from "@medusajs/types"
+import type {StoreProduct, StoreRegion} from '@medusajs/types'
 
 const PRODUCT_FIELDS = [
     '+variants.inventory_quantity',
@@ -10,7 +10,7 @@ const PRODUCT_FIELDS = [
     '*collection',
     '*categories',
     '*tags',
-    '*type',
+    '*type'
 ].join(',')
 
 export default defineEventHandler(async (event) => {
@@ -25,13 +25,12 @@ export default defineEventHandler(async (event) => {
     let regionId = getQuery(event).region_id as string | undefined
 
     if (!regionId) {
-        const {regions} = await medusaFetch<{ regions: StoreRegion[] }>(event, 'regions')
-            .catch(() => ({regions: []}))
+        const {regions} = await medusaFetch<{regions: StoreRegion[]}>(event, 'regions').catch(() => ({regions: []}))
         regionId = regions[0]?.id
     }
 
     try {
-        const {product} = await medusaFetch<{ product: StoreProduct }>(event, `products/${id}`, {
+        const {product} = await medusaFetch<{product: StoreProduct}>(event, `products/${id}`, {
             fields: PRODUCT_FIELDS,
             region_id: regionId,
             sales_channel_id: salesChannelId

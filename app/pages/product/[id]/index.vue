@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type {StoreProduct, StoreProductVariant} from "@medusajs/types"
+import type {StoreProduct, StoreProductVariant} from '@medusajs/types'
 
 const client = useMedusaClient()
 const route = useRoute()
 const toast = useToast()
 const cartId = useCookie<string | null>('cart_id', {maxAge: 60 * 60 * 24 * 30})
 
-const {data, error} = await useFetch<{ product: StoreProduct, region_id?: string, sales_channel_id?: string }>(
-    () => `/api/products/${route.params.id}`,
-    {key: `product-${route.params.id}`}
+const {data, error} = await useFetch<{product: StoreProduct; region_id?: string; sales_channel_id?: string}>(
+  () => `/api/products/${route.params.id}`,
+  {key: `product-${route.params.id}`}
 )
 
 if (error.value || !data.value?.product) {
@@ -22,7 +22,7 @@ if (error.value || !data.value?.product) {
 const product = computed(() => data.value!.product)
 
 const images = computed(() => {
-  const urls = product.value.images?.map(img => img.url) ?? []
+  const urls = product.value.images?.map((img) => img.url) ?? []
   if (!urls.length && product.value.thumbnail) urls.push(product.value.thumbnail)
   return urls
 })
@@ -32,20 +32,18 @@ const options = computed(() => product.value.options ?? [])
 const hasOptions = computed(() => variants.value.length > 1)
 
 const isPurchasable = (variant: StoreProductVariant) =>
-    !variant.manage_inventory || (variant.inventory_quantity ?? 0) > 0 || !!variant.allow_backorder
+  !variant.manage_inventory || (variant.inventory_quantity ?? 0) > 0 || !!variant.allow_backorder
 
 const initialVariant = variants.value.find(isPurchasable) ?? variants.value[0]
 
 const selectedOptions = ref<Record<string, string>>(
-    Object.fromEntries(
-        (initialVariant?.options ?? []).map(o => [o.option_id, o.value])
-    )
+  Object.fromEntries((initialVariant?.options ?? []).map((o) => [o.option_id, o.value]))
 )
 
-const selectedVariant = computed<StoreProductVariant | undefined>(() =>
-    variants.value.find(variant =>
-        variant.options?.every(o => selectedOptions.value[o.option_id!] === o.value)
-    ) ?? variants.value[0]
+const selectedVariant = computed<StoreProductVariant | undefined>(
+  () =>
+    variants.value.find((variant) => variant.options?.every((o) => selectedOptions.value[o.option_id!] === o.value)) ??
+    variants.value[0]
 )
 
 const quantity = ref(1)
@@ -55,8 +53,7 @@ const price = computed(() => {
   if (!calculated || calculated.calculated_amount == null) return null
 
   const currency = calculated.currency_code!.toUpperCase()
-  const format = (amount: number) =>
-      new Intl.NumberFormat('nl-NL', {style: 'currency', currency}).format(amount)
+  const format = (amount: number) => new Intl.NumberFormat('nl-NL', {style: 'currency', currency}).format(amount)
 
   const original = calculated.original_amount ?? calculated.calculated_amount
   return {
@@ -97,7 +94,7 @@ const details = computed(() => {
     ['Material', p.material],
     ['Origin', p.origin_country ? countryNames.of(p.origin_country.toUpperCase()) : null],
     ['Weight', p.weight ? `${p.weight} g` : null],
-    ['Dimensions', p.length && p.width && p.height ? `${p.length} × ${p.width} × ${p.height} mm` : null],
+    ['Dimensions', p.length && p.width && p.height ? `${p.length} × ${p.width} × ${p.height} mm` : null]
   ]
   return entries.filter((entry): entry is [string, string | number] => entry[1] != null && entry[1] !== '')
 })
@@ -105,10 +102,14 @@ const details = computed(() => {
 const breadcrumbs = computed(() => [
   {label: 'Home', to: '/'},
   {label: 'Search', to: '/search'},
-  ...(product.value.collection ? [{
-    label: product.value.collection.title,
-    to: `/search?collection=${product.value.collection.id}`
-  }] : []),
+  ...(product.value.collection
+    ? [
+        {
+          label: product.value.collection.title,
+          to: `/search?collection=${product.value.collection.id}`
+        }
+      ]
+    : []),
   {label: product.value.title}
 ])
 
@@ -160,42 +161,47 @@ useSeoMeta({
 
 <template>
   <div class="max-w-screen-2xl mx-auto p-4 md:p-8 flex flex-col gap-8">
-    <UBreadcrumb :items="breadcrumbs"/>
+    <UBreadcrumb :items="breadcrumbs" />
 
     <div class="flex flex-col lg:flex-row gap-8 lg:gap-16">
       <div class="w-full lg:w-1/2">
         <ClientOnly>
           <UCarousel
-              v-if="images.length > 1"
-              v-slot="{ item }"
-              :autoplay="{ delay: 5000 }"
-              :items="images"
-              arrows
-              dots
-              loop
+            v-if="images.length > 1"
+            v-slot="{item}"
+            :autoplay="{delay: 5000}"
+            :items="images"
+            arrows
+            dots
+            loop
           >
-            <img :src="item" :alt="product.title" class="rounded-4xl mx-auto max-h-160 object-contain" loading="lazy">
+            <img :src="item" :alt="product.title" class="rounded-4xl mx-auto max-h-160 object-contain" loading="lazy" />
           </UCarousel>
           <img
-              v-else-if="images.length === 1"
+            v-else-if="images.length === 1"
+            :src="images[0]"
+            :alt="product.title"
+            class="rounded-4xl mx-auto max-h-160 object-contain"
+          />
+          <template #fallback>
+            <img
+              v-if="images[0]"
               :src="images[0]"
               :alt="product.title"
               class="rounded-4xl mx-auto max-h-160 object-contain"
-          >
-          <template #fallback>
-            <img v-if="images[0]" :src="images[0]" :alt="product.title" class="rounded-4xl mx-auto max-h-160 object-contain">
+            />
           </template>
         </ClientOnly>
         <div v-if="!images.length" class="flex items-center justify-center h-96 rounded-4xl bg-gray-900 text-slate-400">
-          <UIcon name="i-lucide-image-off" class="text-6xl"/>
+          <UIcon name="i-lucide-image-off" class="text-6xl" />
         </div>
       </div>
 
       <div class="w-full lg:w-1/2 flex flex-col gap-6">
         <div class="flex flex-col gap-2">
           <div v-if="product.collection || product.tags?.length" class="flex flex-wrap gap-2">
-            <UBadge v-if="product.collection" :label="product.collection.title" color="primary" variant="subtle"/>
-            <UBadge v-for="tag in product.tags" :key="tag.id" :label="tag.value" color="neutral" variant="subtle"/>
+            <UBadge v-if="product.collection" :label="product.collection.title" color="primary" variant="subtle" />
+            <UBadge v-for="tag in product.tags" :key="tag.id" :label="tag.value" color="neutral" variant="subtle" />
           </div>
 
           <h1 class="text-4xl font-extrabold">{{ product.title }}</h1>
@@ -208,53 +214,47 @@ useSeoMeta({
             <span v-if="price.original" class="text-xl text-slate-400 line-through">{{ price.original }}</span>
           </template>
           <span v-else class="text-lg text-slate-400">Price unavailable</span>
-          <UBadge :color="stock.color" :label="stock.label" size="lg" variant="subtle"/>
+          <UBadge :color="stock.color" :label="stock.label" size="lg" variant="subtle" />
         </div>
 
-        <USeparator/>
+        <USeparator />
 
         <div v-if="hasOptions" class="flex flex-col gap-4">
           <div v-for="option in options" :key="option.id" class="flex flex-col gap-2">
             <span class="font-semibold text-secondary">{{ option.title }}</span>
             <div class="flex flex-wrap gap-2">
               <UButton
-                  v-for="value in option.values"
-                  :key="value.id"
-                  :label="value.value"
-                  :variant="selectedOptions[option.id] === value.value ? 'solid' : 'outline'"
-                  color="primary"
-                  @click="selectedOptions[option.id] = value.value"
+                v-for="value in option.values"
+                :key="value.id"
+                :label="value.value"
+                :variant="selectedOptions[option.id] === value.value ? 'solid' : 'outline'"
+                color="primary"
+                @click="selectedOptions[option.id] = value.value"
               />
             </div>
           </div>
         </div>
 
         <div class="flex flex-wrap items-center gap-4">
-          <UInputNumber
-              v-model="quantity"
-              :disabled="!stock.purchasable"
-              :max="stock.max"
-              :min="1"
-              size="xl"
-          />
+          <UInputNumber v-model="quantity" :disabled="!stock.purchasable" :max="stock.max" :min="1" size="xl" />
           <UButton
-              :disabled="!stock.purchasable"
-              :label="stock.label === 'Backorder' ? 'Backorder now' : 'Add to cart'"
-              :loading="adding"
-              class="flex-1 justify-center"
-              icon="i-lucide-shopping-cart"
-              size="xl"
-              @click="addToCart"
+            :disabled="!stock.purchasable"
+            :label="stock.label === 'Backorder' ? 'Backorder now' : 'Add to cart'"
+            :loading="adding"
+            class="flex-1 justify-center"
+            icon="i-lucide-shopping-cart"
+            size="xl"
+            @click="addToCart"
           />
         </div>
 
         <UAlert
-            v-if="stock.label === 'Backorder'"
-            color="warning"
-            description="This item is currently out of stock. Your order will be shipped as soon as it is back in stock."
-            icon="i-lucide-clock"
-            title="Available on backorder"
-            variant="subtle"
+          v-if="stock.label === 'Backorder'"
+          color="warning"
+          description="This item is currently out of stock. Your order will be shipped as soon as it is back in stock."
+          icon="i-lucide-clock"
+          title="Available on backorder"
+          variant="subtle"
         />
 
         <div v-if="product.description" class="flex flex-col gap-2">
@@ -275,13 +275,13 @@ useSeoMeta({
         <div v-if="product.categories?.length" class="flex flex-wrap items-center gap-2">
           <span class="font-semibold text-secondary">Categories:</span>
           <UButton
-              v-for="category in product.categories"
-              :key="category.id"
-              :label="category.name"
-              :to="`/search?category=${category.id}`"
-              color="neutral"
-              size="sm"
-              variant="soft"
+            v-for="category in product.categories"
+            :key="category.id"
+            :label="category.name"
+            :to="`/search?category=${category.id}`"
+            color="neutral"
+            size="sm"
+            variant="soft"
           />
         </div>
       </div>

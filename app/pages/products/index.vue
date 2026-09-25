@@ -9,11 +9,7 @@ const {data, pending, error} = await useFetch('/api/products')
     <p v-if="error">Something went wrong while loading the products</p>
 
     <div v-if="data">
-      <ProductCard
-          v-for="product in data.products"
-          :key="product.id"
-          :product="product"
-      />
+      <ProductCard v-for="product in data.products" :key="product.id" :product="product" />
     </div>
   </div>
 </template>

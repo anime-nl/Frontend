@@ -7,11 +7,7 @@ export default defineNuxtConfig({
     devtools: {enabled: true},
     vite: {
         optimizeDeps: {
-            include: [
-                '@vue/devtools-core',
-                '@vue/devtools-kit',
-                'qs'
-            ]
+            include: ['@vue/devtools-core', '@vue/devtools-kit', 'qs']
         }
     },
     medusa: {

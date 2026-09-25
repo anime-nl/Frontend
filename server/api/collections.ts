@@ -1,3 +1,5 @@
+import type {StoreCollectionListResponse} from '@medusajs/types'
+
 export default defineEventHandler((event) =>
-    medusaFetch(event, 'collections').catch(() => ({collections: []}))
+    medusaFetch<StoreCollectionListResponse>(event, 'collections').catch(() => ({collections: []}))
 )

@@ -1,3 +1,5 @@
+import type {StoreProductCategoryListResponse} from '@medusajs/types'
+
 export default defineEventHandler((event) =>
-    medusaFetch(event, 'product-categories').catch(() => ({product_categories: []}))
+    medusaFetch<StoreProductCategoryListResponse>(event, 'product-categories').catch(() => ({product_categories: []}))
 )

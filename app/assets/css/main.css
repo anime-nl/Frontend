@@ -1,13 +1,9 @@
-@import "tailwindcss";
-@import "@nuxt/ui";
+@import 'tailwindcss';
+@import '@nuxt/ui';
 
 :root {
-    --ui-primary: #3fa3ee;
-    --ui-secondary: #bbdfff;
-    --ui-bg: #0f172b;
-    --ui-text: #FFFFFF;
-    --ui-success: var(--ui-color-success-500);
-    --ui-info: var(--ui-color-info-500);
-    --ui-warning: var(--ui-color-warning-500);
-    --ui-error: var(--ui-color-error-500);
+  --ui-primary: #3fa3ee;
+  --ui-secondary: #bbdfff;
+  --ui-bg: #0f172b;
+  --ui-text: #ffffff;
 }

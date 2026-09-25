@@ -1,13 +1,16 @@
 <template>
   <UApp>
-    <Navbar/>
+    <Navbar />
 
-    <UBanner class="z-0" close
-             icon="i-lucide-info"
-             title="This website is still under construction! If you encounter any problems with the site, please contact us via the Support page."/>
+    <UBanner
+      class="z-0"
+      close
+      icon="i-lucide-info"
+      title="This website is still under construction! If you encounter any problems with the site, please contact us via the Support page."
+    />
 
     <UMain>
-      <NuxtPage/>
+      <NuxtPage />
     </UMain>
   </UApp>
 </template>

@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bun run test:*)",
+      "Bash(bun run test)",
+      "Bash(bun run typecheck)",
+      "Bash(bun run format:*)",
+      "Bash(bun run format)",
+      "Bash(bun run check)",
+      "Bash(bunx vitest:*)",
+      "Bash(bunx prettier:*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [{"type": "command", "command": "node .claude/hooks/format.mjs"}]
+      }
+    ]
+  }
+}
