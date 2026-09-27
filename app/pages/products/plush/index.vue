@@ -1,5 +1,5 @@
 <script setup lang="ts">
-useSeoMeta({title: 'Plushies | AnimeNL'})
+useSeoMeta({title: 'Plushies', description: 'Browse our entire catalog of plushies.'})
 </script>
 
 <template>

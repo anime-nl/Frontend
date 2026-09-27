@@ -44,6 +44,15 @@ describe('support topic page', () => {
         expect(wrapper.text()).toContain('You have 14 days to return an order.')
     })
 
+    it('sets a page title and meta description for search engines', async () => {
+        await mountTopic('returns')
+
+        await vi.waitFor(() => expect(document.title).toBe('Returns & refunds | Support | AnimeNL'))
+        expect(document.querySelector('meta[name="description"]')?.getAttribute('content')).toBe(
+            'You have 14 days to return an order. Returned items must be unused and in their original packaging, and you pay for the return shipping. For damaged or wrong items, please describe what is wrong.'
+        )
+    })
+
     it('marks the order number as optional for payments only', async () => {
         const payments = await mountTopic('payments')
         const returns = await mountTopic('returns')

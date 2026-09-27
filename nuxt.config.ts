@@ -3,10 +3,26 @@ import {isProductionEnv} from './shared/utils/env'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     ssr: true,
-    modules: ['@nuxt/ui', '@nuxtjs/medusa'],
+    modules: ['@nuxt/ui', '@nuxtjs/medusa', '@nuxtjs/sitemap'],
     css: ['~/assets/css/main.css'],
     compatibilityDate: '2025-07-15',
     devtools: {enabled: true},
+    app: {
+        head: {
+            htmlAttrs: {lang: 'en'},
+            title: 'AnimeNL',
+            titleTemplate: '%s | AnimeNL'
+        }
+    },
+    site: {
+        // Used to build the sitemap and absolute URLs; only cosmetic locally since the sitemap isn't crawled there
+        url: process.env.SITE_URL || 'https://animenl.nl',
+        name: 'AnimeNL'
+    },
+    sitemap: {
+        // Product URLs change as the Medusa catalog changes, so they are fetched at request time instead of at build
+        sources: ['/api/sitemap-urls']
+    },
     vite: {
         optimizeDeps: {
             include: ['@vue/devtools-core', '@vue/devtools-kit', 'qs']

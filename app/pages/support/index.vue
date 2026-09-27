@@ -3,7 +3,7 @@ import type {AccordionItem} from '@nuxt/ui'
 import {supportTopics} from '#shared/utils/support'
 
 useSeoMeta({
-  title: 'Support | AnimeNL',
+  title: 'Support',
   description:
     'Find answers to common questions about orders, shipping, returns and products, or get in touch with the AnimeNL team.'
 })

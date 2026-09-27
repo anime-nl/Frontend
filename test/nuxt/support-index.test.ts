@@ -1,9 +1,18 @@
-import {describe, expect, it} from 'vitest'
+import {describe, expect, it, vi} from 'vitest'
 import {mountSuspended} from '@nuxt/test-utils/runtime'
 import SupportIndex from '~/pages/support/index.vue'
 import {supportTopics} from '#shared/utils/support'
 
 describe('support overview page', () => {
+    it('sets a page title and meta description for search engines', async () => {
+        await mountSuspended(SupportIndex)
+
+        await vi.waitFor(() => expect(document.title).toBe('Support | AnimeNL'))
+        expect(document.querySelector('meta[name="description"]')?.getAttribute('content')).toContain(
+            'orders, shipping, returns and products'
+        )
+    })
+
     it('links to a form for every topic', async () => {
         const wrapper = await mountSuspended(SupportIndex)
 
