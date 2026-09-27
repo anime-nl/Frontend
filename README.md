@@ -50,6 +50,10 @@ Only the Nuxt app is deployed (Nixpacks: `bun run build`, `bun run start`). The 
 
 Nuxt needs Node 22.19 or newer. If the build complains about the Node version, set `NIXPACKS_NODE_VERSION=24`.
 
+### Rotating a secret without a rebuild
+
+`SMTP_PASS` and `MEDUSA_PUBLISHABLE_KEY` above are read at build time, so the values above get baked into `.output`. To change one of them without a redeploy, set the Nuxt-prefixed equivalent (`NUXT_SMTP_PASS`, `NUXT_MEDUSA_PUBLISHABLE_KEY`, ...) as a normal **runtime** environment variable (in Coolify: not "Available at Buildtime") — Nuxt reads `NUXT_*` variables again every time the server starts and lets them override the value baked in at build time. This only applies to `runtimeConfig` keys (everything in the table above except `MEDUSA_URL`, which configures the `@nuxtjs/medusa` module directly and is only ever read at build time).
+
 ### Support emails
 
 The forms on `/support` are emailed to `info@animenl.nl`. Locally they end up in Mailpit (http://localhost:8025) and are never delivered.
