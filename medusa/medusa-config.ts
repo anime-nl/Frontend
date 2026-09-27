@@ -2,6 +2,11 @@ import { ContainerRegistrationKeys, Modules, loadEnv, defineConfig } from '@medu
 
 loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 
+// The Mollie provider throws during startup if apiKey/redirectUrl/medusaUrl are missing, which fails
+// the whole payment module's loader and crashes Medusa entirely (unlike auth-google, which fails to
+// register but lets the rest of Medusa start). So it is only added when a key is actually configured.
+const mollieConfigured = Boolean(process.env.MOLLIE_API_KEY)
+
 module.exports = defineConfig({
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
@@ -59,23 +64,27 @@ module.exports = defineConfig({
         ],
       },
     },
-    {
-      // `pp_system_default` stays registered on the region too (see seed.ts), as a no-op fallback
-      // for local testing without hitting Mollie's API.
-      resolve: '@medusajs/medusa/payment',
-      options: {
-        providers: [
+    // `pp_system_default` stays registered on the region too (see seed.ts), as a no-op fallback for
+    // local dev without a Mollie key, and this module is only added at all once one is configured.
+    ...(mollieConfigured
+      ? [
           {
-            resolve: '@variablevic/mollie-payments-medusa/providers/mollie',
-            id: 'mollie',
+            resolve: '@medusajs/medusa/payment',
             options: {
-              apiKey: process.env.MOLLIE_API_KEY,
-              redirectUrl: process.env.MOLLIE_REDIRECT_URL,
-              medusaUrl: process.env.MEDUSA_URL,
+              providers: [
+                {
+                  resolve: '@variablevic/mollie-payments-medusa/providers/mollie',
+                  id: 'mollie',
+                  options: {
+                    apiKey: process.env.MOLLIE_API_KEY,
+                    redirectUrl: process.env.MOLLIE_REDIRECT_URL,
+                    medusaUrl: process.env.MEDUSA_URL,
+                  },
+                },
+              ],
             },
           },
-        ],
-      },
-    },
+        ]
+      : []),
   ],
 })

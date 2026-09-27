@@ -70,11 +70,20 @@ describe('checkout return page', () => {
         expect(wrapper.find('a[href="/cart"]').exists()).toBe(true)
     })
 
-    it('shows a failed message when the complete request itself errors', async () => {
+    it('shows a pending message instead of a false failure when the complete request errors', async () => {
         completeError = {statusCode: 502, statusMessage: 'Could not complete order'}
         wrapper = await mountSuspended(CheckoutReturnPage)
 
-        expect(wrapper.text()).toContain('failed')
-        expect(wrapper.find('a[href="/cart"]').exists()).toBe(true)
+        expect(wrapper.text()).toContain('confirm')
+        expect(wrapper.text()).not.toContain('failed')
+    })
+
+    it('shows a neutral message when there is nothing to confirm', async () => {
+        completeError = {statusCode: 400, statusMessage: 'No cart'}
+        wrapper = await mountSuspended(CheckoutReturnPage)
+
+        expect(wrapper.text()).toContain('Nothing to confirm here')
+        expect(wrapper.text()).not.toContain('failed')
+        expect(wrapper.text()).not.toContain('confirm your order')
     })
 })
