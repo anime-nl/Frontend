@@ -5,6 +5,7 @@ const medusaFetch = vi.fn()
 
 beforeEach(() => {
     vi.stubGlobal('defineSitemapEventHandler', (handler: unknown) => handler)
+    vi.stubGlobal('createError', (input: object) => Object.assign(new Error(), input))
     vi.stubGlobal('medusaFetch', medusaFetch)
 })
 
@@ -63,5 +64,11 @@ describe('GET /api/sitemap-urls', () => {
         })
         expect(urls).toHaveLength(101)
         expect(urls.at(-1)).toEqual({loc: '/product/prod_100', lastmod: '2026-01-01T00:00:00.000Z'})
+    })
+
+    it('answers 500 when Medusa fails, instead of crashing the sitemap route', async () => {
+        medusaFetch.mockRejectedValue(new Error('connect ECONNREFUSED'))
+
+        await expect(callRoute()).rejects.toMatchObject({statusCode: 500, statusMessage: 'Could not fetch products'})
     })
 })

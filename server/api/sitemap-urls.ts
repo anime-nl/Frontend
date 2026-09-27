@@ -8,19 +8,23 @@ export default defineSitemapEventHandler(async (event) => {
     let offset = 0
     let count = Infinity
 
-    while (offset < count) {
-        const response = await medusaFetch<StoreProductListResponse>(event, 'products', {
-            limit: PAGE_SIZE,
-            offset,
-            fields: 'id,updated_at'
-        })
+    try {
+        while (offset < count) {
+            const response = await medusaFetch<StoreProductListResponse>(event, 'products', {
+                limit: PAGE_SIZE,
+                offset,
+                fields: 'id,updated_at'
+            })
 
-        for (const product of response.products) {
-            urls.push({loc: `/product/${product.id}`, lastmod: product.updated_at ?? undefined})
+            for (const product of response.products) {
+                urls.push({loc: `/product/${product.id}`, lastmod: product.updated_at ?? undefined})
+            }
+
+            count = response.count
+            offset += PAGE_SIZE
         }
-
-        count = response.count
-        offset += PAGE_SIZE
+    } catch {
+        throw createError({statusCode: 500, statusMessage: 'Could not fetch products'})
     }
 
     return urls
