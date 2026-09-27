@@ -58,7 +58,7 @@ const fetchProducts = async (reset = false) => {
     const queryParams: Record<string, unknown> = {
       limit: LIMIT,
       offset: (page.value - 1) * LIMIT,
-      fields: '+variants,+variants.prices',
+      fields: '+variants,*variants.calculated_price',
       region_id: currentRegionId.value
     }
 

@@ -56,6 +56,14 @@ describe('search page', () => {
         await vi.waitFor(() => expect(productRequests.map((request) => request.category_id)).toContain('pcat_tcg'))
     })
 
+    it('requests the calculated price for a region, so product cards can show a price', async () => {
+        wrapper = await mountSearch('category=tcg')
+
+        await vi.waitFor(() => expect(productRequests.length).toBeGreaterThan(0))
+        expect(productRequests[0]?.fields).toContain('calculated_price')
+        expect(productRequests[0]?.region_id).toBe('reg_nl')
+    })
+
     it('focuses the collection dropdown when asked to', async () => {
         wrapper = await mountSearch('category=tcg&focus=collection')
 

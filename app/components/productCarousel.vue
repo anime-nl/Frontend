@@ -2,9 +2,10 @@
 defineProps<{title: string}>()
 const productListRef = ref<HTMLElement | null>(null)
 
+const {data: regionId} = await useDefaultRegionId()
 const {data} = await useFetch('/api/products', {
   key: 'carousel-products',
-  query: {fields: 'title,thumbnail,variants.prices.*'}
+  query: {fields: 'title,thumbnail,*variants.calculated_price', region_id: regionId}
 })
 const products = computed(() => data.value?.products ?? [])
 
