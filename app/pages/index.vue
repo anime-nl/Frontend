@@ -1,3 +1,4 @@
 <template>
   <ShowcaseCarousel />
+  <RandomProductGrid />
 </template>
