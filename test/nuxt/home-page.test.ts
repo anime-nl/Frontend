@@ -3,7 +3,9 @@ import {mountSuspended, registerEndpoint} from '@nuxt/test-utils/runtime'
 import IndexPage from '~/pages/index.vue'
 
 registerEndpoint('/api/regions', () => ({regions: [{id: 'reg_nl'}]}))
-registerEndpoint('/api/products', () => ({products: [{id: 'prod_1', title: 'Zhongli Keychain', thumbnail: null}]}))
+registerEndpoint('/api/products', () => ({
+    products: [{id: 'prod_1', title: 'Zhongli Keychain', thumbnail: 'https://example.com/zhongli.jpg'}]
+}))
 
 let wrapper: Awaited<ReturnType<typeof mountSuspended>> | undefined
 
@@ -12,10 +14,10 @@ afterEach(() => {
 })
 
 describe('home page', () => {
-    it('shows the showcase carousel and the new products carousel', async () => {
+    it('shows the new products in the showcase carousel', async () => {
         wrapper = await mountSuspended(IndexPage, {attachTo: document.body})
 
         expect(wrapper.text()).toContain('New Products')
-        expect(wrapper.text()).toContain('Zhongli Keychain')
+        expect(wrapper.findAll('img').at(0)?.attributes('src')).toBe('https://example.com/zhongli.jpg')
     })
 })
