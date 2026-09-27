@@ -11,9 +11,7 @@ export default defineSitemapEventHandler(async (event) => {
     try {
         while (offset < count) {
             const response = await medusaFetch<StoreProductListResponse>(event, 'products', {
-                limit: PAGE_SIZE,
-                offset,
-                fields: 'id,updated_at'
+                query: {limit: PAGE_SIZE, offset, fields: 'id,updated_at'}
             })
 
             for (const product of response.products) {

@@ -31,9 +31,11 @@ export default defineEventHandler(async (event) => {
 
     try {
         const {product} = await medusaFetch<{product: StoreProduct}>(event, `products/${id}`, {
-            fields: PRODUCT_FIELDS,
-            region_id: regionId,
-            sales_channel_id: salesChannelId
+            query: {
+                fields: PRODUCT_FIELDS,
+                region_id: regionId,
+                sales_channel_id: salesChannelId
+            }
         })
 
         return {product, region_id: regionId, sales_channel_id: salesChannelId}
