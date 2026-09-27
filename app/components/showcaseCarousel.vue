@@ -20,7 +20,7 @@ const products = computed(() => (data.value?.products ?? []).filter((product) =>
       loop
     >
       <NuxtLink :to="`/product/${item.id}`" class="block">
-        <img :src="item.thumbnail!" :alt="item.title" class="rounded-lg object-cover w-full h-80" loading="lazy" />
+        <img :src="item.thumbnail!" :alt="item.title" class="rounded-lg object-cover w-full h-100" loading="lazy" />
       </NuxtLink>
     </UCarousel>
   </div>
