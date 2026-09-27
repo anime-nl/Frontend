@@ -23,7 +23,7 @@ async function getOrCreateCartId(event: H3Event): Promise<string> {
 }
 
 export default defineEventHandler(async (event) => {
-    const body = await readBody<AddItemBody>(event)
+    const body = (await readBody<AddItemBody>(event)) ?? {}
 
     if (!body.variant_id) {
         throw createError({statusCode: 400, statusMessage: 'Missing variant_id'})

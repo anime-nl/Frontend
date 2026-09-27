@@ -31,5 +31,5 @@ export function useCart() {
         await refresh()
     }
 
-    return {cart, items, count, subtotal, total, pending, refresh, addItem, updateItem, removeItem}
+    return {cart, items, count, subtotal, total, format, pending, refresh, addItem, updateItem, removeItem}
 }

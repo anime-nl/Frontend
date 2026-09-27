@@ -23,11 +23,6 @@ async function onRemove(itemId: string) {
     updating.value = null
   }
 }
-
-const format = (amount: number) => {
-  const currency = cart.cart.value?.currency_code?.toUpperCase()
-  return currency ? new Intl.NumberFormat('nl-NL', {style: 'currency', currency}).format(amount) : ''
-}
 </script>
 
 <template>
@@ -44,7 +39,7 @@ const format = (amount: number) => {
         <div class="flex-1">
           <p class="font-semibold">{{ item.title }}</p>
           <p v-if="item.variant_title" class="text-sm text-slate-400">{{ item.variant_title }}</p>
-          <p class="text-primary">{{ format(item.unit_price) }}</p>
+          <p class="text-primary">{{ cart.format(item.unit_price) }}</p>
         </div>
         <UInputNumber
           :model-value="item.quantity"
@@ -52,7 +47,7 @@ const format = (amount: number) => {
           :disabled="updating === item.id"
           @update:model-value="(quantity) => onQuantityChange(item.id, quantity)"
         />
-        <p class="w-24 text-right font-semibold">{{ format(item.unit_price * item.quantity) }}</p>
+        <p class="w-24 text-right font-semibold">{{ cart.format(item.unit_price * item.quantity) }}</p>
         <UButton
           icon="i-lucide-trash-2"
           color="neutral"
@@ -65,7 +60,7 @@ const format = (amount: number) => {
 
       <div class="flex justify-end gap-8 text-xl font-bold">
         <span>Subtotal</span>
-        <span>{{ format(cart.cart.value?.subtotal ?? 0) }}</span>
+        <span>{{ cart.subtotal.value }}</span>
       </div>
 
       <UButton to="/checkout" size="xl" class="self-end justify-center">Checkout</UButton>

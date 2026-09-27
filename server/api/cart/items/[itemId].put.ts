@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const itemId = getRouterParam(event, 'itemId')
-    const {quantity} = await readBody<{quantity?: number}>(event)
+    const {quantity} = (await readBody<{quantity?: number}>(event)) ?? {}
 
     if (!Number.isInteger(quantity) || quantity! < 1) {
         throw createError({statusCode: 400, statusMessage: 'quantity must be an integer of at least 1'})

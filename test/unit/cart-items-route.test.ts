@@ -87,4 +87,12 @@ describe('POST /api/cart/items', () => {
 
         await expect(callRoute()).rejects.toMatchObject({statusCode: 400})
     })
+
+    it('rejects an empty request body', async () => {
+        getCookie.mockReturnValue('cart_1')
+        body = undefined
+
+        await expect(callRoute()).rejects.toMatchObject({statusCode: 400})
+        expect(medusaFetch).not.toHaveBeenCalled()
+    })
 })

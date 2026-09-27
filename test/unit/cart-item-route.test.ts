@@ -58,6 +58,14 @@ describe('PUT /api/cart/items/:itemId', () => {
         await expect(callPutRoute()).rejects.toMatchObject({statusCode: 400, statusMessage: 'No cart'})
         expect(medusaFetch).not.toHaveBeenCalled()
     })
+
+    it('rejects an empty request body', async () => {
+        getCookie.mockReturnValue('cart_1')
+        body = undefined
+
+        await expect(callPutRoute()).rejects.toMatchObject({statusCode: 400})
+        expect(medusaFetch).not.toHaveBeenCalled()
+    })
 })
 
 describe('DELETE /api/cart/items/:itemId', () => {
