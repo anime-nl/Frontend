@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type {StoreProduct, StoreProductVariant} from '@medusajs/types'
+import {formatCurrency} from '#shared/utils/currency'
 
 const route = useRoute()
 const toast = useToast()
@@ -52,13 +53,11 @@ const price = computed(() => {
   const calculated = selectedVariant.value?.calculated_price
   if (!calculated || calculated.calculated_amount == null) return null
 
-  const currency = calculated.currency_code!.toUpperCase()
-  const format = (amount: number) => new Intl.NumberFormat('nl-NL', {style: 'currency', currency}).format(amount)
-
+  const currency = calculated.currency_code!
   const original = calculated.original_amount ?? calculated.calculated_amount
   return {
-    current: format(calculated.calculated_amount),
-    original: original > calculated.calculated_amount ? format(original) : null
+    current: formatCurrency(calculated.calculated_amount, currency),
+    original: original > calculated.calculated_amount ? formatCurrency(original, currency) : null
   }
 })
 

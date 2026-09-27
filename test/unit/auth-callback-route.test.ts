@@ -103,7 +103,7 @@ describe('POST /api/auth/:provider/callback', () => {
 
         await callRoute()
 
-        expect(medusaFetch).toHaveBeenNthCalledWith(2, expect.anything(), 'carts/cart_1/customer/transfer', {
+        expect(medusaFetch).toHaveBeenNthCalledWith(2, expect.anything(), 'carts/cart_1/customer', {
             method: 'POST',
             token: existingCustomerToken
         })

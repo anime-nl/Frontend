@@ -1,4 +1,5 @@
 import type {StoreCart} from '@medusajs/types'
+import {formatCurrency} from '#shared/utils/currency'
 
 /** The visitor's cart, identified server-side by the cart_id cookie. Shared across every consumer via the 'cart' key. */
 export function useCart() {
@@ -9,8 +10,8 @@ export function useCart() {
     const count = computed(() => items.value.reduce((sum, item) => sum + item.quantity, 0))
 
     const format = (amount: number) => {
-        const currency = cart.value?.currency_code?.toUpperCase()
-        return currency ? new Intl.NumberFormat('nl-NL', {style: 'currency', currency}).format(amount) : null
+        const currency = cart.value?.currency_code
+        return currency ? formatCurrency(amount, currency) : null
     }
 
     const subtotal = computed(() => (cart.value?.subtotal != null ? format(cart.value.subtotal) : null))

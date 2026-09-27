@@ -1,9 +1,16 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
 import {mountSuspended, registerEndpoint} from '@nuxt/test-utils/runtime'
+import {createError} from 'h3'
 import Navbar from '~/components/navbar.vue'
 
 let cart: {items: {quantity: number}[]} | null = null
 registerEndpoint('/api/cart', () => ({cart}))
+
+let customer: {email: string; first_name?: string} | null = null
+registerEndpoint('/api/account/me', () => {
+    if (!customer) throw createError({statusCode: 401})
+    return {customer}
+})
 
 const mountNavbar = () => mountSuspended(Navbar, {attachTo: document.body})
 
@@ -11,6 +18,7 @@ let wrapper: Awaited<ReturnType<typeof mountNavbar>> | undefined
 
 beforeEach(() => {
     cart = null
+    customer = null
 })
 
 afterEach(() => {
@@ -62,5 +70,22 @@ describe('navbar', () => {
         wrapper = await mountNavbar()
 
         await vi.waitFor(() => expect(wrapper!.findComponent({name: 'UChip'}).props('show')).toBe(false))
+    })
+
+    it('shows a log in link when signed out', async () => {
+        wrapper = await mountNavbar()
+
+        await vi.waitFor(() => expect(wrapper!.find('a[href="/account/login"]').exists()).toBe(true))
+    })
+
+    it("links to the account page with the customer's name when signed in", async () => {
+        customer = {email: 'jan@example.nl', first_name: 'Jan'}
+        wrapper = await mountNavbar()
+
+        await vi.waitFor(() => {
+            const link = wrapper!.find('a[href="/account"]')
+            expect(link.exists()).toBe(true)
+            expect(link.text()).toBe('Jan')
+        })
     })
 })

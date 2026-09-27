@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
     const cartId = getCookie(event, CART_ID_COOKIE)
     if (cartId) {
         // Best-effort: a guest keeps their cart as a guest cart if this fails, sign-in still succeeds
-        await medusaFetch(event, `carts/${cartId}/customer/transfer`, {method: 'POST', token}).catch(() => {})
+        await medusaFetch(event, `carts/${cartId}/customer`, {method: 'POST', token}).catch(() => {})
     }
 
     return {ok: true}
