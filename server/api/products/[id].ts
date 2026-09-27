@@ -13,6 +13,10 @@ const PRODUCT_FIELDS = [
     '*type'
 ].join(',')
 
+/**
+ * GET /api/products/:id - a single product with its calculated price for a region.
+ * @returns The product plus the region and sales channel id the price was calculated for
+ */
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig(event)
     const id = getRouterParam(event, 'id')

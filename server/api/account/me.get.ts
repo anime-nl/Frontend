@@ -1,6 +1,10 @@
 import type {StoreCustomer} from '@medusajs/types'
 import {SESSION_COOKIE} from '../../utils/session'
 
+/**
+ * GET /api/account/me - the signed-in customer.
+ * @returns The current customer
+ */
 export default defineEventHandler(async (event) => {
     const token = getCookie(event, SESSION_COOKIE)
     if (!token) {

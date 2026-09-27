@@ -1,6 +1,10 @@
 import type {StoreCart} from '@medusajs/types'
 import {CART_FIELDS, CART_ID_COOKIE} from '../../../utils/cart'
 
+/**
+ * PUT /api/cart/items/:itemId - sets a line item to an exact quantity.
+ * @returns The updated cart
+ */
 export default defineEventHandler(async (event) => {
     const cartId = getCookie(event, CART_ID_COOKIE)
     if (!cartId) {

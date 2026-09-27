@@ -1,6 +1,10 @@
 import type {StoreCart} from '@medusajs/types'
 import {CART_FIELDS, CART_ID_COOKIE} from '../../../utils/cart'
 
+/**
+ * DELETE /api/cart/items/:itemId - removes a line item from the cart.
+ * @returns The updated cart
+ */
 export default defineEventHandler(async (event) => {
     const cartId = getCookie(event, CART_ID_COOKIE)
     if (!cartId) {

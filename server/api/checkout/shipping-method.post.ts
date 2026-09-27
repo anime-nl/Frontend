@@ -5,6 +5,10 @@ interface ShippingMethodBody {
     option_id?: string
 }
 
+/**
+ * POST /api/checkout/shipping-method - sets the cart's shipping method.
+ * @returns The updated cart
+ */
 export default defineEventHandler(async (event) => {
     const cartId = getCookie(event, CART_ID_COOKIE)
     if (!cartId) {

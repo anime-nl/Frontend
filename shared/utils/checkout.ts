@@ -30,7 +30,11 @@ const postalCodePatterns: Record<string, RegExp> = {
     BE: /^\d{4}$/
 }
 
-/** Trims every field and turns anything that is not a string into an empty string, collapsing line breaks */
+/**
+ * Trims every field and turns anything that is not a string into an empty string, collapsing line breaks.
+ * @param input Raw address fields, possibly missing or of the wrong type
+ * @returns A fully-populated, single-line AddressRequest
+ */
 export function normalizeAddressRequest(input?: Partial<Record<keyof AddressRequest, unknown>> | null): AddressRequest {
     const singleLine = (value: unknown) => (typeof value === 'string' ? value.trim().replace(/\s+/g, ' ') : '')
 
@@ -46,7 +50,11 @@ export function normalizeAddressRequest(input?: Partial<Record<keyof AddressRequ
     }
 }
 
-/** Used by the form for instant feedback, and by the server before sending */
+/**
+ * Used by the form for instant feedback, and by the server before sending.
+ * @param input Address to validate
+ * @returns A list of field errors, empty when the address is valid
+ */
 export function validateAddressRequest(input: AddressRequest) {
     const request = normalizeAddressRequest(input)
     const {email, firstName, lastName, street, houseNumber, postalCode, city, country} = request
@@ -76,7 +84,12 @@ export function validateAddressRequest(input: AddressRequest) {
     return errors
 }
 
-/** Medusa has no separate house-number field, so it is folded into the address's first line */
+/**
+ * Medusa has no separate house-number field, so it is folded into the address's first line.
+ * @param street Street name
+ * @param houseNumber House number, possibly with an addition
+ * @returns The combined address line
+ */
 export function addressLine1(street: string, houseNumber: string): string {
     return `${street} ${houseNumber}`.trim()
 }

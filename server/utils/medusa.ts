@@ -9,7 +9,13 @@ export interface MedusaFetchInit {
     base?: 'store' | 'auth'
 }
 
-/** Calls the Medusa store or auth API from the Nuxt server, authenticated with the publishable key. */
+/**
+ * Calls the Medusa store or auth API from the Nuxt server, authenticated with the publishable key.
+ * @param event The incoming H3 event, used to read runtime config
+ * @param path Path within the chosen Medusa API, without a leading slash
+ * @param init Request method, query, body, bearer token and which Medusa API to call
+ * @returns The parsed JSON response, typed as T
+ */
 export async function medusaFetch<T>(event: H3Event, path: string, init: MedusaFetchInit = {}): Promise<T> {
     const config = useRuntimeConfig(event)
     const base = init.base ?? 'store'

@@ -7,6 +7,11 @@ interface AddItemBody {
     quantity?: number
 }
 
+/**
+ * Reads the cart id from the cart cookie, creating a new guest cart and cookie if there is none yet.
+ * @param event The incoming H3 event, used to read and set the cart cookie
+ * @returns The existing or newly created cart's id
+ */
 async function getOrCreateCartId(event: H3Event): Promise<string> {
     const existing = getCookie(event, CART_ID_COOKIE)
     if (existing) return existing
@@ -22,6 +27,10 @@ async function getOrCreateCartId(event: H3Event): Promise<string> {
     return cart.id
 }
 
+/**
+ * POST /api/cart/items - adds a variant to the cart, creating the cart if there is none yet.
+ * @returns The updated cart
+ */
 export default defineEventHandler(async (event) => {
     const body = (await readBody<AddItemBody>(event)) ?? {}
 

@@ -82,11 +82,18 @@ export const supportTopics: SupportTopic[] = [
 
 export const supportLimits = {name: 100, email: 254, orderNumber: 50, message: 5000}
 
+/**
+ * Looks up a support topic by slug.
+ * @param slug Topic slug, of unknown type since it may come from unvalidated input
+ * @returns The matching topic, or undefined if none matches
+ */
 export const findSupportTopic = (slug: unknown) => supportTopics.find((topic) => topic.slug === slug)
 
 /**
  * Trims every field and turns anything that is not a string into an empty string.
  * Only the message may contain line breaks, so form input cannot fake extra lines in the email.
+ * @param input Raw support form fields, possibly missing or of the wrong type
+ * @returns A fully-populated SupportRequest
  */
 export function normalizeSupportRequest(input?: Partial<Record<keyof SupportRequest, unknown>> | null): SupportRequest {
     const text = (value: unknown) => (typeof value === 'string' ? value.trim() : '')
@@ -103,7 +110,11 @@ export function normalizeSupportRequest(input?: Partial<Record<keyof SupportRequ
     }
 }
 
-/** Used by the form for instant feedback, and by the server before sending */
+/**
+ * Used by the form for instant feedback, and by the server before sending.
+ * @param input Support request to validate
+ * @returns A list of field errors, empty when the request is valid
+ */
 export function validateSupportRequest(input: SupportRequest) {
     const request = normalizeSupportRequest(input)
     const {name, email, orderNumber, reason, message} = request
