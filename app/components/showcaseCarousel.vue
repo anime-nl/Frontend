@@ -2,7 +2,7 @@
 const {data: regionId} = await useDefaultRegionId()
 const {data} = await useFetch('/api/products', {
   key: 'showcase-products',
-  query: {fields: 'title,thumbnail', region_id: regionId}
+  query: {fields: 'title,thumbnail', region_id: regionId, limit: 10, order: '-created_at'}
 })
 const products = computed(() => (data.value?.products ?? []).filter((product) => product.thumbnail))
 </script>
@@ -20,14 +20,7 @@ const products = computed(() => (data.value?.products ?? []).filter((product) =>
       loop
     >
       <NuxtLink :to="`/product/${item.id}`" class="block">
-        <img
-          :src="item.thumbnail!"
-          :alt="item.title"
-          class="rounded-lg object-cover"
-          height="500"
-          loading="lazy"
-          width="800"
-        />
+        <img :src="item.thumbnail!" :alt="item.title" class="rounded-lg object-cover w-full h-80" loading="lazy" />
       </NuxtLink>
     </UCarousel>
   </div>
