@@ -37,9 +37,9 @@ export const supportTopics: SupportTopic[] = [
         title: 'Shipping',
         icon: 'i-lucide-truck',
         description: 'Delivery times and problems with a delivery.',
-        intro: 'Shipping usually takes 2 to 3 days. If something is wrong with your delivery, let us know.',
+        intro: 'Shipping usually takes 2 to 3 business days from when you place your order. If something is wrong with your delivery, let us know.',
         reasons: [
-            'My order is taking longer than 2 to 3 days',
+            'My order is taking longer than 2 to 3 business days',
             'My tracking shows delivered, but I did not receive it',
             'My order was delivered to the wrong address',
             'Something else'
@@ -52,7 +52,7 @@ export const supportTopics: SupportTopic[] = [
         title: 'Returns & refunds',
         icon: 'i-lucide-undo-2',
         description: 'Returning within 14 days, or received something damaged.',
-        intro: 'You have 14 days to return an order. For damaged or wrong items, please describe what is wrong.',
+        intro: 'You have 14 days to return an order. Returned items must be unused and in their original packaging, and you pay for the return shipping. For damaged or wrong items, please describe what is wrong.',
         reasons: [
             'I want to return an item',
             'My item arrived damaged',

@@ -14,7 +14,7 @@ const faq: AccordionItem[] = [
   {
     label: 'How long does shipping take?',
     content:
-      'Shipping usually takes 2 to 3 days. If your order is taking longer, contact us with your order number and we will look into it.'
+      'Shipping usually takes 2 to 3 business days from when you place your order. If your order is taking longer, contact us with your order number and we will look into it.'
   },
   {
     label: 'Which payment methods do you accept?',
@@ -24,12 +24,12 @@ const faq: AccordionItem[] = [
   {
     label: 'What is your return policy?',
     content:
-      'You have a 14-day return period, in line with EU consumer rules. Contact us within 14 days of receiving your order to let us know you want to return it.'
+      'You have a 14-day return period, in line with EU consumer rules. The item must be unused and in its original packaging, and you pay for the return shipping. Contact us within 14 days of receiving your order to let us know you want to return it.'
   },
   {
     label: 'How do I return an item?',
     content:
-      'Contact us within the 14-day return period, so we can tell you how to send the item back and link it to your order.'
+      'Contact us within the 14-day return period, so we can tell you how to send the item back and link it to your order. Please make sure it is unused and in its original packaging; you pay for the return shipping.'
   },
   {
     label: 'How can I check the status of my order?',

@@ -59,6 +59,7 @@ Test names describe behavior ("rejects a reason that belongs to another topic"),
 Use these in customer-facing copy; do not invent other policies.
 
 - Dutch webshop, so EU rules apply: 14-day return period.
-- Shipping takes 2 to 3 days.
+- Shipping takes 2 to 3 business days from when the order is placed.
+- Returns: the customer pays for return shipping, and the item must be unused and in its original packaging.
 - Payments go through Mollie: iDEAL, credit card and every other method Mollie supports.
 - Support address: `info@animenl.nl`. Trustpilot: https://www.trustpilot.com/review/animenl.nl
