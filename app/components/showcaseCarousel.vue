@@ -8,7 +8,7 @@ const products = computed(() => (data.value?.products ?? []).filter((product) =>
 </script>
 
 <template>
-  <div v-if="products.length" class="w-full px-4 md:w-2/3 mx-auto my-16">
+  <div v-if="products.length" class="w-full max-w-screen-2xl px-4 md:w-2/3 mx-auto my-16">
     <h1 class="mx-6 my-2 text-4xl">New Products</h1>
     <UCarousel
       v-slot="{item}"
