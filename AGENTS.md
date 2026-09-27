@@ -14,21 +14,7 @@ A task is done when `bun run check` passes (formatting, type check and all tests
 
 ## Commands
 
-Uses [Bun](https://bun.sh). Run everything from the repo root.
-
-```bash
-bun install          # install dependencies
-bun run dev          # dev server on http://localhost:3000
-bun run build        # production build
-bun run start        # run the production build (Nixpacks start command)
-
-bun run test         # all tests, once
-bun run test:watch   # tests in watch mode
-bunx vitest run --project unit   # one project: unit, nuxt or e2e
-bun run typecheck    # nuxt typecheck (vue-tsc)
-bun run format       # format everything
-bun run check        # format check + typecheck + tests
-```
+Uses [Bun](https://bun.sh). Run everything from the repo root, via the scripts in `package.json`. `bunx vitest run --project <unit|nuxt|e2e>` runs a single test project (see [Testing](#testing)).
 
 ## Layout
 
