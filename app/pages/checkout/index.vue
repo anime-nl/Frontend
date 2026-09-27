@@ -78,6 +78,22 @@ async function onShippingContinue() {
     submittingShipping.value = false
   }
 }
+
+const submittingPayment = ref(false)
+const paymentError = ref('')
+
+async function onPay() {
+  submittingPayment.value = true
+  paymentError.value = ''
+
+  try {
+    const {redirect_url} = await $fetch<{redirect_url: string}>('/api/checkout/payment-session', {method: 'POST'})
+    await navigateTo(redirect_url, {external: true})
+  } catch {
+    paymentError.value = 'Something went wrong starting your payment. Please try again.'
+    submittingPayment.value = false
+  }
+}
 </script>
 
 <template>
@@ -195,7 +211,18 @@ async function onShippingContinue() {
           <span>{{ cart.total.value }}</span>
         </div>
 
-        <UButton label="Back" color="neutral" variant="ghost" class="self-start" @click="step = 'shipping'" />
+        <UAlert
+          v-if="paymentError"
+          color="error"
+          variant="subtle"
+          icon="i-lucide-circle-alert"
+          :description="paymentError"
+        />
+
+        <div class="flex justify-between">
+          <UButton label="Back" color="neutral" variant="ghost" @click="step = 'shipping'" />
+          <UButton label="Pay" size="lg" :loading="submittingPayment" @click="onPay" />
+        </div>
       </div>
     </UCard>
   </UContainer>
