@@ -59,5 +59,23 @@ module.exports = defineConfig({
         ],
       },
     },
+    {
+      // `pp_system_default` stays registered on the region too (see seed.ts), as a no-op fallback
+      // for local testing without hitting Mollie's API.
+      resolve: '@medusajs/medusa/payment',
+      options: {
+        providers: [
+          {
+            resolve: '@variablevic/mollie-payments-medusa/providers/mollie',
+            id: 'mollie',
+            options: {
+              apiKey: process.env.MOLLIE_API_KEY,
+              redirectUrl: process.env.MOLLIE_REDIRECT_URL,
+              medusaUrl: process.env.MEDUSA_URL,
+            },
+          },
+        ],
+      },
+    },
   ],
 })

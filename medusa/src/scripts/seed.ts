@@ -330,7 +330,13 @@ export default async function seed({ container }: ExecArgs) {
   for (const region of regions) {
     await createRegionsWorkflow(container).run({
       input: {
-        regions: [{ ...region, currency_code: 'eur', payment_providers: ['pp_system_default'] }],
+        regions: [
+          {
+            ...region,
+            currency_code: 'eur',
+            payment_providers: ['pp_system_default', 'pp_mollie-hosted-checkout_mollie'],
+          },
+        ],
       },
     })
   }
