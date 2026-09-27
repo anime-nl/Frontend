@@ -12,7 +12,8 @@ export async function medusaFetch<T>(event: H3Event, path: string, init: MedusaF
     const config = useRuntimeConfig(event)
 
     try {
-        // `any` opts out of Nitro's internal route typing, which does not apply to this external URL
+        // `any` opts out of Nitro's internal route typing, which does not apply to this external URL;
+        // the options object needs the same escape, or TS tries to match it against that typed-route system
         return await $fetch<T, any>(`${config.medusaServerUrl}store/${path}`, {
             method: init.method,
             query: init.query,
@@ -21,7 +22,7 @@ export async function medusaFetch<T>(event: H3Event, path: string, init: MedusaF
                 'x-publishable-api-key': config.medusaPublishableKey,
                 ...(init.token ? {Authorization: `Bearer ${init.token}`} : {})
             }
-        })
+        } as any)
     } catch (error) {
         // A 404 is a normal answer for an unknown product, not a failure worth a log line
         if ((error as {statusCode?: number}).statusCode !== 404) {
