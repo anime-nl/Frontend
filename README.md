@@ -40,19 +40,22 @@ Only the Nuxt app is deployed (Nixpacks: `bun run build`, `bun run start`). The 
 
 `nuxt.config.ts` reads these variables at build time, so they must be available at build time (in Coolify: "Available at Buildtime") and changing one needs a redeploy:
 
-| Variable                                           | Value                                                     |
-| -------------------------------------------------- | --------------------------------------------------------- |
-| `MEDUSA_URL`                                       | Medusa URL as the browser reaches it                      |
-| `MEDUSA_SERVER_URL`                                | Medusa URL for the Nuxt server (defaults to `MEDUSA_URL`) |
-| `MEDUSA_PUBLISHABLE_KEY`                           | Publishable API key from the Medusa admin                 |
-| `MEDUSA_SALES_CHANNEL_ID`                          | Sales channel id, if used                                 |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` | SMTP server for the support forms, see below              |
+| Variable                                           | Value                                                                                   |
+| -------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `MEDUSA_URL`                                       | Medusa URL as the browser reaches it                                                    |
+| `MEDUSA_SERVER_URL`                                | Medusa URL for the Nuxt server (defaults to `MEDUSA_URL`)                               |
+| `MEDUSA_PUBLISHABLE_KEY`                           | Publishable API key from the Medusa admin                                               |
+| `MEDUSA_SALES_CHANNEL_ID`                          | Sales channel id, if used                                                               |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` | SMTP server for the support forms, see below                                            |
+| `SITE_URL`                                         | Public URL of the site, used to build `/sitemap.xml` (defaults to `https://animenl.nl`) |
 
 Nuxt needs Node 22.19 or newer. If the build complains about the Node version, set `NIXPACKS_NODE_VERSION=24`.
 
+`public/robots.txt` points to `https://animenl.nl/sitemap.xml` directly, since it is a static file and cannot read `SITE_URL`. Update it by hand if the production domain ever changes.
+
 ### Rotating a secret without a rebuild
 
-`SMTP_PASS` and `MEDUSA_PUBLISHABLE_KEY` above are read at build time, so the values above get baked into `.output`. To change one of them without a redeploy, set the Nuxt-prefixed equivalent (`NUXT_SMTP_PASS`, `NUXT_MEDUSA_PUBLISHABLE_KEY`, ...) as a normal **runtime** environment variable (in Coolify: not "Available at Buildtime") — Nuxt reads `NUXT_*` variables again every time the server starts and lets them override the value baked in at build time. This only applies to `runtimeConfig` keys (everything in the table above except `MEDUSA_URL`, which configures the `@nuxtjs/medusa` module directly and is only ever read at build time).
+`SMTP_PASS` and `MEDUSA_PUBLISHABLE_KEY` above are read at build time, so the values above get baked into `.output`. To change one of them without a redeploy, set the Nuxt-prefixed equivalent (`NUXT_SMTP_PASS`, `NUXT_MEDUSA_PUBLISHABLE_KEY`, ...) as a normal **runtime** environment variable (in Coolify: not "Available at Buildtime") — Nuxt reads `NUXT_*` variables again every time the server starts and lets them override the value baked in at build time. This only applies to `runtimeConfig` keys (everything in the table above except `MEDUSA_URL` and `SITE_URL`, which configure the `@nuxtjs/medusa` and `@nuxtjs/sitemap` modules directly and are only ever read at build time).
 
 ### Support emails
 
