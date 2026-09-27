@@ -1,4 +1,4 @@
-import {afterEach, describe, expect, it} from 'vitest'
+import {afterEach, describe, expect, it, vi} from 'vitest'
 import {mountSuspended, registerEndpoint} from '@nuxt/test-utils/runtime'
 import ProductsIndexPage from '~/pages/products/index.vue'
 
@@ -15,5 +15,13 @@ describe('products index page', () => {
         wrapper = await mountSuspended(ProductsIndexPage)
 
         expect(wrapper.text()).toContain('Zhongli Keychain')
+    })
+
+    it('keeps search engines from indexing this unlinked duplicate of /search', async () => {
+        wrapper = await mountSuspended(ProductsIndexPage)
+
+        await vi.waitFor(() =>
+            expect(document.querySelector('meta[name="robots"]')?.getAttribute('content')).toBe('noindex')
+        )
     })
 })

@@ -1,4 +1,4 @@
-import {afterEach, beforeEach, describe, expect, it} from 'vitest'
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
 import {mountSuspended, registerEndpoint} from '@nuxt/test-utils/runtime'
 import {getQuery} from 'h3'
 import TcgPage from '~/pages/products/tcg/index.vue'
@@ -49,23 +49,102 @@ afterEach(() => {
 })
 
 describe.each([
-    {page: TcgPage, heading: 'Trading Card Game (TCG) Collection', categoryId: 'pcat_tcg'},
-    {page: TcgSinglesPage, heading: 'Singles', categoryId: 'pcat_singles'},
-    {page: TcgPacksPage, heading: 'Packs', categoryId: 'pcat_packs'},
-    {page: TcgBoostersPage, heading: 'Booster Boxes', categoryId: 'pcat_boosters'},
-    {page: FiguresPage, heading: 'Figures Collection', categoryId: 'pcat_figures'},
-    {page: PrizeFiguresPage, heading: 'Prize Figures', categoryId: 'pcat_prize'},
-    {page: ScaleFiguresPage, heading: 'Scale Figures', categoryId: 'pcat_scale'},
-    {page: NoodleStoppersPage, heading: 'Noodle Stoppers', categoryId: 'pcat_noodle'},
-    {page: PlushPage, heading: 'Plushies Collection', categoryId: 'pcat_plush'},
-    {page: KeychainsPage, heading: 'Keychains Collection', categoryId: 'pcat_keychains'},
-    {page: AcrylicKeychainsPage, heading: 'Acrylic keychains', categoryId: 'pcat_acrylic'},
-    {page: MetalKeychainsPage, heading: 'Metal keychains', categoryId: 'pcat_metal'}
-])('$heading page', ({page, heading, categoryId}) => {
+    {
+        page: TcgPage,
+        heading: 'Trading Card Game (TCG) Collection',
+        categoryId: 'pcat_tcg',
+        title: 'TCG',
+        description: 'Browse our entire catalog of Trading Card Game products.'
+    },
+    {
+        page: TcgSinglesPage,
+        heading: 'Singles',
+        categoryId: 'pcat_singles',
+        title: 'TCG Singles',
+        description: 'Buy single cards in bulk.'
+    },
+    {
+        page: TcgPacksPage,
+        heading: 'Packs',
+        categoryId: 'pcat_packs',
+        title: 'TCG Packs',
+        description: 'Test your luck with single packs.'
+    },
+    {
+        page: TcgBoostersPage,
+        heading: 'Booster Boxes',
+        categoryId: 'pcat_boosters',
+        title: 'TCG Booster Boxes',
+        description: 'Buy boxes filled with packs and extras.'
+    },
+    {
+        page: FiguresPage,
+        heading: 'Figures Collection',
+        categoryId: 'pcat_figures',
+        title: 'Figures',
+        description: 'Browse our entire catalog of figures.'
+    },
+    {
+        page: PrizeFiguresPage,
+        heading: 'Prize Figures',
+        categoryId: 'pcat_prize',
+        title: 'Prize Figures',
+        description: 'Great figures for low prices.'
+    },
+    {
+        page: ScaleFiguresPage,
+        heading: 'Scale Figures',
+        categoryId: 'pcat_scale',
+        title: 'Scale Figures',
+        description: 'Great for decorating.'
+    },
+    {
+        page: NoodleStoppersPage,
+        heading: 'Noodle Stoppers',
+        categoryId: 'pcat_noodle',
+        title: 'Noodle Stoppers',
+        description: 'Figures with a function'
+    },
+    {
+        page: PlushPage,
+        heading: 'Plushies Collection',
+        categoryId: 'pcat_plush',
+        title: 'Plushies',
+        description: 'Browse our entire catalog of plushies.'
+    },
+    {
+        page: KeychainsPage,
+        heading: 'Keychains Collection',
+        categoryId: 'pcat_keychains',
+        title: 'Keychains',
+        description: 'Browse our entire catalog of keychains.'
+    },
+    {
+        page: AcrylicKeychainsPage,
+        heading: 'Acrylic keychains',
+        categoryId: 'pcat_acrylic',
+        title: 'Acrylic Keychains',
+        description: 'A wide selection of cheap keychains.'
+    },
+    {
+        page: MetalKeychainsPage,
+        heading: 'Metal keychains',
+        categoryId: 'pcat_metal',
+        title: 'Metal Keychains',
+        description: 'Super durable keychains.'
+    }
+])('$heading page', ({page, heading, categoryId, title, description}) => {
     it('renders its heading and requests the products of its own category', async () => {
         wrapper = await mountSuspended(page)
 
         expect(wrapper.find('h1').text()).toBe(heading)
         expect(categoryRequests[0]?.category_id).toBe(categoryId)
+    })
+
+    it('sets a page title and meta description for search engines', async () => {
+        wrapper = await mountSuspended(page)
+
+        await vi.waitFor(() => expect(document.title).toBe(`${title} | AnimeNL`))
+        expect(document.querySelector('meta[name="description"]')?.getAttribute('content')).toBe(description)
     })
 })

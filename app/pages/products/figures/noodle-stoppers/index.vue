@@ -1,5 +1,5 @@
 <script setup lang="ts">
-useSeoMeta({title: 'Noodle Stoppers | AnimeNL'})
+useSeoMeta({title: 'Noodle Stoppers', description: 'Figures with a function'})
 </script>
 
 <template>

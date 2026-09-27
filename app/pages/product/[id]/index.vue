@@ -4,6 +4,7 @@ import type {StoreProduct, StoreProductVariant} from '@medusajs/types'
 const client = useMedusaClient()
 const route = useRoute()
 const toast = useToast()
+const requestUrl = useRequestURL()
 const cartId = useCookie<string | null>('cart_id', {maxAge: 60 * 60 * 24 * 30})
 
 const {data, error} = await useFetch<{product: StoreProduct; region_id?: string; sales_channel_id?: string}>(
@@ -162,6 +163,38 @@ useSeoMeta({
   title: () => product.value.title,
   description: () => product.value.subtitle || product.value.description,
   ogImage: () => images.value[0]
+})
+
+const offerAvailability = computed(() => {
+  if (!stock.value.purchasable) return 'https://schema.org/OutOfStock'
+  return stock.value.label === 'Backorder' ? 'https://schema.org/BackOrder' : 'https://schema.org/InStock'
+})
+
+const productJsonLd = computed(() => {
+  const calculated = selectedVariant.value?.calculated_price
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.value.title,
+    description: product.value.description || product.value.subtitle || undefined,
+    image: images.value,
+    sku: selectedVariant.value?.sku || undefined,
+    offers:
+      calculated?.calculated_amount == null
+        ? undefined
+        : {
+            '@type': 'Offer',
+            price: calculated.calculated_amount,
+            priceCurrency: calculated.currency_code!.toUpperCase(),
+            availability: offerAvailability.value,
+            url: requestUrl.href
+          }
+  }
+})
+
+useHead({
+  script: [{key: 'product-ld-json', type: 'application/ld+json', innerHTML: () => JSON.stringify(productJsonLd.value)}]
 })
 </script>
 

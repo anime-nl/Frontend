@@ -1,5 +1,5 @@
 <script setup lang="ts">
-useSeoMeta({title: 'TCG | AnimeNL'})
+useSeoMeta({title: 'TCG', description: 'Browse our entire catalog of Trading Card Game products.'})
 </script>
 
 <template>

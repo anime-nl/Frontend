@@ -1,6 +1,12 @@
 <script lang="ts" setup>
 import type {StoreProduct} from '@medusajs/types'
 
+useSeoMeta({
+  title: 'Search',
+  description:
+    'Search the full AnimeNL catalog of TCG cards, figures, plushies and keychains by keyword, series or category.'
+})
+
 interface Collection {
   id: string
   title: string
