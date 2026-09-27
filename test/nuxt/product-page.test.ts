@@ -1,5 +1,6 @@
-import {afterEach, describe, expect, it, vi} from 'vitest'
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
 import {mountSuspended, registerEndpoint} from '@nuxt/test-utils/runtime'
+import {createError, readBody} from 'h3'
 import ProductPage from '~/pages/product/[id]/index.vue'
 import product from '../fixtures/product.json'
 
@@ -19,10 +20,31 @@ registerEndpoint('/api/products/prod_1', () => ({product: product.product, regio
 registerEndpoint('/api/products/prod_backorder', () => ({product: backorderableInStock, region_id: 'reg_nl'}))
 registerEndpoint('/api/products/prod_out_of_stock', () => ({product: outOfStock, region_id: 'reg_nl'}))
 registerEndpoint('/api/products/prod_on_backorder', () => ({product: onBackorder, region_id: 'reg_nl'}))
+registerEndpoint('/api/cart', () => ({cart: null}))
+
+let lastCartItemsBody: unknown
+let itemsShouldFail = false
+
+registerEndpoint('/api/cart/items', {
+    method: 'POST',
+    handler: async (event) => {
+        lastCartItemsBody = await readBody(event)
+        if (itemsShouldFail) throw createError({statusCode: 500})
+        return {cart: {id: 'cart_1', items: [], currency_code: 'eur', subtotal: 0, total: 0}}
+    }
+})
 
 let wrapper: Awaited<ReturnType<typeof mountProduct>> | undefined
 
 const mountProduct = (id = 'prod_1') => mountSuspended(ProductPage, {route: `/product/${id}`, attachTo: document.body})
+
+const addToCartButton = () =>
+    wrapper!.findAllComponents({name: 'UButton'}).find((button) => button.props('icon') === 'i-lucide-shopping-cart')
+
+beforeEach(() => {
+    lastCartItemsBody = undefined
+    itemsShouldFail = false
+})
 
 afterEach(() => {
     wrapper?.unmount()
@@ -56,6 +78,24 @@ describe('product page', () => {
 
         const quantityInput = wrapper.findComponent({name: 'UInputNumber'})
         expect(quantityInput.props('max')).toBe(25)
+    })
+
+    it('adds the selected variant and quantity to the cart', async () => {
+        wrapper = await mountProduct()
+
+        await addToCartButton()!.trigger('click')
+        await vi.waitFor(() => expect(lastCartItemsBody).toBeDefined())
+
+        expect(lastCartItemsBody).toEqual({variant_id: product.product.variants[0]!.id, quantity: 1})
+    })
+
+    it('stops showing a loading button when adding to the cart fails', async () => {
+        itemsShouldFail = true
+        wrapper = await mountProduct()
+
+        await addToCartButton()!.trigger('click')
+        await vi.waitFor(() => expect(lastCartItemsBody).toBeDefined())
+        await vi.waitFor(() => expect(addToCartButton()!.props('loading')).toBe(false))
     })
 
     describe('Product structured data', () => {
