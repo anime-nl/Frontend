@@ -64,6 +64,17 @@ describe('medusaFetch', () => {
         expect(options.headers).not.toHaveProperty('Authorization')
     })
 
+    it('calls the auth API instead of the store API when base is auth', async () => {
+        fetchMock.mockResolvedValue({location: 'https://accounts.google.com/...'})
+
+        await medusaFetch(event, 'customer/google', {method: 'POST', base: 'auth'})
+
+        expect(fetchMock).toHaveBeenCalledWith('http://medusa:9000/auth/customer/google', {
+            method: 'POST',
+            headers: {'x-publishable-api-key': 'pk_test'}
+        })
+    })
+
     it('passes errors on to the caller', async () => {
         vi.spyOn(console, 'error').mockImplementation(() => {})
         fetchMock.mockRejectedValue(new Error('down'))

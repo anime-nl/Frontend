@@ -61,6 +61,10 @@ services:
       S3_BUCKET: medusa
       ADMIN_EMAIL: admin@animenl.local
       ADMIN_PASSWORD: supersecret
+      # From .devcontainer/.env (not committed; see .devcontainer/.env.example)
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_CALLBACK_URL: http://localhost:3000/account/callback/google
     depends_on:
       postgres:
         condition: service_healthy
