@@ -54,4 +54,11 @@ describe('product card', () => {
 
         expect(wrapper.find('img').exists()).toBe(false)
     })
+
+    it('fills its container width instead of imposing a fixed minimum, so it does not overflow a narrow grid column', async () => {
+        wrapper = await mountSuspended(ProductCard, {props: {product: {id: 'prod_1', title: 'Zhongli Keychain'}}})
+
+        const classes: string[] = wrapper.find('a > div').classes()
+        expect(classes.some((className) => className.startsWith('min-w-'))).toBe(false)
+    })
 })

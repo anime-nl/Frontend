@@ -14,7 +14,7 @@ const price = computed(() => {
 
 <template>
   <NuxtLink :to="`/product/${product.id}`" class="block">
-    <div class="min-w-64 h-full rounded-2xl snap-center bg-gray-900">
+    <div class="w-full h-full rounded-2xl bg-gray-900">
       <div class="text-white relative h-full group overflow-hidden rounded-2xl">
         <img
           v-if="product.thumbnail"
