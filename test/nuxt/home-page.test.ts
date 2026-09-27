@@ -35,4 +35,13 @@ describe('home page', () => {
         expect(wrapper.text()).toContain('Discover')
         expect(wrapper.text()).toContain('Zhongli Keychain')
     })
+
+    it('shows a search bar between the showcase carousel and the discovery grid', async () => {
+        wrapper = await mountSuspended(IndexPage, {attachTo: document.body})
+
+        const order = [...wrapper.element.querySelectorAll('h1, input')].map((element) =>
+            element.tagName === 'INPUT' ? 'input' : element.textContent
+        )
+        expect(order).toEqual(['New Products', 'input', 'Discover'])
+    })
 })

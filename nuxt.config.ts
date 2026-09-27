@@ -11,7 +11,14 @@ export default defineNuxtConfig({
         head: {
             htmlAttrs: {lang: 'en'},
             title: 'AnimeNL',
-            titleTemplate: '%s | AnimeNL'
+            titleTemplate: '%s | AnimeNL',
+            link: [
+                // favicon.ico covers legacy browsers that ignore <link> tags; icon.png is the full-resolution
+                // source (1024x1024) for browsers, bookmarks and search engines that support larger icons
+                {rel: 'icon', href: '/favicon.ico', sizes: '48x48'},
+                {rel: 'icon', type: 'image/png', href: '/icon.png', sizes: '1024x1024'},
+                {rel: 'apple-touch-icon', href: '/apple-touch-icon.png', sizes: '180x180'}
+            ]
         }
     },
     site: {
