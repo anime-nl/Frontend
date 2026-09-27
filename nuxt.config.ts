@@ -7,6 +7,17 @@ export default defineNuxtConfig({
     css: ['~/assets/css/main.css'],
     compatibilityDate: '2025-07-15',
     devtools: {enabled: true},
+    app: {
+        head: {
+            link: [
+                // favicon.ico covers legacy browsers that ignore <link> tags; icon.png is the full-resolution
+                // source (1024x1024) for browsers, bookmarks and search engines that support larger icons
+                {rel: 'icon', href: '/favicon.ico', sizes: '48x48'},
+                {rel: 'icon', type: 'image/png', href: '/icon.png', sizes: '1024x1024'},
+                {rel: 'apple-touch-icon', href: '/apple-touch-icon.png', sizes: '180x180'}
+            ]
+        }
+    },
     vite: {
         optimizeDeps: {
             include: ['@vue/devtools-core', '@vue/devtools-kit', 'qs']
