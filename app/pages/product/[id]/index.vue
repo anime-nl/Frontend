@@ -72,7 +72,13 @@ const stock = computed(() => {
 
   const available = variant.inventory_quantity ?? 0
   if (available > 0) {
-    return {label: `${available} in stock`, color: 'success' as const, purchasable: true, max: available}
+    return {
+      label: `${available} in stock`,
+      color: 'success' as const,
+      purchasable: true,
+      // A backorderable variant has no maximum, even while stock remains
+      max: variant.allow_backorder ? undefined : available
+    }
   }
   if (variant.allow_backorder) {
     return {label: 'Backorder', color: 'warning' as const, purchasable: true, max: undefined}
