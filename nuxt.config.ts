@@ -1,3 +1,5 @@
+import {isProductionEnv} from './shared/utils/env'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     ssr: true,
@@ -31,7 +33,7 @@ export default defineNuxtConfig({
         baseUrl: process.env.MEDUSA_URL || 'http://localhost:9000',
         global: true,
         server: false,
-        debug: true,
+        debug: !isProductionEnv(process.env.NODE_ENV),
         publishableKey: process.env.MEDUSA_PUBLISHABLE_KEY,
         auth: {
             type: 'session',
