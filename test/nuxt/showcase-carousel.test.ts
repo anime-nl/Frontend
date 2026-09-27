@@ -33,4 +33,10 @@ describe('showcase carousel', () => {
         const links = wrapper.findAll('a').map((link) => link.attributes('href'))
         expect(links).toContain('/product/prod_1')
     })
+
+    it('caps its width so it does not blow up on ultrawide screens', async () => {
+        wrapper = await mountCarousel()
+
+        expect(wrapper.find('div').classes()).toContain('max-w-screen-2xl')
+    })
 })
