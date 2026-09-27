@@ -38,6 +38,8 @@ interface ProductSeed {
   description?: string
   collection: string
   category: string
+  /** Handle of a subcategory under `category`, if this product belongs to one. See SUBCATEGORIES. */
+  subcategory?: string
   material: string
   weight: number
   size: [number, number, number]
@@ -65,6 +67,7 @@ const keychain = (
   description: `Official ${material.toLowerCase()} keychain of ${name}, with a sturdy metal clasp.`,
   collection,
   category: 'Keychains',
+  subcategory: material === 'Metal' ? 'metal' : 'acrylic',
   material,
   weight: 16,
   size: [90, 73, 7],
@@ -93,6 +96,7 @@ const PRODUCTS: ProductSeed[] = [
       'A detailed PVC statue of Hitori Gotoh in her iconic pink tracksuit.\n\nComes in a collector box with display base.',
     collection: 'Bocchi the Rock!',
     category: 'Figures',
+    subcategory: 'prize-figures',
     material: 'PVC',
     weight: 187,
     size: [120, 120, 150],
@@ -106,6 +110,7 @@ const PRODUCTS: ProductSeed[] = [
     description: 'A premium 1/7 scale figure of the Raiden Shogun from Genshin Impact.',
     collection: 'Genshin Impact',
     category: 'Figures',
+    subcategory: 'scale-figures',
     material: 'PVC',
     weight: 780,
     size: [180, 160, 260],
@@ -194,6 +199,7 @@ const PRODUCTS: ProductSeed[] = [
     description: 'A single booster pack from the Scarlet & Violet series.',
     collection: 'Pokémon TCG',
     category: 'TCG',
+    subcategory: 'packs',
     material: 'Paper',
     weight: 25,
     size: [70, 5, 120],
@@ -207,6 +213,7 @@ const PRODUCTS: ProductSeed[] = [
     description: 'A sealed display box with 36 booster packs.',
     collection: 'Pokémon TCG',
     category: 'TCG',
+    subcategory: 'boosters',
     material: 'Paper',
     weight: 900,
     size: [200, 130, 90],
@@ -219,6 +226,7 @@ const PRODUCTS: ProductSeed[] = [
     subtitle: 'Ultra Rare',
     collection: 'Pokémon TCG',
     category: 'TCG',
+    subcategory: 'singles',
     material: 'Paper',
     weight: 2,
     size: [63, 1, 88],
@@ -242,6 +250,24 @@ const PRODUCTS: ProductSeed[] = [
 
 const COLLECTIONS = ['Genshin Impact', 'Bocchi the Rock!', 'Hololive', 'Pokémon TCG']
 const CATEGORIES = ['Keychains', 'Figures', 'Plush', 'TCG']
+
+// Subcategories per top-level category, keyed by the handle the Nuxt app links to (e.g. /products/tcg/singles)
+const SUBCATEGORIES: Record<string, {handle: string; name: string}[]> = {
+  TCG: [
+    { handle: 'singles', name: 'Singles' },
+    { handle: 'packs', name: 'Packs' },
+    { handle: 'boosters', name: 'Booster Boxes' },
+  ],
+  Figures: [
+    { handle: 'prize-figures', name: 'Prize Figures' },
+    { handle: 'scale-figures', name: 'Scale Figures' },
+    { handle: 'noodle-stoppers', name: 'Noodle Stoppers' },
+  ],
+  Keychains: [
+    { handle: 'acrylic', name: 'Acrylic keychains' },
+    { handle: 'metal', name: 'Metal keychains' },
+  ],
+}
 const SALES_CHANNELS = ['Webshop', 'Physical', 'Bol.com']
 
 const escapeXml = (value: string) =>
@@ -395,6 +421,18 @@ export default async function seed({ container }: ExecArgs) {
   const { result: categories } = await createProductCategoriesWorkflow(container).run({
     input: { product_categories: CATEGORIES.map((name) => ({ name, is_active: true })) },
   })
+  const { result: subcategories } = await createProductCategoriesWorkflow(container).run({
+    input: {
+      product_categories: Object.entries(SUBCATEGORIES).flatMap(([parentName, subs]) =>
+        subs.map((sub) => ({
+          name: sub.name,
+          handle: sub.handle,
+          is_active: true,
+          parent_category_id: categories.find((category) => category.name === parentName)!.id,
+        })),
+      ),
+    },
+  })
   const types = await productModule.createProductTypes(CATEGORIES.map((value) => ({ value })))
 
   logger.info('Uploading product images...')
@@ -430,7 +468,12 @@ export default async function seed({ container }: ExecArgs) {
           width: product.size[1],
           height: product.size[2],
           collection_id: collections.find((collection) => collection.title === product.collection)!.id,
-          category_ids: [categories.find((category) => category.name === product.category)!.id],
+          category_ids: [
+            categories.find((category) => category.name === product.category)!.id,
+            ...(product.subcategory
+              ? [subcategories.find((subcategory) => subcategory.handle === product.subcategory)!.id]
+              : []),
+          ],
           type_id: types.find((type) => type.value === product.category)!.id,
           shipping_profile_id: shippingProfile.id,
           thumbnail: imageUrls[index][0],

@@ -10,4 +10,10 @@ describe('navbar', () => {
         expect(link.exists()).toBe(true)
         expect(link.text()).toBe('Support')
     })
+
+    it('shows the Trustpilot score', async () => {
+        const wrapper = await mountSuspended(Navbar)
+
+        expect(wrapper.text()).toContain('4.0')
+    })
 })
