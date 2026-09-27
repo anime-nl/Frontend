@@ -27,8 +27,15 @@
     "vue-router": "^5.3.1"
   },
   "devDependencies": {
+    "@iconify-json/at-icons": "^1.2.4",
     "@iconify-json/flat-color-icons": "^1.2.3",
+    "@iconify-json/game-icons": "^1.2.4",
     "@iconify-json/lucide": "^1.2.136",
+    "@iconify-json/material-symbols": "^1.2.93",
+    "@iconify-json/material-symbols-light": "^1.2.94",
+    "@iconify-json/mdi": "^1.2.3",
+    "@iconify-json/pinhead": "^1.2.32",
+    "@iconify-json/simple-icons": "^1.2.97",
     "@nuxt/test-utils": "^4.3.2",
     "@types/node": "^26.6.2",
     "@types/nodemailer": "^8.0.2",

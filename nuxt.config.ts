@@ -10,6 +10,23 @@ export default defineNuxtConfig({
             include: ['@vue/devtools-core', '@vue/devtools-kit', 'qs']
         }
     },
+    icon: {
+        // Nuxt Icon's `local` auto-discovery only recognizes a fixed list of collection names, which
+        // does not include `pinhead` or `at-icons`; naming every collection explicitly bundles all of them.
+        serverBundle: {
+            collections: [
+                'lucide',
+                'flat-color-icons',
+                'mdi',
+                'material-symbols',
+                'material-symbols-light',
+                'game-icons',
+                'simple-icons',
+                'pinhead',
+                'at-icons'
+            ]
+        }
+    },
     medusa: {
         baseUrl: process.env.MEDUSA_URL || 'http://localhost:9000',
         global: true,
