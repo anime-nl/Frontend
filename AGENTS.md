@@ -16,6 +16,13 @@ A task is done when `bun run check` passes (formatting, type check and all tests
 
 Uses [Bun](https://bun.sh). Run everything from the repo root, via the scripts in `package.json`. `bunx vitest run --project <unit|nuxt|e2e>` runs a single test project (see [Testing](#testing)).
 
+## Git workflow
+
+- Every new feature or topic gets its own branch, created off `main`. When the user switches to a different topic, start a new branch instead of continuing on the current one.
+- Commit proactively: a request that changes something gets a commit, and a follow-up fix or adjustment on the same topic gets a new commit on that branch (never an amend).
+- A branch can be revisited later to continue the same feature, but never reopen (commit onto) a branch that has already been merged — start a new branch instead, even for closely related follow-up work.
+- Push to the remote only when asked.
+
 ## Layout
 
 | Path                   | What lives there                                                                      |
@@ -38,7 +45,7 @@ Pages are file-based routes (`app/pages/support/[topic].vue` is `/support/:topic
 - Imports from `shared/utils` are explicit (`import {x} from '#shared/utils/support'`). Nuxt's auto-import missed one of the functions there.
 - Environment variables are read in `nuxt.config.ts` with `process.env` at **build time**. On Coolify they must be available at build time, and changing one needs a redeploy. Add new ones to `.env.example`, `runtimeConfig` and the README.
 - The Nuxt server reaches Medusa through `medusaFetch` and `MEDUSA_SERVER_URL`. The browser uses `MEDUSA_URL`. Inside the dev container these differ.
-- Do not commit unless asked. The repo owner commits themselves. Do not install dependencies without a reason that fits the task.
+- Do not install dependencies without a reason that fits the task.
 
 ## Testing
 
