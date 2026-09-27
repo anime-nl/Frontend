@@ -26,8 +26,14 @@ const validRequest = {
     website: ''
 }
 
-const postSupport = (body: unknown) =>
-    fetch('/api/support', {method: 'POST', body: JSON.stringify(body), headers: {'content-type': 'application/json'}})
+// Every call gets its own address by default, so tests never share a rate limit bucket unless a test wants that
+let nextIp = 0
+const postSupport = (body: unknown, ip = `198.51.100.${++nextIp}`) =>
+    fetch('/api/support', {
+        method: 'POST',
+        body: JSON.stringify(body),
+        headers: {'content-type': 'application/json', 'x-forwarded-for': ip}
+    })
 
 describe('support pages', () => {
     it('renders the overview with a link to every topic', async () => {
@@ -119,5 +125,17 @@ describe('POST /api/support', () => {
         const response = await postSupport(validRequest)
 
         expect(response.status).toBe(502)
+    })
+
+    it('rate limits repeated requests from the same address', async () => {
+        const ip = '203.0.113.42'
+
+        for (let i = 0; i < 5; i++) {
+            const response = await postSupport(validRequest, ip)
+            expect(response.status).toBe(200)
+        }
+
+        const limited = await postSupport(validRequest, ip)
+        expect(limited.status).toBe(429)
     })
 })

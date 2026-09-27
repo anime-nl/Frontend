@@ -1,7 +1,15 @@
 import nodemailer from 'nodemailer'
 import {findSupportTopic, normalizeSupportRequest, validateSupportRequest} from '#shared/utils/support'
+import {isRateLimited} from '../utils/rateLimit'
+
+const SUPPORT_RATE_LIMIT = {limit: 5, windowMs: 10 * 60 * 1000}
 
 export default defineEventHandler(async (event) => {
+    const ip = getRequestIP(event, {xForwardedFor: true}) ?? 'unknown'
+    if (isRateLimited(`support:${ip}`, SUPPORT_RATE_LIMIT)) {
+        throw createError({statusCode: 429, statusMessage: 'Too many support requests, please try again later'})
+    }
+
     const body = normalizeSupportRequest(await readBody(event))
 
     // Bots fill in the hidden field, pretend it worked so they don't retry
