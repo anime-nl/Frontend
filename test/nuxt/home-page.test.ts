@@ -1,4 +1,4 @@
-import {afterEach, describe, expect, it} from 'vitest'
+import {afterEach, describe, expect, it, vi} from 'vitest'
 import {mountSuspended, registerEndpoint} from '@nuxt/test-utils/runtime'
 import IndexPage from '~/pages/index.vue'
 
@@ -15,6 +15,13 @@ afterEach(() => {
 })
 
 describe('home page', () => {
+    it('sets a page title and meta description for search engines', async () => {
+        wrapper = await mountSuspended(IndexPage, {attachTo: document.body})
+
+        await vi.waitFor(() => expect(document.title).toBe('Anime Merchandise Webshop | AnimeNL'))
+        expect(document.querySelector('meta[name="description"]')?.getAttribute('content')).toContain('AnimeNL')
+    })
+
     it('shows the new products in the showcase carousel', async () => {
         wrapper = await mountSuspended(IndexPage, {attachTo: document.body})
 

@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+// Not linked from navigation and duplicates /search without its filters, so keep it out of search results.
+useSeoMeta({robots: 'noindex'})
+
 const {data, pending, error} = await useFetch('/api/products')
 </script>
 

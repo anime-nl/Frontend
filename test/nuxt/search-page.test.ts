@@ -32,6 +32,13 @@ afterEach(() => {
 })
 
 describe('search page', () => {
+    it('sets a page title and meta description for search engines', async () => {
+        wrapper = await mountSearch('')
+
+        await vi.waitFor(() => expect(document.title).toBe('Search | AnimeNL'))
+        expect(document.querySelector('meta[name="description"]')?.getAttribute('content')).toContain('catalog')
+    })
+
     it('selects the category from its handle', async () => {
         wrapper = await mountSearch('category=tcg')
 
