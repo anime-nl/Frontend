@@ -32,13 +32,17 @@ export default defineEventHandler(async (event) => {
         throw createError({statusCode: 400, statusMessage: 'quantity must be an integer of at least 1'})
     }
 
-    const cartId = await getOrCreateCartId(event)
+    try {
+        const cartId = await getOrCreateCartId(event)
 
-    const {cart} = await medusaFetch<{cart: StoreCart}>(event, `carts/${cartId}/line-items`, {
-        method: 'POST',
-        body: {variant_id: body.variant_id, quantity: body.quantity},
-        query: {fields: CART_FIELDS}
-    })
+        const {cart} = await medusaFetch<{cart: StoreCart}>(event, `carts/${cartId}/line-items`, {
+            method: 'POST',
+            body: {variant_id: body.variant_id, quantity: body.quantity},
+            query: {fields: CART_FIELDS}
+        })
 
-    return {cart}
+        return {cart}
+    } catch {
+        throw createError({statusCode: 500, statusMessage: 'Could not add item to cart'})
+    }
 })

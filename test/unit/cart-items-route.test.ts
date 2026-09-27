@@ -95,4 +95,19 @@ describe('POST /api/cart/items', () => {
         await expect(callRoute()).rejects.toMatchObject({statusCode: 400})
         expect(medusaFetch).not.toHaveBeenCalled()
     })
+
+    it('fails gracefully when Medusa is unreachable while creating a cart', async () => {
+        getCookie.mockReturnValue(undefined)
+        medusaFetch.mockRejectedValue(new Error('fetch failed'))
+
+        await expect(callRoute()).rejects.toMatchObject({statusCode: 500})
+        expect(setCookie).not.toHaveBeenCalled()
+    })
+
+    it('fails gracefully when Medusa is unreachable while adding to an existing cart', async () => {
+        getCookie.mockReturnValue('cart_1')
+        medusaFetch.mockRejectedValue(new Error('fetch failed'))
+
+        await expect(callRoute()).rejects.toMatchObject({statusCode: 500})
+    })
 })
