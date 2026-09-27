@@ -10,7 +10,7 @@ if (!topic) {
 }
 
 useSeoMeta({
-  title: `${topic.title} | Support | AnimeNL`,
+  title: `${topic.title} | Support`,
   description: topic.intro
 })
 

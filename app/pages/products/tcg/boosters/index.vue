@@ -1,5 +1,5 @@
 <script setup lang="ts">
-useSeoMeta({title: 'TCG Booster Boxes | AnimeNL'})
+useSeoMeta({title: 'TCG Booster Boxes', description: 'Buy boxes filled with packs and extras.'})
 </script>
 
 <template>

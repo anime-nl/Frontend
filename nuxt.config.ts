@@ -7,6 +7,13 @@ export default defineNuxtConfig({
     css: ['~/assets/css/main.css'],
     compatibilityDate: '2025-07-15',
     devtools: {enabled: true},
+    app: {
+        head: {
+            htmlAttrs: {lang: 'en'},
+            title: 'AnimeNL',
+            titleTemplate: '%s | AnimeNL'
+        }
+    },
     vite: {
         optimizeDeps: {
             include: ['@vue/devtools-core', '@vue/devtools-kit', 'qs']
