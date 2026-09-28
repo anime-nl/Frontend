@@ -18,7 +18,7 @@ describe('home page', () => {
     it('sets a page title and meta description for search engines', async () => {
         wrapper = await mountSuspended(IndexPage, {attachTo: document.body})
 
-        await vi.waitFor(() => expect(document.title).toBe('Anime Merchandise Webshop | AnimeNL'))
+        await vi.waitFor(() => expect(document.title).toBe('Home | AnimeNL'))
         expect(document.querySelector('meta[name="description"]')?.getAttribute('content')).toContain('AnimeNL')
     })
 
