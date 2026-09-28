@@ -61,7 +61,7 @@ describe('showcase carousel', () => {
         wrapper = await mountCarousel()
 
         const image = wrapper.find('img')
-        expect(image.classes()).toContain('h-80')
+        expect(image.classes()).toContain('h-100')
         expect(image.classes()).toContain('object-cover')
     })
 })
