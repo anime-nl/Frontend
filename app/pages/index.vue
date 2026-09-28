@@ -7,7 +7,9 @@ useSeoMeta({
 </script>
 
 <template>
-  <ShowcaseCarousel />
-  <SearchBar />
-  <RandomProductGrid />
+  <div>
+    <ShowcaseCarousel />
+    <SearchBar />
+    <RandomProductGrid />
+  </div>
 </template>

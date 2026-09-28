@@ -33,7 +33,8 @@ bun run dev      # dev server on http://localhost:3000
 bun run build    # production build
 bun run preview  # preview the production build
 bun run test     # unit, component and end-to-end tests
-bun run check    # format check, type check and tests
+bun run lint     # eslint
+bun run check    # format check, lint, type check and tests
 ```
 
 ## Production
