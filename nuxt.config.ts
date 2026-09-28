@@ -55,6 +55,9 @@ export default defineNuxtConfig({
         medusaServerUrl: process.env.MEDUSA_SERVER_URL || process.env.MEDUSA_URL,
         medusaPublishableKey: process.env.MEDUSA_PUBLISHABLE_KEY,
         medusaSalesChannelId: process.env.MEDUSA_SALES_CHANNEL_ID,
+        // Shipping profile ids used to pick which shipping options to show at checkout (see server/api/checkout/shipping-options.get.ts)
+        medusaBrievenbusShippingProfileId: process.env.MEDUSA_BRIEVENBUS_SHIPPING_PROFILE_ID,
+        medusaPakketShippingProfileId: process.env.MEDUSA_PAKKET_SHIPPING_PROFILE_ID,
         // SMTP server for the /support forms
         smtpHost: process.env.SMTP_HOST,
         smtpPort: Number(process.env.SMTP_PORT) || 587,

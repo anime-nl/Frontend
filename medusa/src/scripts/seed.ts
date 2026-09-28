@@ -250,6 +250,8 @@ const PRODUCTS: ProductSeed[] = [
 
 const COLLECTIONS = ['Genshin Impact', 'Bocchi the Rock!', 'Hololive', 'Pokémon TCG']
 const CATEGORIES = ['Keychains', 'Figures', 'Plush', 'TCG']
+// Categories thin/small enough to ship in a Brievenbus (letterbox parcel); everything else ships as a Pakket.
+const BRIEVENBUS_CATEGORIES = ['Keychains', 'TCG']
 
 // Subcategories per top-level category, keyed by the handle the Nuxt app links to (e.g. /products/tcg/singles)
 const SUBCATEGORIES: Record<string, {handle: string; name: string}[]> = {
@@ -365,14 +367,27 @@ export default async function seed({ container }: ExecArgs) {
     [Modules.FULFILLMENT]: { fulfillment_provider_id: 'manual_manual' },
   })
 
-  let [shippingProfile] = await fulfillmentModule.listShippingProfiles({ type: 'default' })
-  if (!shippingProfile) {
-    ;[shippingProfile] = (
+  let [brievenbusProfile] = await fulfillmentModule.listShippingProfiles({ name: 'Brievenbus' })
+  if (!brievenbusProfile) {
+    ;[brievenbusProfile] = (
       await createShippingProfilesWorkflow(container).run({
-        input: { data: [{ name: 'Default Shipping Profile', type: 'default' }] },
+        input: { data: [{ name: 'Brievenbus', type: 'default' }] },
       })
     ).result
   }
+
+  let [pakketProfile] = await fulfillmentModule.listShippingProfiles({ name: 'Pakket' })
+  if (!pakketProfile) {
+    ;[pakketProfile] = (
+      await createShippingProfilesWorkflow(container).run({
+        input: { data: [{ name: 'Pakket', type: 'default' }] },
+      })
+    ).result
+  }
+  logger.info(
+    `Shipping profiles: Brievenbus=${brievenbusProfile.id} Pakket=${pakketProfile.id} ` +
+      '(set MEDUSA_BRIEVENBUS_SHIPPING_PROFILE_ID / MEDUSA_PAKKET_SHIPPING_PROFILE_ID to these in .env)',
+  )
 
   const fulfillmentSet = await fulfillmentModule.createFulfillmentSets({
     name: 'Warehouse delivery',
@@ -391,15 +406,41 @@ export default async function seed({ container }: ExecArgs) {
 
   await createShippingOptionsWorkflow(container).run({
     input: [
-      { name: 'Standard Shipping', code: 'standard', description: 'Ship in 2-3 days.', amount: 4.95 },
-      { name: 'Express Shipping', code: 'express', description: 'Ship in 24 hours.', amount: 9.95 },
+      {
+        name: 'PostNL Brievenbuspakje',
+        code: 'postnl-brievenbuspakje',
+        description: 'Ship in 2-3 days.',
+        amount: 3.95,
+        shipping_profile_id: brievenbusProfile.id,
+      },
+      {
+        name: 'PostNL Pakket',
+        code: 'postnl-pakket',
+        description: 'Ship in 2-3 days.',
+        amount: 4.95,
+        shipping_profile_id: pakketProfile.id,
+      },
+      {
+        name: 'DPD',
+        code: 'dpd',
+        description: 'Ship in 2-3 days.',
+        amount: 5.45,
+        shipping_profile_id: pakketProfile.id,
+      },
+      {
+        name: 'DHL',
+        code: 'dhl',
+        description: 'Ship in 24 hours.',
+        amount: 8.95,
+        shipping_profile_id: pakketProfile.id,
+      },
     ].map((option) => ({
       name: option.name,
       price_type: 'flat' as const,
       provider_id: 'manual_manual',
       service_zone_id: fulfillmentSet.service_zones[0].id,
-      shipping_profile_id: shippingProfile.id,
-      type: { label: option.name.split(' ')[0], description: option.description, code: option.code },
+      shipping_profile_id: option.shipping_profile_id,
+      type: { label: option.name, description: option.description, code: option.code },
       prices: [{ currency_code: 'eur', amount: option.amount }],
       rules: [
         { attribute: 'enabled_in_store', value: 'true', operator: 'eq' as const },
@@ -486,7 +527,9 @@ export default async function seed({ container }: ExecArgs) {
               : []),
           ],
           type_id: types.find((type) => type.value === product.category)!.id,
-          shipping_profile_id: shippingProfile.id,
+          shipping_profile_id: BRIEVENBUS_CATEGORIES.includes(product.category)
+            ? brievenbusProfile.id
+            : pakketProfile.id,
           thumbnail: imageUrls[index][0],
           images: imageUrls[index].map((url) => ({ url })),
           options: optionNames.map((title) => ({

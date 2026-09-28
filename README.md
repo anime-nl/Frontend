@@ -17,6 +17,7 @@ On first start the `medusa` service installs its dependencies, runs migrations, 
 - Admin login: `admin@animenl.local` / `supersecret`
 - File storage is SeaweedFS (S3 API on `localhost:9100`, no login needed; any credentials work). Medusa's bucket is `medusa`, created by `medusa/start.sh`.
 - The Nuxt environment (`MEDUSA_URL`, `MEDUSA_SERVER_URL`, `MEDUSA_PUBLISHABLE_KEY`, `MEDUSA_SALES_CHANNEL_ID`) is set by the compose file and overrides any local `.env`. Copy `.env.example` to `.env` to run Nuxt outside the container.
+- Seeding also logs the ids of the Brievenbus and Pakket shipping profiles it creates. Copy `.env.example` to `.env` and set `MEDUSA_BRIEVENBUS_SHIPPING_PROFILE_ID`/`MEDUSA_PAKKET_SHIPPING_PROFILE_ID` to those values so checkout can group shipping options by profile locally; the compose file does not set them since they are regenerated on every reseed.
 - The browser never talks to Medusa directly; only the Nuxt server does, through `server/api/*` routes. Inside a container, `*.localhost` hostnames resolve to loopback rather than to other containers, so the Nuxt server uses `MEDUSA_SERVER_URL=http://medusa:9000/` (the compose service name) to reach Medusa; `medusa.localhost` is still how your host browser reaches the Medusa **admin dashboard** directly.
 - Google sign-in needs a Google OAuth client: copy `.devcontainer/.env.example` to `.devcontainer/.env` (gitignored, never commit real credentials) and fill in `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` from a Google Cloud Console Web application client whose Authorized redirect URIs include `http://localhost:3000/account/callback/google`. Without it, `medusa`'s `auth-google` provider fails to register and sign-in shows an error, but the rest of the site still works.
 - The `app` service depends on `medusa`, so opening the dev container starts the whole stack. The first start takes a few minutes while Medusa installs dependencies, migrates and seeds; follow it with `docker compose -f .devcontainer/docker-compose.yml logs -f medusa`.
@@ -47,6 +48,8 @@ Only the Nuxt app is deployed (Nixpacks: `bun run build`, `bun run start`). The 
 | `MEDUSA_SERVER_URL`                                | Medusa URL for the Nuxt server (defaults to `MEDUSA_URL`)                               |
 | `MEDUSA_PUBLISHABLE_KEY`                           | Publishable API key from the Medusa admin                                               |
 | `MEDUSA_SALES_CHANNEL_ID`                          | Sales channel id, if used                                                               |
+| `MEDUSA_BRIEVENBUS_SHIPPING_PROFILE_ID`            | Id of the Brievenbus shipping profile in the Medusa admin                               |
+| `MEDUSA_PAKKET_SHIPPING_PROFILE_ID`                | Id of the Pakket shipping profile in the Medusa admin                                   |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` | SMTP server for the support forms, see below                                            |
 | `SITE_URL`                                         | Public URL of the site, used to build `/sitemap.xml` (defaults to `https://animenl.nl`) |
 

@@ -18,9 +18,7 @@
   },
   "postCreateCommand": "bun install",
   "remoteUser": "node",
-  "mounts": [
-    "source=claude-code-config,target=/home/node/.claude,type=volume"
-  ],
+  "mounts": ["source=claude-code-config,target=/home/node/.claude,type=volume"],
   "containerEnv": {
     "CLAUDE_CONFIG_DIR": "/home/node/.claude"
   }
