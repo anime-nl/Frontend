@@ -2,6 +2,7 @@
 const items = navigationItems
 const mobileMenuOpen = ref(false)
 const cart = useCart()
+const customer = useCustomer()
 
 const route = useRoute()
 watch(
@@ -20,6 +21,15 @@ watch(
       <UChip :text="String(cart.count.value)" :show="cart.count.value > 0" color="primary" size="sm">
         <UButton to="/cart" icon="i-lucide-shopping-cart" color="neutral" variant="ghost" aria-label="Cart" />
       </UChip>
+
+      <UButton
+        v-if="customer.customer.value"
+        :label="customer.customer.value.first_name || 'Account'"
+        to="/account"
+        color="neutral"
+        variant="ghost"
+      />
+      <UButton v-else label="Log in" to="/account/login" color="neutral" variant="ghost" />
 
       <UButton
         class="lg:hidden"

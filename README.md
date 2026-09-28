@@ -18,6 +18,7 @@ On first start the `medusa` service installs its dependencies, runs migrations, 
 - File storage is SeaweedFS (S3 API on `localhost:9100`, no login needed; any credentials work). Medusa's bucket is `medusa`, created by `medusa/start.sh`.
 - The Nuxt environment (`MEDUSA_URL`, `MEDUSA_SERVER_URL`, `MEDUSA_PUBLISHABLE_KEY`, `MEDUSA_SALES_CHANNEL_ID`) is set by the compose file and overrides any local `.env`. Copy `.env.example` to `.env` to run Nuxt outside the container.
 - The browser never talks to Medusa directly; only the Nuxt server does, through `server/api/*` routes. Inside a container, `*.localhost` hostnames resolve to loopback rather than to other containers, so the Nuxt server uses `MEDUSA_SERVER_URL=http://medusa:9000/` (the compose service name) to reach Medusa; `medusa.localhost` is still how your host browser reaches the Medusa **admin dashboard** directly.
+- Google sign-in needs a Google OAuth client: copy `.devcontainer/.env.example` to `.devcontainer/.env` (gitignored, never commit real credentials) and fill in `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` from a Google Cloud Console Web application client whose Authorized redirect URIs include `http://localhost:3000/account/callback/google`. Without it, `medusa`'s `auth-google` provider fails to register and sign-in shows an error, but the rest of the site still works.
 - The `app` service depends on `medusa`, so opening the dev container starts the whole stack. The first start takes a few minutes while Medusa installs dependencies, migrates and seeds; follow it with `docker compose -f .devcontainer/docker-compose.yml logs -f medusa`.
 - To reset all data and reseed: `docker compose -f .devcontainer/docker-compose.yml down -v`, then rebuild the container.
 
@@ -69,3 +70,11 @@ Production sends them through [Brevo](https://www.brevo.com):
 4. Submit a form on the live site and check that the email arrives and is not marked as spam.
 
 Brevo handles the name, email address and message of every submission, so mention it in the privacy policy.
+
+### Enabling Google sign-in
+
+Customers sign in with Google only — the store never collects or stores a password. This is configured on **Medusa**, not on the Nuxt app, and production's Medusa instance is a separate deployment outside this repo (see "Production" above), so enabling it there is a manual step this repo cannot do or verify:
+
+1. In Google Cloud Console, create (or reuse) an OAuth 2.0 **Web application** client. Add the production callback URL to its Authorized redirect URIs: `https://animenl.nl/account/callback/google` (alongside the local dev one, `http://localhost:3000/account/callback/google`, if the same client is reused). "Authorized JavaScript origins" is not needed — sign-in is a server-side redirect, not a client-side flow.
+2. On production's Medusa instance, set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` and `GOOGLE_CALLBACK_URL=https://animenl.nl/account/callback/google`, and make sure its `medusa-config.ts` registers the `@medusajs/medusa/auth-google` provider (see `medusa/medusa-config.ts` in this repo for the shape local dev uses).
+3. Sign in on the live site and confirm the customer appears in the Medusa admin.

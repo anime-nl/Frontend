@@ -5,16 +5,19 @@ export interface MedusaFetchInit {
     query?: Record<string, unknown>
     body?: unknown
     token?: string
+    /** Which Medusa API to call. Defaults to 'store'; OAuth routes need 'auth' instead. */
+    base?: 'store' | 'auth'
 }
 
-/** Calls the Medusa store API from the Nuxt server, authenticated with the publishable key. */
+/** Calls the Medusa store or auth API from the Nuxt server, authenticated with the publishable key. */
 export async function medusaFetch<T>(event: H3Event, path: string, init: MedusaFetchInit = {}): Promise<T> {
     const config = useRuntimeConfig(event)
+    const base = init.base ?? 'store'
 
     try {
         // `any` opts out of Nitro's internal route typing, which does not apply to this external URL;
         // the options object needs the same escape, or TS tries to match it against that typed-route system
-        return await $fetch<T, any>(`${config.medusaServerUrl}store/${path}`, {
+        return await $fetch<T, any>(`${config.medusaServerUrl}${base}/${path}`, {
             method: init.method,
             query: init.query,
             body: init.body,
@@ -26,7 +29,7 @@ export async function medusaFetch<T>(event: H3Event, path: string, init: MedusaF
     } catch (error) {
         // A 404 is a normal answer for an unknown product, not a failure worth a log line
         if ((error as {statusCode?: number}).statusCode !== 404) {
-            console.error(`Medusa request to store/${path} failed:`, error, (error as {data?: unknown}).data)
+            console.error(`Medusa request to ${base}/${path} failed:`, error, (error as {data?: unknown}).data)
         }
         throw error
     }
