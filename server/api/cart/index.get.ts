@@ -12,8 +12,9 @@ export default defineEventHandler(async (event) => {
     try {
         const {cart} = await medusaFetch<{cart: StoreCart}>(event, `carts/${cartId}`, {query: {fields: CART_FIELDS}})
         return {cart}
-    } catch (error: any) {
-        if (error?.statusCode === 404 || error?.response?.status === 404) {
+    } catch (error) {
+        const {statusCode, response} = error as {statusCode?: number; response?: {status?: number}}
+        if (statusCode === 404 || response?.status === 404) {
             deleteCookie(event, CART_ID_COOKIE, {path: '/'})
             return {cart: null}
         }

@@ -41,6 +41,20 @@ describe('product card', () => {
         expect(wrapper.text()).toContain('Price unavailable')
     })
 
+    it('shows "Price unavailable" when the calculated price has no amount', async () => {
+        wrapper = await mountSuspended(ProductCard, {
+            props: {
+                product: {
+                    id: 'prod_1',
+                    title: 'Zhongli Keychain',
+                    variants: [{calculated_price: {calculated_amount: null, currency_code: 'eur'}}]
+                }
+            }
+        })
+
+        expect(wrapper.text()).toContain('Price unavailable')
+    })
+
     it('shows the thumbnail image when there is one', async () => {
         wrapper = await mountSuspended(ProductCard, {
             props: {product: {id: 'prod_1', title: 'Zhongli Keychain', thumbnail: 'https://example.com/img.png'}}

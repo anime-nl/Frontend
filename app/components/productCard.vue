@@ -1,9 +1,17 @@
 <script lang="ts" setup>
-const props = defineProps(['product'])
+// Narrowed to the fields this card actually renders, so callers (and tests) don't need a full StoreProduct
+type ProductCardProduct = {
+  id: string
+  title: string
+  thumbnail?: string | null
+  variants?: {calculated_price?: {calculated_amount: number | null; currency_code: string | null} | null}[] | null
+}
+
+const props = defineProps<{product: ProductCardProduct}>()
 
 const price = computed(() => {
   const calculated = props.product?.variants?.[0]?.calculated_price
-  if (!calculated) return null
+  if (calculated?.calculated_amount == null || calculated.currency_code == null) return null
 
   return {
     amount: calculated.calculated_amount,

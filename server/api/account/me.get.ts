@@ -13,8 +13,9 @@ export default defineEventHandler(async (event) => {
 
     try {
         return await medusaFetch<{customer: StoreCustomer}>(event, 'customers/me', {token})
-    } catch (error: any) {
-        if (error?.statusCode === 401 || error?.response?.status === 401) {
+    } catch (error) {
+        const {statusCode, response} = error as {statusCode?: number; response?: {status?: number}}
+        if (statusCode === 401 || response?.status === 401) {
             deleteCookie(event, SESSION_COOKIE, {path: '/'})
         }
         throw createError({statusCode: 401, statusMessage: 'Not signed in'})

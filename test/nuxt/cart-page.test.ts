@@ -30,7 +30,10 @@ registerEndpoint('/api/cart/items/item_1', {
     handler: async (event) => {
         lastPutBody = await readBody(event)
         return {
-            cart: {...cartWithItems, items: [{...cartWithItems.items[0]!, quantity: (lastPutBody as any).quantity}]}
+            cart: {
+                ...cartWithItems,
+                items: [{...cartWithItems.items[0]!, quantity: (lastPutBody as {quantity: number}).quantity}]
+            }
         }
     }
 })

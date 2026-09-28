@@ -43,8 +43,9 @@ export default defineEventHandler(async (event) => {
         })
 
         return {product, region_id: regionId, sales_channel_id: salesChannelId}
-    } catch (error: any) {
-        if (error?.statusCode === 404 || error?.response?.status === 404) {
+    } catch (error) {
+        const {statusCode, response} = error as {statusCode?: number; response?: {status?: number}}
+        if (statusCode === 404 || response?.status === 404) {
             throw createError({statusCode: 404, statusMessage: 'Product not found'})
         }
         throw createError({statusCode: 500, statusMessage: 'Could not fetch product'})
