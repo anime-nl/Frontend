@@ -30,10 +30,14 @@ registerEndpoint('/api/account/me', () => {
     if (!customer) throw createError({statusCode: 401})
     return {customer}
 })
+let addressShouldFail = false
+let shippingMethodShouldFail = false
+
 registerEndpoint('/api/checkout/address', {
     method: 'POST',
     handler: async (event) => {
         lastAddressBody = await readBody(event)
+        if (addressShouldFail) throw createError({statusCode: 500})
         cart = {...cartWithItems}
         return {cart}
     }
@@ -43,12 +47,12 @@ registerEndpoint('/api/checkout/shipping-method', {
     method: 'POST',
     handler: async (event) => {
         const {option_id} = await readBody<{option_id: string}>(event)
+        if (shippingMethodShouldFail) throw createError({statusCode: 500})
         const option = shippingOptions.find((o) => o.id === option_id)!
         cart = {...cartWithItems, shipping_methods: [{id: 'sm_1', name: option.name, amount: option.amount}]}
         return {cart}
     }
 })
-
 let paymentSessionError: {statusCode: number; statusMessage: string} | undefined
 registerEndpoint('/api/checkout/payment-session', {
     method: 'POST',
@@ -88,6 +92,8 @@ beforeEach(() => {
     cart = cartWithItems
     customer = null
     lastAddressBody = undefined
+    addressShouldFail = false
+    shippingMethodShouldFail = false
     paymentSessionError = undefined
     navigateToMock.mockClear()
 })
@@ -146,6 +152,51 @@ describe('checkout page', () => {
         expect(wrapper.text()).toContain('Express')
     })
 
+    it('shows an error and stays on the address step when saving the address fails', async () => {
+        addressShouldFail = true
+        wrapper = await mountCheckout()
+
+        await fillAddress(wrapper)
+        await submitAddress(wrapper)
+
+        await vi.waitFor(() =>
+            expect(wrapper!.text()).toContain('Something went wrong saving your address. Please try again.')
+        )
+        expect(wrapper.text()).not.toContain('Standard')
+    })
+
+    it('going back from the shipping step returns to the address step', async () => {
+        wrapper = await mountCheckout()
+        await fillAddress(wrapper)
+        await submitAddress(wrapper)
+        await vi.waitFor(() => expect(wrapper!.findComponent({name: 'URadioGroup'}).exists()).toBe(true))
+
+        const backButton = wrapper.findAllComponents({name: 'UButton'}).find((button) => button.text() === 'Back')
+        await backButton!.trigger('click')
+
+        expect(wrapper.find('[name="email"]').exists()).toBe(true)
+    })
+
+    it('shows an error and stays on the shipping step when setting the shipping method fails', async () => {
+        shippingMethodShouldFail = true
+        wrapper = await mountCheckout()
+        await fillAddress(wrapper)
+        await submitAddress(wrapper)
+        await vi.waitFor(() => expect(wrapper!.findComponent({name: 'URadioGroup'}).exists()).toBe(true))
+
+        await wrapper.findComponent({name: 'URadioGroup'}).vm.$emit('update:modelValue', 'so_standard')
+        await flushPromises()
+        const continueButton = wrapper
+            .findAllComponents({name: 'UButton'})
+            .find((button) => button.text() === 'Continue to review')
+        await continueButton!.trigger('click')
+
+        await vi.waitFor(() =>
+            expect(wrapper!.text()).toContain('Something went wrong setting your shipping method. Please try again.')
+        )
+        expect(wrapper.text()).not.toContain('Review your order')
+    })
+
     async function reachReviewStep(w: Awaited<ReturnType<typeof mountCheckout>>) {
         await fillAddress(w)
         await submitAddress(w)
@@ -183,5 +234,15 @@ describe('checkout page', () => {
 
         await vi.waitFor(() => expect(wrapper!.text()).toContain('Something went wrong starting your payment'))
         expect(navigateToMock).not.toHaveBeenCalledWith(expect.stringContaining('mollie'), expect.anything())
+    })
+
+    it('going back from the review step returns to the shipping step', async () => {
+        wrapper = await mountCheckout()
+        await reachReviewStep(wrapper)
+
+        const backButton = wrapper.findAllComponents({name: 'UButton'}).find((button) => button.text() === 'Back')
+        await backButton!.trigger('click')
+
+        expect(wrapper.findComponent({name: 'URadioGroup'}).exists()).toBe(true)
     })
 })

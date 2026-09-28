@@ -37,6 +37,10 @@ const submit = async (wrapper: Awaited<ReturnType<typeof mountTopic>>) => {
 }
 
 describe('support topic page', () => {
+    it('answers 404 for an unknown topic', async () => {
+        await expect(mountTopic('unknown-topic')).rejects.toThrow()
+    })
+
     it('shows the title and intro of the topic', async () => {
         const wrapper = await mountTopic('returns')
 
@@ -97,6 +101,36 @@ describe('support topic page', () => {
         ])
         await vi.waitFor(() => expect(wrapper.text()).toContain('Message sent'))
         expect(wrapper.text()).toContain('jan@example.nl')
+    })
+
+    it('sends the chosen reason instead of the default one', async () => {
+        const wrapper = await mountTopic('returns')
+
+        await fillIn(wrapper, {
+            orderNumber: '1001',
+            name: 'Jan Jansen',
+            email: 'jan@example.nl',
+            message: 'Please help'
+        })
+        await wrapper.find('[name="reason"]').setValue('My item arrived damaged')
+        await submit(wrapper)
+
+        expect(submittedBodies).toEqual([expect.objectContaining({reason: 'My item arrived damaged'})])
+    })
+
+    it('sends whatever a bot fills into the hidden honeypot field', async () => {
+        const wrapper = await mountTopic('returns')
+
+        await fillIn(wrapper, {
+            orderNumber: '1001',
+            name: 'Jan Jansen',
+            email: 'jan@example.nl',
+            message: 'Please help',
+            website: 'https://spam.example'
+        })
+        await submit(wrapper)
+
+        expect(submittedBodies).toEqual([expect.objectContaining({website: 'https://spam.example'})])
     })
 
     it('shows an error and keeps the form when sending fails', async () => {

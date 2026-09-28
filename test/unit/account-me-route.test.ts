@@ -48,4 +48,20 @@ describe('GET /api/account/me', () => {
         await expect(callRoute()).rejects.toMatchObject({statusCode: 401})
         expect(deleteCookie).toHaveBeenCalledWith(expect.anything(), 'medusa_session', expect.anything())
     })
+
+    it('clears the cookie when Medusa rejects with a 401 response instead of a statusCode', async () => {
+        getCookie.mockReturnValue('tok_stale')
+        medusaFetch.mockRejectedValue({response: {status: 401}})
+
+        await expect(callRoute()).rejects.toMatchObject({statusCode: 401})
+        expect(deleteCookie).toHaveBeenCalledWith(expect.anything(), 'medusa_session', expect.anything())
+    })
+
+    it('does not clear the cookie when Medusa fails for an unrelated reason', async () => {
+        getCookie.mockReturnValue('tok_valid')
+        medusaFetch.mockRejectedValue({statusCode: 500})
+
+        await expect(callRoute()).rejects.toMatchObject({statusCode: 401})
+        expect(deleteCookie).not.toHaveBeenCalled()
+    })
 })

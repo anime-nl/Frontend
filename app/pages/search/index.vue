@@ -215,8 +215,8 @@ onUnmounted(() => {
       <div v-if="!loading && products.length === 0" class="text-center py-20 text-slate-400">
         <p class="text-lg">No products found matching your criteria.</p>
         <button
-          @click="resetFilters"
           class="mt-4 text-sky-400 hover:text-sky-200 underline transition-colors focus:outline-none"
+          @click="resetFilters"
         >
           Clear filters
         </button>

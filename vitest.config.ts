@@ -4,6 +4,18 @@ import {defineVitestProject} from '@nuxt/test-utils/config'
 
 export default defineConfig({
     test: {
+        coverage: {
+            provider: 'v8',
+            reporter: ['text', 'json-summary', 'html'],
+            // The Medusa backend under medusa/ isn't part of this app's deployment (see AGENTS.md), so it's excluded
+            include: ['app/**', 'server/**', 'shared/**'],
+            thresholds: {
+                lines: 80,
+                statements: 80,
+                functions: 80,
+                branches: 80
+            }
+        },
         projects: [
             {
                 resolve: {

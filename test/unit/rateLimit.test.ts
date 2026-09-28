@@ -31,4 +31,8 @@ describe('isRateLimited', () => {
 
         expect(isRateLimited('key-b', {limit: 1, windowMs: 1000, now: 0})).toBe(false)
     })
+
+    it('defaults to the current time when none is given', () => {
+        expect(isRateLimited('defaults-to-now', {limit: 1, windowMs: 1000})).toBe(false)
+    })
 })

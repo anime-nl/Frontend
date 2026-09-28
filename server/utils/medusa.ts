@@ -23,6 +23,7 @@ export async function medusaFetch<T>(event: H3Event, path: string, init: MedusaF
     try {
         // `any` opts out of Nitro's internal route typing, which does not apply to this external URL;
         // the options object needs the same escape, or TS tries to match it against that typed-route system
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return await $fetch<T, any>(`${config.medusaServerUrl}${base}/${path}`, {
             method: init.method,
             query: init.query,
@@ -31,6 +32,7 @@ export async function medusaFetch<T>(event: H3Event, path: string, init: MedusaF
                 'x-publishable-api-key': config.medusaPublishableKey,
                 ...(init.token ? {Authorization: `Bearer ${init.token}`} : {})
             }
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any)
     } catch (error) {
         // A 404 is a normal answer for an unknown product, not a failure worth a log line

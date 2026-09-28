@@ -11,10 +11,12 @@
     "postinstall": "nuxt prepare",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:coverage": "vitest run --project unit --project nuxt --coverage",
     "typecheck": "nuxt typecheck",
+    "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "bun run format:check && bun run typecheck && bun run test"
+    "check": "bun run format:check && bun run lint && bun run typecheck && bun run test"
   },
   "dependencies": {
     "@nuxt/ui": "^4.11.2",
@@ -36,9 +38,11 @@
     "@iconify-json/pinhead": "^1.2.32",
     "@iconify-json/simple-icons": "^1.2.97",
     "@medusajs/types": "2.21.1",
+    "@nuxt/eslint": "^1.17.0",
     "@nuxt/test-utils": "^4.3.2",
     "@types/node": "^26.6.2",
     "@types/nodemailer": "^8.0.2",
+    "@vitest/coverage-v8": "^5.0.2",
     "@vue/devtools-core": "^8.2.1",
     "@vue/devtools-kit": "^8.2.1",
     "@vue/test-utils": "^2.5.1",
@@ -47,5 +51,8 @@
     "typescript": "5",
     "vitest": "^5.0.2",
     "vue-tsc": "^3.3.11"
-  }
+  },
+  "trustedDependencies": [
+    "unrs-resolver"
+  ]
 }

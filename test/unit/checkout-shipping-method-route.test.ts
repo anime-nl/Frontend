@@ -41,6 +41,14 @@ describe('POST /api/checkout/shipping-method', () => {
         expect(medusaFetch).not.toHaveBeenCalled()
     })
 
+    it('rejects an empty request body', async () => {
+        getCookie.mockReturnValue('cart_1')
+        body = undefined
+
+        await expect(callRoute()).rejects.toMatchObject({statusCode: 400, statusMessage: 'Missing option_id'})
+        expect(medusaFetch).not.toHaveBeenCalled()
+    })
+
     it('sets the shipping method on the cart', async () => {
         getCookie.mockReturnValue('cart_1')
         medusaFetch.mockResolvedValue({cart: {id: 'cart_1', shipping_methods: [{id: 'sm_1'}]}})
