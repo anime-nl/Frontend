@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest'
-import {$fetch, setup} from '@nuxt/test-utils/e2e'
+import {$fetch, fetch, setup} from '@nuxt/test-utils/e2e'
 
 await setup({server: true})
 
@@ -24,9 +24,16 @@ describe('account pages', () => {
         expect(html).toContain('Sign in to see your account')
     })
 
-    it('/account/callback/google shows a sign-in error instead of crashing when Medusa is unreachable', async () => {
-        const html = await $fetch<string>('/account/callback/google?code=abc&state=xyz')
+    // The sign-in exchange must happen from the browser, not during server-side rendering: an
+    // internal SSR-to-SSR fetch never forwards the resulting session cookie to the real response
+    // (see server/api/auth/[provider]/callback.post.ts), so completing it during SSR would sign
+    // the visitor in on the server only and leave the browser without a session, looping forever.
+    it('/account/callback/google does not attempt sign-in during server rendering', async () => {
+        const response = await fetch('/account/callback/google?code=abc&state=xyz')
+        const html = await response.text()
 
-        expect(html).toContain('Something went wrong signing you in')
+        expect(html).toContain('Signing you in')
+        expect(html).not.toContain('Something went wrong signing you in')
+        expect(response.headers.get('set-cookie')).toBeNull()
     })
 })
