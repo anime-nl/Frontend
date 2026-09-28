@@ -110,4 +110,28 @@ describe('POST /api/cart/items', () => {
 
         await expect(callRoute()).rejects.toMatchObject({statusCode: 500})
     })
+
+    it('creates a new cart when the cookie points at a cart Medusa no longer has', async () => {
+        getCookie.mockReturnValue('cart_1')
+        const cartNotFound = Object.assign(new Error('Cart id not found'), {statusCode: 404})
+        medusaFetch
+            .mockRejectedValueOnce(cartNotFound)
+            .mockResolvedValueOnce({regions: [{id: 'reg_nl'}]})
+            .mockResolvedValueOnce({cart: {id: 'cart_2'}})
+            .mockResolvedValueOnce({cart: {id: 'cart_2', items: [{id: 'item_1'}]}})
+
+        await expect(callRoute()).resolves.toEqual({cart: {id: 'cart_2', items: [{id: 'item_1'}]}})
+
+        expect(medusaFetch).toHaveBeenNthCalledWith(1, expect.anything(), 'carts/cart_1/line-items', {
+            method: 'POST',
+            body: {variant_id: 'variant_1', quantity: 1},
+            query: {fields: expect.stringContaining('items')}
+        })
+        expect(medusaFetch).toHaveBeenNthCalledWith(4, expect.anything(), 'carts/cart_2/line-items', {
+            method: 'POST',
+            body: {variant_id: 'variant_1', quantity: 1},
+            query: {fields: expect.stringContaining('items')}
+        })
+        expect(setCookie).toHaveBeenCalledWith(expect.anything(), 'cart_id', 'cart_2', expect.anything())
+    })
 })
