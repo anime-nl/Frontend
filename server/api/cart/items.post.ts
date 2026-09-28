@@ -7,10 +7,12 @@ interface AddItemBody {
     quantity?: number
 }
 
-async function getOrCreateCartId(event: H3Event): Promise<string> {
-    const existing = getCookie(event, CART_ID_COOKIE)
-    if (existing) return existing
-
+/**
+ * Creates a new guest cart, storing its id in the cart cookie.
+ * @param event The incoming H3 event, used to read runtime config and set the cart cookie
+ * @returns The newly created cart's id
+ */
+async function createCart(event: H3Event): Promise<string> {
     const config = useRuntimeConfig(event)
     const {regions} = await medusaFetch<{regions: StoreRegion[]}>(event, 'regions')
     const {cart} = await medusaFetch<{cart: StoreCart}>(event, 'carts', {
@@ -22,6 +24,26 @@ async function getOrCreateCartId(event: H3Event): Promise<string> {
     return cart.id
 }
 
+/**
+ * Adds a variant to an existing cart in Medusa.
+ * @param event The incoming H3 event, used to reach Medusa
+ * @param cartId Id of the cart to add the line item to
+ * @param body Variant and quantity to add
+ * @returns The updated cart
+ */
+async function addLineItem(event: H3Event, cartId: string, body: AddItemBody): Promise<StoreCart> {
+    const {cart} = await medusaFetch<{cart: StoreCart}>(event, `carts/${cartId}/line-items`, {
+        method: 'POST',
+        body: {variant_id: body.variant_id, quantity: body.quantity},
+        query: {fields: CART_FIELDS}
+    })
+    return cart
+}
+
+/**
+ * POST /api/cart/items - adds a variant to the cart, creating the cart if there is none yet.
+ * @returns The updated cart
+ */
 export default defineEventHandler(async (event) => {
     const body = (await readBody<AddItemBody>(event)) ?? {}
 
@@ -33,15 +55,20 @@ export default defineEventHandler(async (event) => {
     }
 
     try {
-        const cartId = await getOrCreateCartId(event)
+        const existingCartId = getCookie(event, CART_ID_COOKIE)
 
-        const {cart} = await medusaFetch<{cart: StoreCart}>(event, `carts/${cartId}/line-items`, {
-            method: 'POST',
-            body: {variant_id: body.variant_id, quantity: body.quantity},
-            query: {fields: CART_FIELDS}
-        })
+        if (existingCartId) {
+            try {
+                return {cart: await addLineItem(event, existingCartId, body)}
+            } catch (error) {
+                // The cart cookie can outlive its cart, for example after a database reset; fall
+                // through and create a fresh cart instead of failing forever on a dead cart id.
+                if ((error as {statusCode?: number}).statusCode !== 404) throw error
+            }
+        }
 
-        return {cart}
+        const cartId = await createCart(event)
+        return {cart: await addLineItem(event, cartId, body)}
     } catch {
         throw createError({statusCode: 500, statusMessage: 'Could not add item to cart'})
     }

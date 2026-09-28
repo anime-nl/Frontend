@@ -4,6 +4,10 @@ import {isRateLimited} from '../utils/rateLimit'
 
 const SUPPORT_RATE_LIMIT = {limit: 5, windowMs: 10 * 60 * 1000}
 
+/**
+ * POST /api/support - validates a support request and emails it to the support inbox.
+ * @returns Confirmation that the request was handled, including silently for bots and dev without SMTP
+ */
 export default defineEventHandler(async (event) => {
     const ip = getRequestIP(event, {xForwardedFor: true}) ?? 'unknown'
     if (isRateLimited(`support:${ip}`, SUPPORT_RATE_LIMIT)) {

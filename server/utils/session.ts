@@ -13,6 +13,8 @@ export const SESSION_COOKIE_OPTIONS = {
 /**
  * Reads the actor id and metadata out of a Medusa JWT without verifying its signature: the token
  * only ever reaches this function right after Medusa itself issued it, over a server-to-server call.
+ * @param token Medusa-issued JWT
+ * @returns The token's actor id and user metadata, or an empty object if the payload cannot be parsed
  */
 export function decodeJwtPayload(token: string): {actor_id?: string; user_metadata?: Record<string, unknown>} {
     const payload = token.split('.')[1]

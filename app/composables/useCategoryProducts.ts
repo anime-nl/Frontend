@@ -1,6 +1,10 @@
 import type {StoreProduct, StoreProductCategory} from '@medusajs/types'
 
-/** Products of the Medusa product category with the given handle, with a calculated price for the default region. */
+/**
+ * Returns products in a given category, including the price
+ * @param handle Category ID
+ * @returns List of products in the given category
+ */
 export function useCategoryProducts(handle: string) {
     return useAsyncData(`category-products-${handle}`, async () => {
         const [{product_categories: categories}, {regions}] = await Promise.all([

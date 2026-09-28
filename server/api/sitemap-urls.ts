@@ -2,7 +2,10 @@ import type {StoreProductListResponse} from '@medusajs/types'
 
 const PAGE_SIZE = 100
 
-/** Product URLs change as the Medusa catalog changes, so the sitemap module fetches them from here on demand. */
+/**
+ * Product URLs change as the Medusa catalog changes, so the sitemap module fetches them from here on demand.
+ * @returns One sitemap entry per product, paginated through the full Medusa catalog
+ */
 export default defineSitemapEventHandler(async (event) => {
     const urls: {loc: string; lastmod?: string}[] = []
     let offset = 0

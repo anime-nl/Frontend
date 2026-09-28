@@ -9,6 +9,7 @@ Webshop for anime merchandise (TCG, figures, plushies, keychains) for the Dutch 
 3. **Optimize for readability, not speed.** Prefer the obvious, boring solution with clear names and small functions. Only trade readability for performance in genuinely complex logic where the slowdown would be noticeable, and say why in a comment.
 4. **No useless comments.** A comment must explain something the code cannot say by itself, such as why something is done or a non-obvious constraint. Never restate what the code does, and never leave commented-out code or change-log comments. If a comment feels necessary to explain _what_, rename or restructure instead.
 5. **Bugs: note them, and fix them only when in scope.** If a bug is in the way of the task, fix it (with a test). If it is outside the task, do not fix it silently: add it to [docs/known-issues.md](docs/known-issues.md) and mention it in your answer.
+6. **Functions get a TypeScript JSDoc comment.** Every function (composables, server utils, API route handlers, shared utils) gets a `/** */` block above it describing what it returns and documenting its parameters with `@param`/`@returns`. See `app/composables/useCategoryProducts.ts` for the expected format.
 
 A task is done when `bun run check` passes (formatting, type check and all tests).
 

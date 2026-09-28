@@ -2,6 +2,11 @@ import {findOAuthProvider} from '#shared/utils/auth'
 import {CART_ID_COOKIE} from '../../../utils/cart'
 import {SESSION_COOKIE, SESSION_COOKIE_OPTIONS, decodeJwtPayload} from '../../../utils/session'
 
+/**
+ * POST /api/auth/:provider/callback - exchanges the OAuth provider's callback data for a session,
+ * creating the customer record on first sign-in and attaching the guest cart if there is one.
+ * @returns Confirmation that sign-in succeeded
+ */
 export default defineEventHandler(async (event) => {
     const provider = getRouterParam(event, 'provider')
     if (!findOAuthProvider(provider)) {
