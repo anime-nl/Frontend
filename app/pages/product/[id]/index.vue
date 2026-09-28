@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import type {StoreProduct, StoreProductVariant} from '@medusajs/types'
 
-const client = useMedusaClient()
 const route = useRoute()
 const toast = useToast()
 const requestUrl = useRequestURL()
-const cartId = useCookie<string | null>('cart_id', {maxAge: 60 * 60 * 24 * 30})
+const cart = useCart()
 
 const {data, error} = await useFetch<{product: StoreProduct; region_id?: string; sales_channel_id?: string}>(
   () => `/api/products/${route.params.id}`,
@@ -127,18 +126,7 @@ async function addToCart() {
   adding.value = true
 
   try {
-    if (!cartId.value) {
-      const {cart} = await client.store.cart.create({
-        region_id: data.value!.region_id,
-        sales_channel_id: data.value!.sales_channel_id
-      })
-      cartId.value = cart.id
-    }
-
-    await client.store.cart.createLineItem(cartId.value, {
-      variant_id: selectedVariant.value.id,
-      quantity: quantity.value
-    })
+    await cart.addItem(selectedVariant.value.id, quantity.value)
 
     toast.add({
       title: 'Added to cart',

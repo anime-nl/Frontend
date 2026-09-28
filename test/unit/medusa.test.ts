@@ -23,13 +23,45 @@ describe('medusaFetch', () => {
     it('calls the store API with the publishable key and query', async () => {
         fetchMock.mockResolvedValue({regions: []})
 
-        const result = await medusaFetch(event, 'regions', {limit: 1})
+        const result = await medusaFetch(event, 'regions', {query: {limit: 1}})
 
         expect(result).toEqual({regions: []})
         expect(fetchMock).toHaveBeenCalledWith('http://medusa:9000/store/regions', {
             headers: {'x-publishable-api-key': 'pk_test'},
             query: {limit: 1}
         })
+    })
+
+    it('sends a POST with a JSON body and no query', async () => {
+        fetchMock.mockResolvedValue({cart: {id: 'cart_1'}})
+
+        const result = await medusaFetch(event, 'carts', {method: 'POST', body: {region_id: 'reg_1'}})
+
+        expect(result).toEqual({cart: {id: 'cart_1'}})
+        expect(fetchMock).toHaveBeenCalledWith('http://medusa:9000/store/carts', {
+            method: 'POST',
+            body: {region_id: 'reg_1'},
+            headers: {'x-publishable-api-key': 'pk_test'}
+        })
+    })
+
+    it('adds an Authorization header when a token is given', async () => {
+        fetchMock.mockResolvedValue({customer: {id: 'cus_1'}})
+
+        await medusaFetch(event, 'customers/me', {token: 'tok_123'})
+
+        expect(fetchMock).toHaveBeenCalledWith('http://medusa:9000/store/customers/me', {
+            headers: {'x-publishable-api-key': 'pk_test', Authorization: 'Bearer tok_123'}
+        })
+    })
+
+    it('omits the Authorization header when no token is given', async () => {
+        fetchMock.mockResolvedValue({regions: []})
+
+        await medusaFetch(event, 'regions')
+
+        const options = fetchMock.mock.calls[0][1]
+        expect(options.headers).not.toHaveProperty('Authorization')
     })
 
     it('passes errors on to the caller', async () => {

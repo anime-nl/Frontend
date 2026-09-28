@@ -17,7 +17,7 @@ On first start the `medusa` service installs its dependencies, runs migrations, 
 - Admin login: `admin@animenl.local` / `supersecret`
 - File storage is SeaweedFS (S3 API on `localhost:9100`, no login needed; any credentials work). Medusa's bucket is `medusa`, created by `medusa/start.sh`.
 - The Nuxt environment (`MEDUSA_URL`, `MEDUSA_SERVER_URL`, `MEDUSA_PUBLISHABLE_KEY`, `MEDUSA_SALES_CHANNEL_ID`) is set by the compose file and overrides any local `.env`. Copy `.env.example` to `.env` to run Nuxt outside the container.
-- The browser reaches Medusa at `http://medusa.localhost:9000` (browsers resolve `*.localhost` to your machine). Inside a container `*.localhost` always resolves to loopback, so the Nuxt server uses `MEDUSA_SERVER_URL=http://medusa:9000/` instead.
+- The browser never talks to Medusa directly; only the Nuxt server does, through `server/api/*` routes. Inside a container, `*.localhost` hostnames resolve to loopback rather than to other containers, so the Nuxt server uses `MEDUSA_SERVER_URL=http://medusa:9000/` (the compose service name) to reach Medusa; `medusa.localhost` is still how your host browser reaches the Medusa **admin dashboard** directly.
 - The `app` service depends on `medusa`, so opening the dev container starts the whole stack. The first start takes a few minutes while Medusa installs dependencies, migrates and seeds; follow it with `docker compose -f .devcontainer/docker-compose.yml logs -f medusa`.
 - To reset all data and reseed: `docker compose -f .devcontainer/docker-compose.yml down -v`, then rebuild the container.
 
@@ -42,7 +42,7 @@ Only the Nuxt app is deployed (Nixpacks: `bun run build`, `bun run start`). The 
 
 | Variable                                           | Value                                                                                   |
 | -------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| `MEDUSA_URL`                                       | Medusa URL as the browser reaches it                                                    |
+| `MEDUSA_URL`                                       | Medusa URL for the Nuxt server, used when `MEDUSA_SERVER_URL` is not set                |
 | `MEDUSA_SERVER_URL`                                | Medusa URL for the Nuxt server (defaults to `MEDUSA_URL`)                               |
 | `MEDUSA_PUBLISHABLE_KEY`                           | Publishable API key from the Medusa admin                                               |
 | `MEDUSA_SALES_CHANNEL_ID`                          | Sales channel id, if used                                                               |
@@ -55,7 +55,7 @@ Nuxt needs Node 22.19 or newer. If the build complains about the Node version, s
 
 ### Rotating a secret without a rebuild
 
-`SMTP_PASS` and `MEDUSA_PUBLISHABLE_KEY` above are read at build time, so the values above get baked into `.output`. To change one of them without a redeploy, set the Nuxt-prefixed equivalent (`NUXT_SMTP_PASS`, `NUXT_MEDUSA_PUBLISHABLE_KEY`, ...) as a normal **runtime** environment variable (in Coolify: not "Available at Buildtime") — Nuxt reads `NUXT_*` variables again every time the server starts and lets them override the value baked in at build time. This only applies to `runtimeConfig` keys (everything in the table above except `MEDUSA_URL` and `SITE_URL`, which configure the `@nuxtjs/medusa` and `@nuxtjs/sitemap` modules directly and are only ever read at build time).
+`SMTP_PASS` and `MEDUSA_PUBLISHABLE_KEY` above are read at build time, so the values above get baked into `.output`. To change one of them without a redeploy, set the Nuxt-prefixed equivalent (`NUXT_SMTP_PASS`, `NUXT_MEDUSA_PUBLISHABLE_KEY`, ...) as a normal **runtime** environment variable (in Coolify: not "Available at Buildtime") — Nuxt reads `NUXT_*` variables again every time the server starts and lets them override the value baked in at build time. This only applies to `runtimeConfig` keys (everything in the table above except `SITE_URL`, which configures the `@nuxtjs/sitemap` module directly and is only ever read at build time).
 
 ### Support emails
 

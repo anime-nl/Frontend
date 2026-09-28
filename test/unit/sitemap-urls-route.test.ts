@@ -53,14 +53,10 @@ describe('GET /api/sitemap-urls', () => {
 
         expect(medusaFetch).toHaveBeenCalledTimes(2)
         expect(medusaFetch).toHaveBeenNthCalledWith(1, expect.anything(), 'products', {
-            limit: 100,
-            offset: 0,
-            fields: 'id,updated_at'
+            query: {limit: 100, offset: 0, fields: 'id,updated_at'}
         })
         expect(medusaFetch).toHaveBeenNthCalledWith(2, expect.anything(), 'products', {
-            limit: 100,
-            offset: 100,
-            fields: 'id,updated_at'
+            query: {limit: 100, offset: 100, fields: 'id,updated_at'}
         })
         expect(urls).toHaveLength(101)
         expect(urls.at(-1)).toEqual({loc: '/product/prod_100', lastmod: '2026-01-01T00:00:00.000Z'})

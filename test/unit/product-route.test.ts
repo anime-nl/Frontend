@@ -23,6 +23,20 @@ async function callRoute() {
 }
 
 describe('GET /api/products/:id', () => {
+    it('forwards the requested fields, region and sales channel as query params', async () => {
+        medusaFetch.mockResolvedValue({product: {id: 'prod_1'}})
+
+        await callRoute()
+
+        expect(medusaFetch).toHaveBeenCalledWith(expect.anything(), 'products/prod_1', {
+            query: {
+                fields: expect.stringContaining('variants'),
+                region_id: 'reg_nl',
+                sales_channel_id: undefined
+            }
+        })
+    })
+
     it('answers 404 when Medusa does not know the product', async () => {
         medusaFetch.mockRejectedValue({statusCode: 404})
 

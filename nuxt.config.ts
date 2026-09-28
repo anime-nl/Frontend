@@ -1,9 +1,7 @@
-import {isProductionEnv} from './shared/utils/env'
-
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     ssr: true,
-    modules: ['@nuxt/ui', '@nuxtjs/medusa', '@nuxtjs/sitemap'],
+    modules: ['@nuxt/ui', '@nuxtjs/sitemap'],
     css: ['~/assets/css/main.css'],
     compatibilityDate: '2025-07-15',
     devtools: {enabled: true},
@@ -50,18 +48,6 @@ export default defineNuxtConfig({
                 'pinhead',
                 'at-icons'
             ]
-        }
-    },
-    medusa: {
-        baseUrl: process.env.MEDUSA_URL || 'http://localhost:9000',
-        global: true,
-        server: false,
-        debug: !isProductionEnv(process.env.NODE_ENV),
-        publishableKey: process.env.MEDUSA_PUBLISHABLE_KEY,
-        auth: {
-            type: 'session',
-            jwtTokenStorageKey: 'medusa_auth_token',
-            jwtTokenStorageMethod: 'local'
         }
     },
     runtimeConfig: {

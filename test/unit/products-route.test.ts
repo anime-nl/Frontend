@@ -25,7 +25,7 @@ describe('GET /api/products', () => {
         medusaFetch.mockResolvedValue({products: [{id: 'prod_1'}], count: 1})
 
         await expect(callRoute()).resolves.toEqual({products: [{id: 'prod_1'}], count: 1})
-        expect(medusaFetch).toHaveBeenCalledWith(expect.anything(), 'products', {category_id: ['pcat_1']})
+        expect(medusaFetch).toHaveBeenCalledWith(expect.anything(), 'products', {query: {category_id: ['pcat_1']}})
     })
 
     it('answers 500 when Medusa fails', async () => {
