@@ -1,10 +1,20 @@
-import {afterEach, describe, expect, it, vi} from 'vitest'
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
 import {mountSuspended, registerEndpoint} from '@nuxt/test-utils/runtime'
+import {createError} from 'h3'
 import ProductsIndexPage from '~/pages/products/index.vue'
 
-registerEndpoint('/api/products', () => ({products: [{id: 'prod_1', title: 'Zhongli Keychain', thumbnail: null}]}))
+let shouldFail = false
+
+registerEndpoint('/api/products', () => {
+    if (shouldFail) throw createError({statusCode: 500})
+    return {products: [{id: 'prod_1', title: 'Zhongli Keychain', thumbnail: null}]}
+})
 
 let wrapper: Awaited<ReturnType<typeof mountSuspended>> | undefined
+
+beforeEach(() => {
+    shouldFail = false
+})
 
 afterEach(() => {
     wrapper?.unmount()
@@ -23,5 +33,12 @@ describe('products index page', () => {
         await vi.waitFor(() =>
             expect(document.querySelector('meta[name="robots"]')?.getAttribute('content')).toBe('noindex')
         )
+    })
+
+    it('shows an error message when the products request fails', async () => {
+        shouldFail = true
+        wrapper = await mountSuspended(ProductsIndexPage)
+
+        expect(wrapper.text()).toContain('Something went wrong while loading the products')
     })
 })

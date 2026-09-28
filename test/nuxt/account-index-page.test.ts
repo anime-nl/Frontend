@@ -71,6 +71,13 @@ describe('account page', () => {
         expect(wrapper.text()).toContain('completed')
     })
 
+    it('falls back to the order id when it has no display id', async () => {
+        orders = [{id: 'order_1', display_id: null, status: 'completed', currency_code: 'eur', total: 21.8}]
+        wrapper = await mountAccount()
+
+        expect(wrapper.text()).toContain('order_1')
+    })
+
     it('logs out and shows the sign-in prompt again', async () => {
         wrapper = await mountAccount()
 

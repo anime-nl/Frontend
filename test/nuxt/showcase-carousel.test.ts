@@ -4,17 +4,16 @@ import {getQuery} from 'h3'
 import ShowcaseCarousel from '~/components/showcaseCarousel.vue'
 
 const productRequests: Record<string, unknown>[] = []
+let products: {id: string; title: string; thumbnail: string | null}[] = [
+    {id: 'prod_1', title: 'Zhongli Keychain', thumbnail: 'https://example.com/zhongli.jpg'},
+    {id: 'prod_2', title: 'Nijika Keychain', thumbnail: null}
+]
 
 registerEndpoint('/api/regions', () => ({regions: [{id: 'reg_nl'}]}))
 registerEndpoint('/api/products', (event) => {
     productRequests.push(getQuery(event))
 
-    return {
-        products: [
-            {id: 'prod_1', title: 'Zhongli Keychain', thumbnail: 'https://example.com/zhongli.jpg'},
-            {id: 'prod_2', title: 'Nijika Keychain', thumbnail: null}
-        ]
-    }
+    return {products}
 })
 
 const mountCarousel = () => mountSuspended(ShowcaseCarousel, {attachTo: document.body})
@@ -23,6 +22,10 @@ let wrapper: Awaited<ReturnType<typeof mountCarousel>> | undefined
 
 beforeEach(() => {
     productRequests.length = 0
+    products = [
+        {id: 'prod_1', title: 'Zhongli Keychain', thumbnail: 'https://example.com/zhongli.jpg'},
+        {id: 'prod_2', title: 'Nijika Keychain', thumbnail: null}
+    ]
 })
 
 afterEach(() => {
@@ -63,5 +66,12 @@ describe('showcase carousel', () => {
         const image = wrapper.find('img')
         expect(image.classes()).toContain('h-100')
         expect(image.classes()).toContain('object-cover')
+    })
+
+    it('renders nothing when no new product has a thumbnail', async () => {
+        products = [{id: 'prod_2', title: 'Nijika Keychain', thumbnail: null}]
+        wrapper = await mountCarousel()
+
+        expect(wrapper.html()).toBe('<!--v-if-->')
     })
 })

@@ -3,7 +3,29 @@ import {mountSuspended, registerEndpoint} from '@nuxt/test-utils/runtime'
 import {getQuery} from 'h3'
 import SearchPage from '~/pages/search/index.vue'
 
+class FakeIntersectionObserver {
+    static instances: FakeIntersectionObserver[] = []
+    callback: IntersectionObserverCallback
+
+    constructor(callback: IntersectionObserverCallback) {
+        this.callback = callback
+        FakeIntersectionObserver.instances.push(this)
+    }
+
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+
+    intersect() {
+        this.callback([{isIntersecting: true} as IntersectionObserverEntry], this as unknown as IntersectionObserver)
+    }
+}
+
 const productRequests: Record<string, unknown>[] = []
+let allProducts: {id: string; title: string; thumbnail: string | null}[] = []
+let productsShouldFail = false
+let collectionsShouldFail = false
+let regionsShouldFail = false
 
 registerEndpoint('/api/categories', () => ({
     product_categories: [
@@ -11,11 +33,21 @@ registerEndpoint('/api/categories', () => ({
         {id: 'pcat_figures', handle: 'figures', name: 'Figures'}
     ]
 }))
-registerEndpoint('/api/collections', () => ({collections: [{id: 'pcol_pokemon', title: 'Pokémon TCG'}]}))
-registerEndpoint('/api/regions', () => ({regions: [{id: 'reg_nl'}]}))
+registerEndpoint('/api/collections', () => {
+    if (collectionsShouldFail) throw new Error('down')
+    return {collections: [{id: 'pcol_pokemon', title: 'Pokémon TCG'}]}
+})
+registerEndpoint('/api/regions', () => {
+    if (regionsShouldFail) throw new Error('down')
+    return {regions: [{id: 'reg_nl'}]}
+})
 registerEndpoint('/api/products', (event) => {
-    productRequests.push(getQuery(event))
-    return {products: [], count: 0}
+    const query = getQuery(event)
+    productRequests.push(query)
+    if (productsShouldFail) throw new Error('down')
+    const limit = Number(query.limit)
+    const offset = Number(query.offset)
+    return {products: allProducts.slice(offset, offset + limit), count: allProducts.length}
 })
 
 let wrapper: Awaited<ReturnType<typeof mountSearch>> | undefined
@@ -25,10 +57,17 @@ const selectValue = (id: string) => (document.getElementById(id) as HTMLSelectEl
 
 beforeEach(() => {
     productRequests.length = 0
+    allProducts = []
+    productsShouldFail = false
+    collectionsShouldFail = false
+    regionsShouldFail = false
+    FakeIntersectionObserver.instances.length = 0
+    vi.stubGlobal('IntersectionObserver', FakeIntersectionObserver)
 })
 
 afterEach(() => {
     wrapper?.unmount()
+    vi.unstubAllGlobals()
 })
 
 describe('search page', () => {
@@ -81,5 +120,86 @@ describe('search page', () => {
         wrapper = await mountSearch('category=tcg')
 
         expect(document.activeElement?.id).not.toBe('collection-select')
+    })
+
+    it('shows the products returned from the store', async () => {
+        allProducts = [{id: 'prod_1', title: 'Charizard ex', thumbnail: null}]
+        wrapper = await mountSearch('')
+
+        await vi.waitFor(() => expect(wrapper!.text()).toContain('Charizard ex'))
+    })
+
+    it('shows a message and clears the filters when nothing matches', async () => {
+        wrapper = await mountSearch('category=tcg')
+
+        await vi.waitFor(() => expect(wrapper!.text()).toContain('No products found'))
+        await wrapper.find('button').trigger('click')
+
+        expect(selectValue('category-select')).toBe('')
+        expect((document.getElementById('search-input') as HTMLInputElement).value).toBe('')
+    })
+
+    it('searches for typed text after a debounce', async () => {
+        wrapper = await mountSearch('')
+        await vi.waitFor(() => expect(productRequests.length).toBeGreaterThan(0))
+        productRequests.length = 0
+
+        await wrapper.find('#search-input').setValue('zhongli')
+
+        await vi.waitFor(() => expect(productRequests.some((request) => request.q === 'zhongli')).toBe(true), {
+            timeout: 1000
+        })
+    })
+
+    it('searches with the id of the selected collection', async () => {
+        wrapper = await mountSearch('')
+        await vi.waitFor(() =>
+            expect(document.querySelector('#collection-select option[value="pcol_pokemon"]')).not.toBeNull()
+        )
+        await wrapper.find('#collection-select').setValue('pcol_pokemon')
+
+        await vi.waitFor(
+            () => expect(productRequests.some((request) => request.collection_id === 'pcol_pokemon')).toBe(true),
+            {timeout: 1000}
+        )
+    })
+
+    it('loads another page once the sentinel scrolls into view', async () => {
+        allProducts = Array.from({length: 15}, (_, i) => ({id: `prod_${i}`, title: `Product ${i}`, thumbnail: null}))
+        wrapper = await mountSearch('')
+        await vi.waitFor(() => expect(wrapper!.findAllComponents({name: 'ProductCard'})).toHaveLength(12))
+
+        FakeIntersectionObserver.instances[0]?.intersect()
+
+        await vi.waitFor(() => expect(wrapper!.findAllComponents({name: 'ProductCard'})).toHaveLength(15))
+        expect(wrapper.text()).toContain("You've reached the end of the catalog.")
+    })
+
+    it('recovers without crashing when the products request fails', async () => {
+        productsShouldFail = true
+        wrapper = await mountSearch('')
+
+        await vi.waitFor(() => expect(productRequests.length).toBeGreaterThan(0))
+        expect(wrapper.text()).toContain('No products found')
+    })
+
+    it('still loads products when only the collections lookup fails', async () => {
+        allProducts = [{id: 'prod_1', title: 'Charizard ex', thumbnail: null}]
+        collectionsShouldFail = true
+        wrapper = await mountSearch('')
+
+        await vi.waitFor(() => expect(wrapper!.text()).toContain('Charizard ex'))
+    })
+
+    it('does not search at all when the region lookup fails', async () => {
+        allProducts = [{id: 'prod_1', title: 'Charizard ex', thumbnail: null}]
+        regionsShouldFail = true
+        wrapper = await mountSearch('')
+
+        await vi.waitFor(() =>
+            expect(document.querySelector('#collection-select option[value="pcol_pokemon"]')).not.toBeNull()
+        )
+        expect(productRequests).toHaveLength(0)
+        expect(wrapper.text()).toContain('No products found')
     })
 })

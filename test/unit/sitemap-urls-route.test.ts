@@ -35,6 +35,12 @@ describe('GET /api/sitemap-urls', () => {
         ])
     })
 
+    it('omits lastmod for a product with no updated_at', async () => {
+        medusaFetch.mockResolvedValue({products: [{id: 'prod_1', updated_at: null}], count: 1})
+
+        await expect(callRoute()).resolves.toEqual([{loc: '/product/prod_1', lastmod: undefined}])
+    })
+
     it('pages through the full catalog when it is larger than one page', async () => {
         medusaFetch
             .mockResolvedValueOnce({

@@ -55,6 +55,20 @@ describe('POST /api/auth/:provider/callback', () => {
         await expect(callRoute()).rejects.toMatchObject({statusCode: 401})
     })
 
+    it('forwards an empty query when the callback has no body', async () => {
+        body = undefined
+        getCookie.mockReturnValue(undefined)
+        medusaFetch.mockResolvedValue({token: existingCustomerToken})
+
+        await callRoute()
+
+        expect(medusaFetch).toHaveBeenCalledWith(expect.anything(), 'customer/google/callback', {
+            method: 'POST',
+            base: 'auth',
+            query: {}
+        })
+    })
+
     it('signs in an existing customer without creating one', async () => {
         getCookie.mockReturnValue(undefined)
         medusaFetch.mockResolvedValue({token: existingCustomerToken})
