@@ -78,3 +78,18 @@ Customers sign in with Google only — the store never collects or stores a pass
 1. In Google Cloud Console, create (or reuse) an OAuth 2.0 **Web application** client. Add the production callback URL to its Authorized redirect URIs: `https://animenl.nl/account/callback/google` (alongside the local dev one, `http://localhost:3000/account/callback/google`, if the same client is reused). "Authorized JavaScript origins" is not needed — sign-in is a server-side redirect, not a client-side flow.
 2. On production's Medusa instance, set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` and `GOOGLE_CALLBACK_URL=https://animenl.nl/account/callback/google`, and make sure its `medusa-config.ts` registers the `@medusajs/medusa/auth-google` provider (see `medusa/medusa-config.ts` in this repo for the shape local dev uses).
 3. Sign in on the live site and confirm the customer appears in the Medusa admin.
+
+### Enabling Mollie payments
+
+Payments go through [Mollie](https://www.mollie.com) (iDEAL, credit card and everything else Mollie supports), using the [`@variablevic/mollie-payments-medusa`](https://github.com/variablevic/mollie-payments-medusa) community plugin's hosted-checkout provider. This is configured on **Medusa**, not on the Nuxt app, and production's Medusa instance is a separate deployment outside this repo (see "Production" above), so enabling it there is a manual step this repo cannot do or verify.
+
+**Local dev works without a Mollie key** — `medusa/medusa-config.ts` only registers the Mollie provider when `MOLLIE_API_KEY` is set (it throws and crashes Medusa's entire startup otherwise, unlike `auth-google`, which just fails to register on its own), and `medusa/src/scripts/seed.ts` only adds `pp_mollie-hosted-checkout_mollie` to a region's `payment_providers` when a key is present. Without one, checkout only offers `pp_system_default` (a no-op).
+
+To enable it:
+
+1. Create a Mollie account and, for local dev, grab a test API key from the Mollie dashboard (Developers > API keys, starts with `test_`); production needs a live key (starts with `live_`) once the account is verified.
+2. Set `MOLLIE_API_KEY` (in `.devcontainer/.env` locally, see `.devcontainer/.env.example`), `MOLLIE_REDIRECT_URL` (the page customers land on after paying, `https://animenl.nl/checkout/return` in production) and `MEDUSA_URL` (Medusa's own public base URL, used to build the webhook Mollie calls back — `https://<production-medusa-host>` in production).
+3. Re-seed (`bun run --cwd medusa seed`, or reset the dev database per the "Local development environment" section above) so the region picks up `pp_mollie-hosted-checkout_mollie` — or add it to an existing region's `payment_providers` in the Medusa admin.
+4. Pay for a test order in Mollie's sandbox mode and confirm the order and payment appear in the Medusa admin.
+
+The plugin's `package.json` pins its `@medusajs/*` peer dependencies to `2.5.1`, well behind the `2.21.1` this repo runs — there is an [open upstream issue](https://github.com/variablevic/mollie-payments-medusa/issues/7) reporting a provider-not-found error on 2.7.0 because of it. Verified locally against a throwaway Medusa 2.21.1 instance that the provider still registers correctly and reaches Mollie's real API (see `docs/known-issues.md`), but re-check `GET /store/payment-providers?region_id=<id>` after any Medusa or plugin version bump.

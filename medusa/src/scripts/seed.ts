@@ -323,6 +323,11 @@ export default async function seed({ container }: ExecArgs) {
   })
 
   logger.info('Seeding regions and taxes...')
+  // medusa-config.ts only registers the Mollie payment provider when MOLLIE_API_KEY is set (it
+  // crashes Medusa's startup otherwise), so seeding it into a region without that would fail too.
+  const paymentProviders = process.env.MOLLIE_API_KEY
+    ? ['pp_system_default', 'pp_mollie-hosted-checkout_mollie']
+    : ['pp_system_default']
   const regions = [
     { name: 'Netherlands', countries: ['nl'] },
     { name: 'Belgium', countries: ['be'] },
@@ -330,7 +335,13 @@ export default async function seed({ container }: ExecArgs) {
   for (const region of regions) {
     await createRegionsWorkflow(container).run({
       input: {
-        regions: [{ ...region, currency_code: 'eur', payment_providers: ['pp_system_default'] }],
+        regions: [
+          {
+            ...region,
+            currency_code: 'eur',
+            payment_providers: paymentProviders,
+          },
+        ],
       },
     })
   }

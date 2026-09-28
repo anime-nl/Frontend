@@ -49,6 +49,15 @@ registerEndpoint('/api/checkout/shipping-method', {
     }
 })
 
+let paymentSessionError: {statusCode: number; statusMessage: string} | undefined
+registerEndpoint('/api/checkout/payment-session', {
+    method: 'POST',
+    handler: () => {
+        if (paymentSessionError) throw createError(paymentSessionError)
+        return {redirect_url: 'https://mollie.example/checkout/abc'}
+    }
+})
+
 const eur = (amount: number) => new Intl.NumberFormat('nl-NL', {style: 'currency', currency: 'EUR'}).format(amount)
 const mountCheckout = () => mountSuspended(CheckoutPage)
 
@@ -79,6 +88,7 @@ beforeEach(() => {
     cart = cartWithItems
     customer = null
     lastAddressBody = undefined
+    paymentSessionError = undefined
     navigateToMock.mockClear()
 })
 
@@ -134,6 +144,44 @@ describe('checkout page', () => {
 
         expect(wrapper.text()).toContain('Acrylic Zhongli Keychain')
         expect(wrapper.text()).toContain('Express')
-        expect(wrapper.text()).not.toContain('Pay')
+    })
+
+    async function reachReviewStep(w: Awaited<ReturnType<typeof mountCheckout>>) {
+        await fillAddress(w)
+        await submitAddress(w)
+        await vi.waitFor(() => expect(w.findComponent({name: 'URadioGroup'}).exists()).toBe(true))
+        await w.findComponent({name: 'URadioGroup'}).vm.$emit('update:modelValue', 'so_standard')
+        await flushPromises()
+        const continueButton = w
+            .findAllComponents({name: 'UButton'})
+            .find((button) => button.text() === 'Continue to review')
+        await continueButton!.trigger('click')
+        await vi.waitFor(() => expect(w.text()).toContain('Review your order'))
+    }
+
+    function findPayButton(w: Awaited<ReturnType<typeof mountCheckout>>) {
+        return w.findAllComponents({name: 'UButton'}).find((button) => button.text() === 'Pay')
+    }
+
+    it('paying redirects the browser to the Mollie checkout URL', async () => {
+        wrapper = await mountCheckout()
+        await reachReviewStep(wrapper)
+
+        await findPayButton(wrapper)!.trigger('click')
+
+        await vi.waitFor(() =>
+            expect(navigateToMock).toHaveBeenCalledWith('https://mollie.example/checkout/abc', {external: true})
+        )
+    })
+
+    it('shows an error when starting the payment fails', async () => {
+        paymentSessionError = {statusCode: 502, statusMessage: 'Could not start payment'}
+        wrapper = await mountCheckout()
+        await reachReviewStep(wrapper)
+
+        await findPayButton(wrapper)!.trigger('click')
+
+        await vi.waitFor(() => expect(wrapper!.text()).toContain('Something went wrong starting your payment'))
+        expect(navigateToMock).not.toHaveBeenCalledWith(expect.stringContaining('mollie'), expect.anything())
     })
 })
