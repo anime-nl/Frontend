@@ -1,8 +1,13 @@
 import type {StoreShippingOption} from '@medusajs/types'
 import {CART_ID_COOKIE} from '../../utils/cart'
 
-interface CartItemShippingProfile {
-    product: {shipping_profile: {id: string}}
+interface CartItemProductId {
+    product_id: string
+}
+
+interface ProductShippingProfile {
+    product_id: string
+    shipping_profile_id: string | null
 }
 
 /**
@@ -38,15 +43,27 @@ export default defineEventHandler(async (event) => {
 
     const config = useRuntimeConfig(event)
     const [{cart}, {shipping_options: shippingOptions}] = await Promise.all([
-        medusaFetch<{cart: {items: CartItemShippingProfile[]}}>(event, `carts/${cartId}`, {
-            query: {fields: '*items.product.shipping_profile'}
+        medusaFetch<{cart: {items: CartItemProductId[]}}>(event, `carts/${cartId}`, {
+            query: {fields: 'items.product_id'}
         }),
         medusaFetch<{shipping_options: StoreShippingOption[]}>(event, 'shipping-options', {
             query: {cart_id: cartId}
         })
     ])
 
-    const itemProfileIds = cart.items.map((item) => item.product.shipping_profile.id)
+    // The Store API never exposes a product's shipping_profile (not even the id), so it comes
+    // from a dedicated Medusa route instead of the cart/product endpoints' field allowlists.
+    const productIds = [...new Set(cart.items.map((item) => item.product_id))]
+    const itemProfileIds = productIds.length
+        ? (
+              await medusaFetch<{shipping_profiles: ProductShippingProfile[]}>(event, 'products/shipping-profiles', {
+                  query: {id: productIds}
+              })
+          ).shipping_profiles
+              .map((profile) => profile.shipping_profile_id)
+              .filter((id): id is string => id !== null)
+        : []
+
     const profileId = resolveShippingProfileId(
         itemProfileIds,
         config.medusaBrievenbusShippingProfileId,
