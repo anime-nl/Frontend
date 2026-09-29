@@ -53,10 +53,13 @@ Only the Nuxt app is deployed (Nixpacks: `bun run build`, `bun run start`). The 
 | `MEDUSA_PAKKET_SHIPPING_PROFILE_ID`                | Id of the Pakket shipping profile in the Medusa admin                                   |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` | SMTP server for the support forms, see below                                            |
 | `SITE_URL`                                         | Public URL of the site, used to build `/sitemap.xml` (defaults to `https://animenl.nl`) |
+| `GA_MEASUREMENT_ID`                                | Google Analytics measurement id (e.g. `G-XXXXXXXXXX`); leave unset to disable analytics |
 
 Nuxt needs Node 22.19 or newer. If the build complains about the Node version, set `NIXPACKS_NODE_VERSION=24`.
 
 `public/robots.txt` points to `https://animenl.nl/sitemap.xml` directly, since it is a static file and cannot read `SITE_URL`. Update it by hand if the production domain ever changes.
+
+Google Analytics only loads when `GA_MEASUREMENT_ID` is set and only in a production build (`NODE_ENV=production`), so it never runs in the dev container. Even then, it stays off until a visitor accepts the cookie consent banner (`app/components/cookieConsentBanner.vue`).
 
 ### Rotating a secret without a rebuild
 

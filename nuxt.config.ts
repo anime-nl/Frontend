@@ -1,7 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     ssr: true,
-    modules: ['@nuxt/ui', '@nuxtjs/sitemap', '@nuxt/eslint'],
+    modules: ['@nuxt/ui', '@nuxtjs/sitemap', '@nuxt/eslint', 'nuxt-gtag'],
     css: ['~/assets/css/main.css'],
     compatibilityDate: '2025-07-15',
     devtools: {enabled: true},
@@ -27,6 +27,26 @@ export default defineNuxtConfig({
     sitemap: {
         // Product URLs change as the Medusa catalog changes, so they are fetched at request time instead of at build
         sources: ['/api/sitemap-urls']
+    },
+    gtag: {
+        id: process.env.GA_MEASUREMENT_ID || '',
+        // Never track the dev container or a build without a measurement id
+        enabled: process.env.NODE_ENV === 'production' && !!process.env.GA_MEASUREMENT_ID,
+        // Loading is deferred until the visitor grants consent, see app/components/cookieConsentBanner.vue
+        initMode: 'manual',
+        initCommands: [
+            [
+                'consent',
+                'default',
+                {
+                    analytics_storage: 'denied',
+                    ad_storage: 'denied',
+                    ad_user_data: 'denied',
+                    ad_personalization: 'denied',
+                    wait_for_update: 500
+                }
+            ]
+        ]
     },
     vite: {
         optimizeDeps: {
@@ -64,7 +84,9 @@ export default defineNuxtConfig({
         smtpUser: process.env.SMTP_USER,
         smtpPass: process.env.SMTP_PASS,
         public: {
-            supportEmail: 'info@animenl.nl'
+            supportEmail: 'info@animenl.nl',
+            // Lets the cookie consent banner know whether there is anything to ask consent for
+            gaEnabled: process.env.NODE_ENV === 'production' && !!process.env.GA_MEASUREMENT_ID
         }
     }
 })

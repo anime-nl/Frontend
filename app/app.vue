@@ -1,3 +1,9 @@
+<script lang="ts" setup>
+const {
+  public: {gaEnabled}
+} = useRuntimeConfig()
+</script>
+
 <template>
   <UApp>
     <Navbar />
@@ -8,6 +14,8 @@
       icon="i-lucide-info"
       title="This website is still under construction! If you encounter any problems with the site, please contact us via the Support page."
     />
+
+    <CookieConsentBanner :ga-enabled="gaEnabled" />
 
     <UMain>
       <NuxtPage />
