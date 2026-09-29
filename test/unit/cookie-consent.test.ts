@@ -1,5 +1,5 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
-import {getCookieConsent, setCookieConsent} from '../../shared/utils/cookieConsent'
+import {getCookieConsent, isDoNotTrackEnabled, setCookieConsent} from '../../shared/utils/cookieConsent'
 
 /** Minimal in-memory stand-in for the browser's localStorage, since the unit test environment is plain Node */
 function createLocalStorageStub() {
@@ -33,5 +33,19 @@ describe('cookie consent storage', () => {
     it('returns the stored choice after it is set to denied', () => {
         setCookieConsent('denied')
         expect(getCookieConsent()).toBe('denied')
+    })
+})
+
+describe('isDoNotTrackEnabled', () => {
+    it('is true when the browser sends "1"', () => {
+        expect(isDoNotTrackEnabled('1')).toBe(true)
+    })
+
+    it('is false when the browser sends "0"', () => {
+        expect(isDoNotTrackEnabled('0')).toBe(false)
+    })
+
+    it('is false when the browser does not send a preference', () => {
+        expect(isDoNotTrackEnabled(null)).toBe(false)
     })
 })

@@ -18,3 +18,12 @@ export function getCookieConsent(): CookieConsent | null {
 export function setCookieConsent(consent: CookieConsent): void {
     localStorage.setItem(storageKey, consent)
 }
+
+/**
+ * Checks the browser's Do Not Track preference
+ * @param doNotTrack Value of navigator.doNotTrack
+ * @returns True when the visitor has asked not to be tracked
+ */
+export function isDoNotTrackEnabled(doNotTrack: string | null): boolean {
+    return doNotTrack === '1'
+}

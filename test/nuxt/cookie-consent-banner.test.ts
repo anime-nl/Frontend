@@ -19,6 +19,7 @@ afterEach(() => {
     wrapper?.unmount()
     gtagMock.mockReset()
     initializeMock.mockReset()
+    Object.defineProperty(navigator, 'doNotTrack', {value: null, configurable: true})
 })
 
 async function clickButton(label: string) {
@@ -77,5 +78,31 @@ describe('cookie consent banner', () => {
         wrapper = await mountBanner()
 
         expect(initializeMock).toHaveBeenCalled()
+    })
+
+    it('never shows the banner and stores denied consent when the browser sends Do Not Track', async () => {
+        Object.defineProperty(navigator, 'doNotTrack', {value: '1', configurable: true})
+        wrapper = await mountBanner()
+
+        expect(wrapper.text()).toBe('')
+        expect(localStorage.getItem('cookie-consent')).toBe('denied')
+        expect(initializeMock).not.toHaveBeenCalled()
+    })
+
+    it('overrides a previously granted consent when the browser now sends Do Not Track', async () => {
+        localStorage.setItem('cookie-consent', 'granted')
+        Object.defineProperty(navigator, 'doNotTrack', {value: '1', configurable: true})
+        wrapper = await mountBanner()
+
+        expect(initializeMock).not.toHaveBeenCalled()
+        expect(localStorage.getItem('cookie-consent')).toBe('denied')
+    })
+
+    it('gives the Decline button a solid, high-contrast style so it is not invisible', async () => {
+        wrapper = await mountBanner()
+
+        const declineButton = wrapper.findAllComponents({name: 'UButton'}).find((b) => b.text() === 'Decline')
+
+        expect(declineButton!.props('variant')).toBe('solid')
     })
 })
