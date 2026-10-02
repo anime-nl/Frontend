@@ -20,6 +20,11 @@ const status = computed<'completed' | 'pending' | 'failed' | 'idle'>(() => {
 })
 const order = computed(() => (data.value?.status === 'completed' ? data.value.order : null))
 
+const cart = useCart()
+if (status.value === 'completed') {
+  await cart.refresh()
+}
+
 await useFetch('/api/account/me', {key: 'current-customer'})
 const customer = useCustomer()
 </script>

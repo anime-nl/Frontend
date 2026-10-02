@@ -6,6 +6,7 @@ import CheckoutReturnPage from '~/pages/checkout/return.vue'
 let completeResponse: unknown
 let completeError: {statusCode: number; statusMessage: string} | undefined
 let customer: {email: string; first_name: string; last_name: string} | null
+let cartFetchCount = 0
 
 registerEndpoint('/api/checkout/complete', {
     method: 'POST',
@@ -18,6 +19,10 @@ registerEndpoint('/api/account/me', () => {
     if (!customer) throw createError({statusCode: 401})
     return {customer}
 })
+registerEndpoint('/api/cart', () => {
+    cartFetchCount++
+    return {cart: null}
+})
 
 let wrapper: Awaited<ReturnType<typeof mountSuspended>> | undefined
 
@@ -25,6 +30,7 @@ beforeEach(() => {
     completeResponse = undefined
     completeError = undefined
     customer = null
+    cartFetchCount = 0
 })
 
 afterEach(() => {
@@ -85,5 +91,28 @@ describe('checkout return page', () => {
         expect(wrapper.text()).toContain('Nothing to confirm here')
         expect(wrapper.text()).not.toContain('failed')
         expect(wrapper.text()).not.toContain('confirm your order')
+    })
+
+    it('refetches the cart after a successful completion', async () => {
+        completeResponse = {status: 'completed', order: {id: 'order_1', display_id: 42}}
+        wrapper = await mountSuspended(CheckoutReturnPage)
+
+        await vi.waitFor(() => expect(cartFetchCount).toBe(2))
+    })
+
+    it('does not refetch the cart when payment is pending', async () => {
+        completeResponse = {status: 'pending', cart: {id: 'cart_1'}}
+        wrapper = await mountSuspended(CheckoutReturnPage)
+
+        await vi.waitFor(() => expect(wrapper!.text()).toContain('confirm'))
+        expect(cartFetchCount).toBe(1)
+    })
+
+    it('does not refetch the cart when payment fails', async () => {
+        completeResponse = {status: 'failed', cart: {id: 'cart_1'}}
+        wrapper = await mountSuspended(CheckoutReturnPage)
+
+        await vi.waitFor(() => expect(wrapper!.text()).toContain('failed'))
+        expect(cartFetchCount).toBe(1)
     })
 })
