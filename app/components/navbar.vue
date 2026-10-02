@@ -18,7 +18,13 @@ watch(
     <UNavigationMenu :items="items" class="hidden lg:flex" />
 
     <div class="flex items-center gap-2">
-      <UChip :text="String(cart.count.value)" :show="cart.count.value > 0" color="primary" size="sm">
+      <UChip
+        :text="String(cart.count.value)"
+        :show="cart.count.value > 0"
+        color="primary"
+        size="3xl"
+        :ui="{base: 'h-[18px] min-w-[18px] px-1 text-[11px] leading-none'}"
+      >
         <UButton to="/cart" icon="i-lucide-shopping-cart" color="neutral" variant="ghost" aria-label="Cart" />
       </UChip>
 

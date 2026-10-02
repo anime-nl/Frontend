@@ -72,6 +72,14 @@ describe('navbar', () => {
         await vi.waitFor(() => expect(wrapper!.findComponent({name: 'UChip'}).props('show')).toBe(false))
     })
 
+    // Nuxt UI's Chip size scale is built for tiny status dots (its largest built-in size is only a
+    // 12px box), so a legible count badge needs a larger size than the component's own default.
+    it('renders the cart badge large enough to read a count', async () => {
+        wrapper = await mountNavbar()
+
+        expect(wrapper.findComponent({name: 'UChip'}).props('size')).toBe('3xl')
+    })
+
     it('shows a log in link when signed out', async () => {
         wrapper = await mountNavbar()
 
