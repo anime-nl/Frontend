@@ -1,7 +1,12 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
-import {mountSuspended, registerEndpoint} from '@nuxt/test-utils/runtime'
+import {mockNuxtImport, mountSuspended, registerEndpoint} from '@nuxt/test-utils/runtime'
 import {createError, readBody} from 'h3'
 import CartPage from '~/pages/cart/index.vue'
+
+const fakeRequestEvent = vi.hoisted(() => ({marker: 'fake-request-event'}))
+const forwardSetCookieMock = vi.hoisted(() => vi.fn())
+mockNuxtImport('useRequestEvent', () => () => fakeRequestEvent)
+mockNuxtImport('forwardSetCookie', () => forwardSetCookieMock)
 
 const cartWithItems = {
     id: 'cart_1',
@@ -13,7 +18,7 @@ const cartWithItems = {
     discount_total: 0,
     item_total: 21.8,
     total: 21.8,
-    promotions: [] as {id: string; code: string | null}[],
+    promotions: [] as {id: string; code: string | null; is_automatic?: boolean}[],
     items: [
         {
             id: 'item_1',
@@ -31,6 +36,7 @@ let lastPutBody: unknown
 let lastDeletedItemId: string | undefined
 let lastPromotionBody: unknown
 let applyShouldFail = false
+let applyFailureStatusMessage = 'That promo code is not valid.'
 let removeShouldFail = false
 
 registerEndpoint('/api/cart', () => ({cart}))
@@ -38,7 +44,7 @@ registerEndpoint('/api/cart/promotions', {
     method: 'POST',
     handler: async (event) => {
         lastPromotionBody = await readBody(event)
-        if (applyShouldFail) throw createError({statusCode: 400, statusMessage: 'That promo code is not valid.'})
+        if (applyShouldFail) throw createError({statusCode: 400, statusMessage: applyFailureStatusMessage})
         cart = {...cartWithItems, promotions: [{id: 'promo_1', code: (lastPromotionBody as {code: string}).code}]}
         return {cart}
     }
@@ -83,7 +89,9 @@ beforeEach(() => {
     lastDeletedItemId = undefined
     lastPromotionBody = undefined
     applyShouldFail = false
+    applyFailureStatusMessage = 'That promo code is not valid.'
     removeShouldFail = false
+    forwardSetCookieMock.mockClear()
 })
 
 afterEach(() => {
@@ -210,6 +218,19 @@ describe('cart page', () => {
         expect((wrapper.find('input[placeholder="Promo code"]').element as HTMLInputElement).value).toBe('BADCODE')
     })
 
+    it('shows the server error message when applying a promo code fails for a reason other than an invalid code', async () => {
+        applyShouldFail = true
+        applyFailureStatusMessage = 'Could not apply promo code'
+        wrapper = await mountCart()
+
+        await wrapper.find('input[placeholder="Promo code"]').setValue('WELCOME10')
+        const applyButton = wrapper.findAllComponents({name: 'UButton'}).find((button) => button.text() === 'Apply')
+        await applyButton!.trigger('click')
+
+        await vi.waitFor(() => expect(wrapper!.text()).toContain('Could not apply promo code'))
+        expect(wrapper.text()).not.toContain('not valid')
+    })
+
     it('removing an applied code calls the remove endpoint', async () => {
         cart = {...cartWithItems, promotions: [{id: 'promo_1', code: 'WELCOME10'}]}
         wrapper = await mountCart()
@@ -236,5 +257,22 @@ describe('cart page', () => {
 
         await vi.waitFor(() => expect(wrapper!.text()).toContain('could not be removed'))
         expect(wrapper.text()).toContain('WELCOME10')
+    })
+
+    it('forwards the /api/cart response onto the real browser response during SSR', async () => {
+        wrapper = await mountCart()
+
+        await vi.waitFor(() => expect(forwardSetCookieMock).toHaveBeenCalledWith(fakeRequestEvent, expect.anything()))
+    })
+
+    it('does not show a remove button for an automatically-applied promotion', async () => {
+        cart = {...cartWithItems, promotions: [{id: 'promo_1', code: 'AUTO10', is_automatic: true}]}
+        wrapper = await mountCart()
+        await vi.waitFor(() => expect(wrapper!.text()).toContain('AUTO10'))
+
+        const removeButton = wrapper
+            .findAllComponents({name: 'UButton'})
+            .find((button) => button.props('icon') === 'i-lucide-x')
+        expect(removeButton).toBeUndefined()
     })
 })

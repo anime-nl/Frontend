@@ -15,8 +15,8 @@ async function onApplyCode() {
   try {
     await cart.applyPromoCode(trimmed)
     code.value = ''
-  } catch {
-    promoError.value = 'That promo code is not valid.'
+  } catch (error) {
+    promoError.value = (error as {statusMessage?: string}).statusMessage ?? 'That promo code is not valid.'
   } finally {
     applying.value = false
   }
@@ -59,6 +59,7 @@ async function onRemoveCode(promoCode: string) {
       <div v-for="promotion in cart.promotions.value" :key="promotion.id" class="flex items-center justify-between">
         <UBadge :label="promotion.code ?? ''" color="primary" variant="subtle" />
         <UButton
+          v-if="!promotion.is_automatic"
           icon="i-lucide-x"
           color="neutral"
           variant="ghost"
