@@ -1,4 +1,4 @@
-import type {StoreCart} from '@medusajs/types'
+import type {StoreCart, StoreCartPromotion} from '@medusajs/types'
 import {formatCurrency} from '#shared/utils/currency'
 
 /**
@@ -19,6 +19,10 @@ export function useCart() {
 
     const subtotal = computed(() => (cart.value?.subtotal != null ? format(cart.value.subtotal) : null))
     const total = computed(() => (cart.value?.total != null ? format(cart.value.total) : null))
+    const taxTotal = computed(() => (cart.value?.tax_total != null ? format(cart.value.tax_total) : null))
+    const discountTotal = computed(() => (cart.value?.discount_total ? format(cart.value.discount_total) : null))
+    const subtotalInclTax = computed(() => (cart.value?.item_total != null ? format(cart.value.item_total) : null))
+    const promotions = computed<StoreCartPromotion[]>(() => cart.value?.promotions ?? [])
 
     /**
      * Adds a variant to the cart, creating the cart cookie if there is none yet.
@@ -49,5 +53,41 @@ export function useCart() {
         await refresh()
     }
 
-    return {cart, items, count, subtotal, total, format, pending, refresh, addItem, updateItem, removeItem}
+    /**
+     * Applies a promo code to the cart.
+     * @param code Promo code to apply
+     */
+    async function applyPromoCode(code: string) {
+        await $fetch('/api/cart/promotions', {method: 'POST', body: {code}})
+        await refresh()
+    }
+
+    /**
+     * Removes an already-applied promo code from the cart.
+     * @param code Promo code to remove
+     */
+    async function removePromoCode(code: string) {
+        await $fetch('/api/cart/promotions', {method: 'DELETE', body: {code}})
+        await refresh()
+    }
+
+    return {
+        cart,
+        items,
+        count,
+        subtotal,
+        total,
+        taxTotal,
+        discountTotal,
+        subtotalInclTax,
+        promotions,
+        format,
+        pending,
+        refresh,
+        addItem,
+        updateItem,
+        removeItem,
+        applyPromoCode,
+        removePromoCode
+    }
 }

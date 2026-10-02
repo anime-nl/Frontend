@@ -58,10 +58,7 @@ async function onRemove(itemId: string) {
         />
       </div>
 
-      <div class="flex justify-end gap-8 text-xl font-bold">
-        <span>Subtotal</span>
-        <span>{{ cart.subtotal.value }}</span>
-      </div>
+      <CartSummary />
 
       <UButton to="/checkout" size="xl" class="self-end justify-center">Checkout</UButton>
     </div>

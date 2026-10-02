@@ -11,4 +11,5 @@ export const CART_COOKIE_OPTIONS = {
 }
 
 /** Requests everything the cart page and header badge need in one call. */
-export const CART_FIELDS = '*items,*items.variant,+items.variant.calculated_price,*shipping_methods,*shipping_address'
+export const CART_FIELDS =
+    '*items,*items.variant,+items.variant.calculated_price,*shipping_methods,*shipping_address,*promotions'

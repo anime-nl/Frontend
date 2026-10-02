@@ -206,10 +206,7 @@ async function onPay() {
           </div>
         </div>
 
-        <div class="flex justify-between text-xl font-bold">
-          <span>Total</span>
-          <span>{{ cart.total.value }}</span>
-        </div>
+        <CartSummary />
 
         <UAlert
           v-if="paymentError"
