@@ -1,7 +1,9 @@
 <script setup lang="ts">
 // Blocks on the shared 'cart' key so this page's first render already has the cart, instead of
-// flashing the empty state until useCart's own fetch resolves
-await useFetch('/api/cart', {key: 'cart'})
+// flashing the empty state until useCart's own fetch resolves. useFetch dedupes by key, so this
+// call (not useCart's own) is the one that actually fires and must carry the cookie-forwarding hook.
+const requestEvent = useRequestEvent()
+await useFetch('/api/cart', {key: 'cart', onResponse: ({response}) => forwardSetCookie(requestEvent, response)})
 const cart = useCart()
 
 const updating = ref<string | null>(null)
@@ -58,10 +60,7 @@ async function onRemove(itemId: string) {
         />
       </div>
 
-      <div class="flex justify-end gap-8 text-xl font-bold">
-        <span>Subtotal</span>
-        <span>{{ cart.subtotal.value }}</span>
-      </div>
+      <CartSummary />
 
       <UButton to="/checkout" size="xl" class="self-end justify-center">Checkout</UButton>
     </div>

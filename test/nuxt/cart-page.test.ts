@@ -1,13 +1,24 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
-import {mountSuspended, registerEndpoint} from '@nuxt/test-utils/runtime'
-import {readBody} from 'h3'
+import {mockNuxtImport, mountSuspended, registerEndpoint} from '@nuxt/test-utils/runtime'
+import {createError, readBody} from 'h3'
 import CartPage from '~/pages/cart/index.vue'
+
+const fakeRequestEvent = vi.hoisted(() => ({marker: 'fake-request-event'}))
+const forwardSetCookieMock = vi.hoisted(() => vi.fn())
+mockNuxtImport('useRequestEvent', () => () => fakeRequestEvent)
+mockNuxtImport('forwardSetCookie', () => forwardSetCookieMock)
 
 const cartWithItems = {
     id: 'cart_1',
     currency_code: 'eur',
-    subtotal: 21.8,
+    subtotal: 18.0,
+    tax_total: 3.8,
+    item_subtotal: 18.0,
+    original_item_tax_total: 3.8,
+    discount_total: 0,
+    item_total: 21.8,
     total: 21.8,
+    promotions: [] as {id: string; code: string | null; is_automatic?: boolean}[],
     items: [
         {
             id: 'item_1',
@@ -23,8 +34,30 @@ const cartWithItems = {
 let cart: typeof cartWithItems | null = cartWithItems
 let lastPutBody: unknown
 let lastDeletedItemId: string | undefined
+let lastPromotionBody: unknown
+let applyShouldFail = false
+let applyFailureStatusMessage = 'That promo code is not valid.'
+let removeShouldFail = false
 
 registerEndpoint('/api/cart', () => ({cart}))
+registerEndpoint('/api/cart/promotions', {
+    method: 'POST',
+    handler: async (event) => {
+        lastPromotionBody = await readBody(event)
+        if (applyShouldFail) throw createError({statusCode: 400, statusMessage: applyFailureStatusMessage})
+        cart = {...cartWithItems, promotions: [{id: 'promo_1', code: (lastPromotionBody as {code: string}).code}]}
+        return {cart}
+    }
+})
+registerEndpoint('/api/cart/promotions', {
+    method: 'DELETE',
+    handler: async (event) => {
+        lastPromotionBody = await readBody(event)
+        if (removeShouldFail) throw createError({statusCode: 500, statusMessage: 'Could not remove promo code'})
+        cart = {...cartWithItems, promotions: []}
+        return {cart}
+    }
+})
 registerEndpoint('/api/cart/items/item_1', {
     method: 'PUT',
     handler: async (event) => {
@@ -54,6 +87,11 @@ beforeEach(() => {
     cart = cartWithItems
     lastPutBody = undefined
     lastDeletedItemId = undefined
+    lastPromotionBody = undefined
+    applyShouldFail = false
+    applyFailureStatusMessage = 'That promo code is not valid.'
+    removeShouldFail = false
+    forwardSetCookieMock.mockClear()
 })
 
 afterEach(() => {
@@ -70,10 +108,41 @@ describe('cart page', () => {
         expect(wrapper.text()).toContain(eur(10.9))
     })
 
-    it('shows the subtotal formatted as EUR currency', async () => {
+    it('shows the price excl. VAT, the VAT amount, the incl.-VAT subtotal and the total', async () => {
         wrapper = await mountCart()
 
+        expect(wrapper.text()).toContain('Price excl. VAT')
+        expect(wrapper.text()).toContain(eur(18.0))
+        expect(wrapper.text()).toContain('VAT')
+        expect(wrapper.text()).toContain(eur(3.8))
+        expect(wrapper.text()).toContain('Subtotal')
+        expect(wrapper.text()).toContain('Total')
         expect(wrapper.text()).toContain(eur(21.8))
+    })
+
+    it('does not show a discount row when there is no discount', async () => {
+        wrapper = await mountCart()
+
+        expect(wrapper.text()).not.toContain('Discount')
+    })
+
+    it('shows a discount row, and the breakdown rows reconcile, when a discount is applied', async () => {
+        // A 10% promo code on a 100.00 excl.-VAT, 21% item: excl. VAT + VAT - discount = subtotal.
+        cart = {
+            ...cartWithItems,
+            item_subtotal: 100.0,
+            original_item_tax_total: 21.0,
+            discount_total: 12.1,
+            item_total: 108.9,
+            total: 108.9
+        }
+        wrapper = await mountCart()
+
+        expect(wrapper.text()).toContain(eur(100.0))
+        expect(wrapper.text()).toContain(eur(21.0))
+        expect(wrapper.text()).toContain('Discount')
+        expect(wrapper.text()).toContain(eur(12.1))
+        expect(wrapper.text()).toContain(eur(108.9))
     })
 
     it('does not show a variant line for an item with no variant title', async () => {
@@ -117,11 +186,93 @@ describe('cart page', () => {
         expect(wrapper.text()).not.toContain('€')
     })
 
-    it('shows no subtotal when the cart has not calculated one yet', async () => {
-        cart = {...cartWithItems, subtotal: null as unknown as number}
+    it('hides the excl.-VAT row when the cart has not calculated it yet', async () => {
+        cart = {...cartWithItems, item_subtotal: null as unknown as number}
         wrapper = await mountCart()
 
-        const subtotalRow = wrapper.text().split('Subtotal')[1]
-        expect(subtotalRow?.trim().startsWith('€')).toBe(false)
+        expect(wrapper.text()).not.toContain('Price excl. VAT')
+    })
+
+    it('applying a valid promo code adds it to the applied list and clears the input', async () => {
+        applyShouldFail = false
+        wrapper = await mountCart()
+
+        await wrapper.find('input[placeholder="Promo code"]').setValue('WELCOME10')
+        const applyButton = wrapper.findAllComponents({name: 'UButton'}).find((button) => button.text() === 'Apply')
+        await applyButton!.trigger('click')
+
+        await vi.waitFor(() => expect(lastPromotionBody).toEqual({code: 'WELCOME10'}))
+        await vi.waitFor(() => expect(wrapper!.text()).toContain('WELCOME10'))
+        expect((wrapper.find('input[placeholder="Promo code"]').element as HTMLInputElement).value).toBe('')
+    })
+
+    it('applying an invalid promo code shows an error and keeps the input value', async () => {
+        applyShouldFail = true
+        wrapper = await mountCart()
+
+        await wrapper.find('input[placeholder="Promo code"]').setValue('BADCODE')
+        const applyButton = wrapper.findAllComponents({name: 'UButton'}).find((button) => button.text() === 'Apply')
+        await applyButton!.trigger('click')
+
+        await vi.waitFor(() => expect(wrapper!.text()).toContain('not valid'))
+        expect((wrapper.find('input[placeholder="Promo code"]').element as HTMLInputElement).value).toBe('BADCODE')
+    })
+
+    it('shows the server error message when applying a promo code fails for a reason other than an invalid code', async () => {
+        applyShouldFail = true
+        applyFailureStatusMessage = 'Could not apply promo code'
+        wrapper = await mountCart()
+
+        await wrapper.find('input[placeholder="Promo code"]').setValue('WELCOME10')
+        const applyButton = wrapper.findAllComponents({name: 'UButton'}).find((button) => button.text() === 'Apply')
+        await applyButton!.trigger('click')
+
+        await vi.waitFor(() => expect(wrapper!.text()).toContain('Could not apply promo code'))
+        expect(wrapper.text()).not.toContain('not valid')
+    })
+
+    it('removing an applied code calls the remove endpoint', async () => {
+        cart = {...cartWithItems, promotions: [{id: 'promo_1', code: 'WELCOME10'}]}
+        wrapper = await mountCart()
+        await vi.waitFor(() => expect(wrapper!.text()).toContain('WELCOME10'))
+
+        const removeButton = wrapper
+            .findAllComponents({name: 'UButton'})
+            .find((button) => button.props('icon') === 'i-lucide-x')
+        await removeButton!.trigger('click')
+
+        await vi.waitFor(() => expect(lastPromotionBody).toEqual({code: 'WELCOME10'}))
+    })
+
+    it('shows an error when removing an applied code fails', async () => {
+        removeShouldFail = true
+        cart = {...cartWithItems, promotions: [{id: 'promo_1', code: 'WELCOME10'}]}
+        wrapper = await mountCart()
+        await vi.waitFor(() => expect(wrapper!.text()).toContain('WELCOME10'))
+
+        const removeButton = wrapper
+            .findAllComponents({name: 'UButton'})
+            .find((button) => button.props('icon') === 'i-lucide-x')
+        await removeButton!.trigger('click')
+
+        await vi.waitFor(() => expect(wrapper!.text()).toContain('could not be removed'))
+        expect(wrapper.text()).toContain('WELCOME10')
+    })
+
+    it('forwards the /api/cart response onto the real browser response during SSR', async () => {
+        wrapper = await mountCart()
+
+        await vi.waitFor(() => expect(forwardSetCookieMock).toHaveBeenCalledWith(fakeRequestEvent, expect.anything()))
+    })
+
+    it('does not show a remove button for an automatically-applied promotion', async () => {
+        cart = {...cartWithItems, promotions: [{id: 'promo_1', code: 'AUTO10', is_automatic: true}]}
+        wrapper = await mountCart()
+        await vi.waitFor(() => expect(wrapper!.text()).toContain('AUTO10'))
+
+        const removeButton = wrapper
+            .findAllComponents({name: 'UButton'})
+            .find((button) => button.props('icon') === 'i-lucide-x')
+        expect(removeButton).toBeUndefined()
     })
 })

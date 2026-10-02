@@ -1,4 +1,4 @@
-import type {StoreCart} from '@medusajs/types'
+import type {StoreCart, StoreCartPromotion} from '@medusajs/types'
 import {formatCurrency} from '#shared/utils/currency'
 
 /**
@@ -6,7 +6,11 @@ import {formatCurrency} from '#shared/utils/currency'
  * @returns Cart state and totals, plus addItem/updateItem/removeItem to mutate it
  */
 export function useCart() {
-    const {data, pending, refresh} = useFetch<{cart: StoreCart | null}>('/api/cart', {key: 'cart'})
+    const requestEvent = useRequestEvent()
+    const {data, pending, refresh} = useFetch<{cart: StoreCart | null}>('/api/cart', {
+        key: 'cart',
+        onResponse: ({response}) => forwardSetCookie(requestEvent, response)
+    })
 
     const cart = computed(() => data.value?.cart ?? null)
     const items = computed(() => cart.value?.items ?? [])
@@ -17,8 +21,18 @@ export function useCart() {
         return currency ? formatCurrency(amount, currency) : null
     }
 
-    const subtotal = computed(() => (cart.value?.subtotal != null ? format(cart.value.subtotal) : null))
+    // The excl./incl.-VAT breakdown uses items-only, same-basis fields (item_subtotal and
+    // original_item_tax_total are both pre-discount) so that excl. VAT + VAT - discount reconciles
+    // to item_total. cart.subtotal/tax_total mix pre- and post-discount, cart-level (shipping-inclusive)
+    // amounts and do not add up to a displayable breakdown.
+    const subtotal = computed(() => (cart.value?.item_subtotal != null ? format(cart.value.item_subtotal) : null))
     const total = computed(() => (cart.value?.total != null ? format(cart.value.total) : null))
+    const taxTotal = computed(() =>
+        cart.value?.original_item_tax_total != null ? format(cart.value.original_item_tax_total) : null
+    )
+    const discountTotal = computed(() => (cart.value?.discount_total ? format(cart.value.discount_total) : null))
+    const subtotalInclTax = computed(() => (cart.value?.item_total != null ? format(cart.value.item_total) : null))
+    const promotions = computed<StoreCartPromotion[]>(() => cart.value?.promotions ?? [])
 
     /**
      * Adds a variant to the cart, creating the cart cookie if there is none yet.
@@ -49,5 +63,41 @@ export function useCart() {
         await refresh()
     }
 
-    return {cart, items, count, subtotal, total, format, pending, refresh, addItem, updateItem, removeItem}
+    /**
+     * Applies a promo code to the cart.
+     * @param code Promo code to apply
+     */
+    async function applyPromoCode(code: string) {
+        await $fetch('/api/cart/promotions', {method: 'POST', body: {code}})
+        await refresh()
+    }
+
+    /**
+     * Removes an already-applied promo code from the cart.
+     * @param code Promo code to remove
+     */
+    async function removePromoCode(code: string) {
+        await $fetch('/api/cart/promotions', {method: 'DELETE', body: {code}})
+        await refresh()
+    }
+
+    return {
+        cart,
+        items,
+        count,
+        subtotal,
+        total,
+        taxTotal,
+        discountTotal,
+        subtotalInclTax,
+        promotions,
+        format,
+        pending,
+        refresh,
+        addItem,
+        updateItem,
+        removeItem,
+        applyPromoCode,
+        removePromoCode
+    }
 }

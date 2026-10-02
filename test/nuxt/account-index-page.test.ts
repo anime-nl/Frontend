@@ -1,7 +1,12 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
-import {mountSuspended, registerEndpoint} from '@nuxt/test-utils/runtime'
+import {mockNuxtImport, mountSuspended, registerEndpoint} from '@nuxt/test-utils/runtime'
 import {createError} from 'h3'
 import AccountPage from '~/pages/account/index.vue'
+
+const fakeRequestEvent = vi.hoisted(() => ({marker: 'fake-request-event'}))
+const forwardSetCookieMock = vi.hoisted(() => vi.fn())
+mockNuxtImport('useRequestEvent', () => () => fakeRequestEvent)
+mockNuxtImport('forwardSetCookie', () => forwardSetCookieMock)
 
 let signedIn = true
 let orders: unknown[] = []
@@ -34,6 +39,7 @@ beforeEach(() => {
     orders = []
     ordersCallCount = 0
     logoutCallCount = 0
+    forwardSetCookieMock.mockClear()
 })
 
 afterEach(() => {
@@ -88,5 +94,11 @@ describe('account page', () => {
 
         expect(logoutCallCount).toBe(1)
         await vi.waitFor(() => expect(wrapper!.text().toLowerCase()).toContain('sign in'))
+    })
+
+    it('forwards the /api/account/me response onto the real browser response during SSR', async () => {
+        wrapper = await mountAccount()
+
+        await vi.waitFor(() => expect(forwardSetCookieMock).toHaveBeenCalledWith(fakeRequestEvent, expect.anything()))
     })
 })

@@ -1,17 +1,23 @@
 <script setup lang="ts">
 import type {StoreShippingOption} from '@medusajs/types'
-import {checkoutCountries, validateAddressRequest} from '#shared/utils/checkout'
+import {checkoutCountries, splitStreetAndHouseNumber, validateAddressRequest} from '#shared/utils/checkout'
 import type {AddressRequest} from '#shared/utils/checkout'
 import {formatCurrency} from '#shared/utils/currency'
 
-await useFetch('/api/cart', {key: 'cart'})
+// useFetch dedupes by key, so whichever call with a given key runs first is the one that actually
+// fires and must carry the cookie-forwarding hook - not useCart's/useCustomer's own internal call.
+const requestEvent = useRequestEvent()
+await useFetch('/api/cart', {key: 'cart', onResponse: ({response}) => forwardSetCookie(requestEvent, response)})
 const cart = useCart()
 
 if (!cart.items.value.length) {
   await navigateTo('/cart')
 }
 
-await useFetch('/api/account/me', {key: 'current-customer'})
+await useFetch('/api/account/me', {
+  key: 'current-customer',
+  onResponse: ({response}) => forwardSetCookie(requestEvent, response)
+})
 const customer = useCustomer()
 
 type Step = 'address' | 'shipping' | 'review'
@@ -27,6 +33,23 @@ const address = reactive<AddressRequest>({
   city: '',
   country: 'NL'
 })
+
+/**
+ * Dutch browser autofill profiles store the full "Street 12A"-style address as one value and drop
+ * it into whichever field is recognized as the street line. Splits it out on the field's native
+ * `change` event (blur, or autofill), not on every keystroke - splitting on every input would
+ * trample a house number the customer is still in the middle of typing into the street field
+ * themselves. Only runs when houseNumber is still empty, so it never overwrites a number the
+ * customer already entered.
+ */
+function onStreetChange() {
+  if (address.houseNumber) return
+  const split = splitStreetAndHouseNumber(address.street)
+  if (split.houseNumber) {
+    address.street = split.street
+    address.houseNumber = split.houseNumber
+  }
+}
 
 const shippingOptions = ref<StoreShippingOption[]>([])
 const shippingOptionItems = computed(() =>
@@ -119,10 +142,10 @@ async function onPay() {
 
         <div class="grid grid-cols-1 sm:grid-cols-[2fr_1fr] gap-5">
           <UFormField name="street" label="Street" required>
-            <UInput v-model="address.street" autocomplete="address-line1" class="w-full" />
+            <UInput v-model="address.street" autocomplete="address-line1" class="w-full" @change="onStreetChange" />
           </UFormField>
           <UFormField name="houseNumber" label="House number" required>
-            <UInput v-model="address.houseNumber" class="w-full" />
+            <UInput v-model="address.houseNumber" autocomplete="address-line2" class="w-full" />
           </UFormField>
         </div>
 
@@ -206,10 +229,7 @@ async function onPay() {
           </div>
         </div>
 
-        <div class="flex justify-between text-xl font-bold">
-          <span>Total</span>
-          <span>{{ cart.total.value }}</span>
-        </div>
+        <CartSummary />
 
         <UAlert
           v-if="paymentError"

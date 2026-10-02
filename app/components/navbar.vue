@@ -18,8 +18,14 @@ watch(
     <UNavigationMenu :items="items" class="hidden lg:flex" />
 
     <div class="flex items-center gap-2">
-      <UChip :text="String(cart.count.value)" :show="cart.count.value > 0" color="primary" size="sm">
-        <UButton to="/cart" icon="i-lucide-shopping-cart" color="neutral" variant="ghost" aria-label="Cart" />
+      <UChip
+        :text="String(cart.count.value)"
+        :show="cart.count.value > 0"
+        color="primary"
+        size="3xl"
+        :ui="{base: 'h-[18px] min-w-[18px] px-1 text-[11px] leading-none'}"
+      >
+        <UButton to="/cart" icon="i-lucide-shopping-cart" color="neutral" variant="link" aria-label="Cart" />
       </UChip>
 
       <UButton
@@ -27,9 +33,9 @@ watch(
         :label="customer.customer.value.first_name || 'Account'"
         to="/account"
         color="neutral"
-        variant="ghost"
+        variant="link"
       />
-      <UButton v-else label="Log in" to="/account/login" color="neutral" variant="ghost" />
+      <UButton v-else label="Log in" to="/account/login" color="neutral" variant="link" />
 
       <UButton
         class="lg:hidden"

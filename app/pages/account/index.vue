@@ -2,7 +2,13 @@
 import type {StoreOrder} from '@medusajs/types'
 import {formatCurrency} from '#shared/utils/currency'
 
-await useFetch('/api/account/me', {key: 'current-customer'})
+// useFetch dedupes by key, so this call (not useCustomer's own) is the one that actually fires
+// and must carry the cookie-forwarding hook.
+const requestEvent = useRequestEvent()
+await useFetch('/api/account/me', {
+  key: 'current-customer',
+  onResponse: ({response}) => forwardSetCookie(requestEvent, response)
+})
 const customer = useCustomer()
 
 const {data: ordersData} = await useFetch<{orders: StoreOrder[]}>('/api/account/orders', {

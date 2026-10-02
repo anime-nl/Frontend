@@ -25,6 +25,7 @@ function resolveShippingProfileId(
     brievenbusProfileId: string,
     pakketProfileId: string
 ): string | undefined {
+    if (itemProfileIds.length === 0) return undefined
     if (itemProfileIds.includes(pakketProfileId)) return pakketProfileId
     if (itemProfileIds.every((id) => id === brievenbusProfileId)) return brievenbusProfileId
     return undefined

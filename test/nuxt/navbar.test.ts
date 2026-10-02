@@ -72,6 +72,14 @@ describe('navbar', () => {
         await vi.waitFor(() => expect(wrapper!.findComponent({name: 'UChip'}).props('show')).toBe(false))
     })
 
+    // Nuxt UI's Chip size scale is built for tiny status dots (its largest built-in size is only a
+    // 12px box), so a legible count badge needs a larger size than the component's own default.
+    it('renders the cart badge large enough to read a count', async () => {
+        wrapper = await mountNavbar()
+
+        expect(wrapper.findComponent({name: 'UChip'}).props('size')).toBe('3xl')
+    })
+
     it('shows a log in link when signed out', async () => {
         wrapper = await mountNavbar()
 
@@ -87,5 +95,27 @@ describe('navbar', () => {
             expect(link.exists()).toBe(true)
             expect(link.text()).toBe('Jan')
         })
+    })
+
+    it('styles the cart and login links as plain links, not buttons', async () => {
+        wrapper = await mountNavbar()
+
+        const cartButton = wrapper.findAllComponents({name: 'UButton'}).find((button) => button.props('to') === '/cart')
+        const loginButton = wrapper
+            .findAllComponents({name: 'UButton'})
+            .find((button) => button.props('to') === '/account/login')
+
+        expect(cartButton!.props('variant')).toBe('link')
+        expect(loginButton!.props('variant')).toBe('link')
+    })
+
+    it('keeps the mobile menu button as a button', async () => {
+        wrapper = await mountNavbar()
+
+        const menuButton = wrapper
+            .findAllComponents({name: 'UButton'})
+            .find((button) => button.attributes('aria-label') === 'Open menu')
+
+        expect(menuButton!.props('variant')).toBe('ghost')
     })
 })

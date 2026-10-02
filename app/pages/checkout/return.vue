@@ -6,7 +6,11 @@ type CompleteResponse = {status: 'completed'; order: StoreOrder} | {status: 'pen
 // useFetch (not a plain $fetch) is required here: only useFetch forwards the browser's cookies to
 // this internal API call during server-side rendering, which /api/checkout/complete needs to read
 // the cart_id cookie. A plain $fetch would always see no cookie on the first, server-rendered paint.
-const {data, error} = await useFetch<CompleteResponse>('/api/checkout/complete', {method: 'POST'})
+const requestEvent = useRequestEvent()
+const {data, error} = await useFetch<CompleteResponse>('/api/checkout/complete', {
+  method: 'POST',
+  onResponse: ({response}) => forwardSetCookie(requestEvent, response)
+})
 
 // The complete route (and the Mollie provider behind it) cannot always tell "still processing" apart
 // from "genuinely failed" — see docs/known-issues.md. Only a confident 'failed' response from the API
@@ -20,7 +24,15 @@ const status = computed<'completed' | 'pending' | 'failed' | 'idle'>(() => {
 })
 const order = computed(() => (data.value?.status === 'completed' ? data.value.order : null))
 
-await useFetch('/api/account/me', {key: 'current-customer'})
+const cart = useCart()
+if (status.value === 'completed') {
+  await cart.refresh()
+}
+
+await useFetch('/api/account/me', {
+  key: 'current-customer',
+  onResponse: ({response}) => forwardSetCookie(requestEvent, response)
+})
 const customer = useCustomer()
 </script>
 
