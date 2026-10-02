@@ -121,4 +121,10 @@ describe('GET /api/checkout/shipping-options', () => {
 
         expect(medusaFetch).not.toHaveBeenCalledWith(expect.anything(), 'products/shipping-profiles', expect.anything())
     })
+
+    it('returns every option unfiltered for an empty cart instead of only Brievenbus options', async () => {
+        mockMedusa(itemsWithProfiles())
+
+        await expect(callRoute()).resolves.toEqual({shipping_options: ALL_OPTIONS})
+    })
 })
