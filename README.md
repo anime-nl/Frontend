@@ -82,9 +82,10 @@ Brevo handles the name, email address and message of every submission, so mentio
 
 Customers sign in with Google only — the store never collects or stores a password. This is configured on **Medusa**, not on the Nuxt app, and production's Medusa instance is a separate deployment outside this repo (see "Production" above), so enabling it there is a manual step this repo cannot do or verify:
 
-1. In Google Cloud Console, create (or reuse) an OAuth 2.0 **Web application** client. Add the production callback URL to its Authorized redirect URIs: `https://animenl.nl/account/callback/google` (alongside the local dev one, `http://localhost:3000/account/callback/google`, if the same client is reused). "Authorized JavaScript origins" is not needed — sign-in is a server-side redirect, not a client-side flow.
-2. On production's Medusa instance, set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` and `GOOGLE_CALLBACK_URL=https://animenl.nl/account/callback/google`, and make sure its `medusa-config.ts` registers the `@medusajs/medusa/auth-google` provider (see `medusa/medusa-config.ts` in this repo for the shape local dev uses).
-3. Sign in on the live site and confirm the customer appears in the Medusa admin.
+1. In Google Cloud Console, open **APIs & Services → OAuth consent screen** for the project tied to `GOOGLE_CLIENT_ID` and confirm **Audience** is set to **External**, with the app **Published** (not stuck in "Testing" — Testing mode only allows sign-in from accounts explicitly added as test users, and shows "access blocked: can only be used within the organization" for anyone else, including "Internal" audience apps outside that one Workspace org).
+2. In Google Cloud Console, create (or reuse) an OAuth 2.0 **Web application** client. Add the production callback URL to its Authorized redirect URIs: `https://animenl.nl/account/callback/google` (alongside the local dev one, `http://localhost:3000/account/callback/google`, if the same client is reused). "Authorized JavaScript origins" is not needed — sign-in is a server-side redirect, not a client-side flow.
+3. On production's Medusa instance, set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` and `GOOGLE_CALLBACK_URL=https://animenl.nl/account/callback/google`, and make sure its `medusa-config.ts` registers the `@medusajs/medusa/auth-google` provider (see `medusa/medusa-config.ts` in this repo for the shape local dev uses).
+4. Sign in on the live site and confirm the customer appears in the Medusa admin.
 
 ### Enabling Mollie payments
 
