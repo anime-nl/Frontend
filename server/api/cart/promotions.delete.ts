@@ -21,10 +21,14 @@ export default defineEventHandler(async (event) => {
         throw createError({statusCode: 400, statusMessage: 'Missing code'})
     }
 
-    const {cart} = await medusaFetch<{cart: StoreCart}>(event, `carts/${cartId}/promotions`, {
-        method: 'DELETE',
-        body: {promo_codes: [code]},
-        query: {fields: CART_FIELDS}
-    })
-    return {cart}
+    try {
+        const {cart} = await medusaFetch<{cart: StoreCart}>(event, `carts/${cartId}/promotions`, {
+            method: 'DELETE',
+            body: {promo_codes: [code]},
+            query: {fields: CART_FIELDS}
+        })
+        return {cart}
+    } catch {
+        throw createError({statusCode: 500, statusMessage: 'Could not remove promo code'})
+    }
 })

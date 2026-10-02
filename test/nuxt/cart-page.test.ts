@@ -8,6 +8,8 @@ const cartWithItems = {
     currency_code: 'eur',
     subtotal: 18.0,
     tax_total: 3.8,
+    item_subtotal: 18.0,
+    original_item_tax_total: 3.8,
     discount_total: 0,
     item_total: 21.8,
     total: 21.8,
@@ -29,6 +31,7 @@ let lastPutBody: unknown
 let lastDeletedItemId: string | undefined
 let lastPromotionBody: unknown
 let applyShouldFail = false
+let removeShouldFail = false
 
 registerEndpoint('/api/cart', () => ({cart}))
 registerEndpoint('/api/cart/promotions', {
@@ -44,6 +47,7 @@ registerEndpoint('/api/cart/promotions', {
     method: 'DELETE',
     handler: async (event) => {
         lastPromotionBody = await readBody(event)
+        if (removeShouldFail) throw createError({statusCode: 500, statusMessage: 'Could not remove promo code'})
         cart = {...cartWithItems, promotions: []}
         return {cart}
     }
@@ -79,6 +83,7 @@ beforeEach(() => {
     lastDeletedItemId = undefined
     lastPromotionBody = undefined
     applyShouldFail = false
+    removeShouldFail = false
 })
 
 afterEach(() => {
@@ -113,12 +118,23 @@ describe('cart page', () => {
         expect(wrapper.text()).not.toContain('Discount')
     })
 
-    it('shows a discount row when a discount is applied', async () => {
-        cart = {...cartWithItems, discount_total: 2.0}
+    it('shows a discount row, and the breakdown rows reconcile, when a discount is applied', async () => {
+        // A 10% promo code on a 100.00 excl.-VAT, 21% item: excl. VAT + VAT - discount = subtotal.
+        cart = {
+            ...cartWithItems,
+            item_subtotal: 100.0,
+            original_item_tax_total: 21.0,
+            discount_total: 12.1,
+            item_total: 108.9,
+            total: 108.9
+        }
         wrapper = await mountCart()
 
+        expect(wrapper.text()).toContain(eur(100.0))
+        expect(wrapper.text()).toContain(eur(21.0))
         expect(wrapper.text()).toContain('Discount')
-        expect(wrapper.text()).toContain(eur(2.0))
+        expect(wrapper.text()).toContain(eur(12.1))
+        expect(wrapper.text()).toContain(eur(108.9))
     })
 
     it('does not show a variant line for an item with no variant title', async () => {
@@ -163,7 +179,7 @@ describe('cart page', () => {
     })
 
     it('hides the excl.-VAT row when the cart has not calculated it yet', async () => {
-        cart = {...cartWithItems, subtotal: null as unknown as number}
+        cart = {...cartWithItems, item_subtotal: null as unknown as number}
         wrapper = await mountCart()
 
         expect(wrapper.text()).not.toContain('Price excl. VAT')
@@ -205,5 +221,20 @@ describe('cart page', () => {
         await removeButton!.trigger('click')
 
         await vi.waitFor(() => expect(lastPromotionBody).toEqual({code: 'WELCOME10'}))
+    })
+
+    it('shows an error when removing an applied code fails', async () => {
+        removeShouldFail = true
+        cart = {...cartWithItems, promotions: [{id: 'promo_1', code: 'WELCOME10'}]}
+        wrapper = await mountCart()
+        await vi.waitFor(() => expect(wrapper!.text()).toContain('WELCOME10'))
+
+        const removeButton = wrapper
+            .findAllComponents({name: 'UButton'})
+            .find((button) => button.props('icon') === 'i-lucide-x')
+        await removeButton!.trigger('click')
+
+        await vi.waitFor(() => expect(wrapper!.text()).toContain('could not be removed'))
+        expect(wrapper.text()).toContain('WELCOME10')
     })
 })

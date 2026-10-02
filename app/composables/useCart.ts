@@ -17,9 +17,15 @@ export function useCart() {
         return currency ? formatCurrency(amount, currency) : null
     }
 
-    const subtotal = computed(() => (cart.value?.subtotal != null ? format(cart.value.subtotal) : null))
+    // The excl./incl.-VAT breakdown uses items-only, same-basis fields (item_subtotal and
+    // original_item_tax_total are both pre-discount) so that excl. VAT + VAT - discount reconciles
+    // to item_total. cart.subtotal/tax_total mix pre- and post-discount, cart-level (shipping-inclusive)
+    // amounts and do not add up to a displayable breakdown.
+    const subtotal = computed(() => (cart.value?.item_subtotal != null ? format(cart.value.item_subtotal) : null))
     const total = computed(() => (cart.value?.total != null ? format(cart.value.total) : null))
-    const taxTotal = computed(() => (cart.value?.tax_total != null ? format(cart.value.tax_total) : null))
+    const taxTotal = computed(() =>
+        cart.value?.original_item_tax_total != null ? format(cart.value.original_item_tax_total) : null
+    )
     const discountTotal = computed(() => (cart.value?.discount_total ? format(cart.value.discount_total) : null))
     const subtotalInclTax = computed(() => (cart.value?.item_total != null ? format(cart.value.item_total) : null))
     const promotions = computed<StoreCartPromotion[]>(() => cart.value?.promotions ?? [])

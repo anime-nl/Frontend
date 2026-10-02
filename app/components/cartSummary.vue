@@ -3,7 +3,7 @@ const cart = useCart()
 
 const code = ref('')
 const applying = ref(false)
-const applyError = ref('')
+const promoError = ref('')
 const removing = ref<string | null>(null)
 
 async function onApplyCode() {
@@ -11,12 +11,12 @@ async function onApplyCode() {
   if (!trimmed) return
 
   applying.value = true
-  applyError.value = ''
+  promoError.value = ''
   try {
     await cart.applyPromoCode(trimmed)
     code.value = ''
   } catch {
-    applyError.value = 'That promo code is not valid.'
+    promoError.value = 'That promo code is not valid.'
   } finally {
     applying.value = false
   }
@@ -24,8 +24,11 @@ async function onApplyCode() {
 
 async function onRemoveCode(promoCode: string) {
   removing.value = promoCode
+  promoError.value = ''
   try {
     await cart.removePromoCode(promoCode)
+  } catch {
+    promoError.value = 'That promo code could not be removed. Please try again.'
   } finally {
     removing.value = null
   }
@@ -66,7 +69,7 @@ async function onRemoveCode(promoCode: string) {
         />
       </div>
 
-      <UAlert v-if="applyError" color="error" variant="subtle" icon="i-lucide-circle-alert" :description="applyError" />
+      <UAlert v-if="promoError" color="error" variant="subtle" icon="i-lucide-circle-alert" :description="promoError" />
     </div>
 
     <div class="flex justify-between text-xl font-bold">

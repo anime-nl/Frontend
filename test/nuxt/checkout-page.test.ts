@@ -12,6 +12,8 @@ const cartWithItems = {
     currency_code: 'eur',
     subtotal: 18.0,
     tax_total: 3.8,
+    item_subtotal: 18.0,
+    original_item_tax_total: 3.8,
     discount_total: 0,
     item_total: 21.8,
     total: 21.8,
@@ -78,7 +80,8 @@ registerEndpoint('/api/checkout/shipping-method', {
         cart = {
             ...cartWithItems,
             promotions: (cart as typeof cartWithItems).promotions,
-            shipping_methods: [{id: 'sm_1', name: option.name, amount: option.amount}]
+            shipping_methods: [{id: 'sm_1', name: option.name, amount: option.amount}],
+            total: cartWithItems.item_total + option.amount
         }
         return {cart}
     }
@@ -157,6 +160,24 @@ describe('checkout page', () => {
         await wrapper.find('[name="street"]').setValue('Kerkstraat 12A')
 
         expect((wrapper.find('[name="street"]').element as HTMLInputElement).value).toBe('Kerkstraat')
+        expect((wrapper.find('[name="houseNumber"]').element as HTMLInputElement).value).toBe('12A')
+    })
+
+    it('does not split a house number while the customer is still typing, only once they move on from the field', async () => {
+        wrapper = await mountCheckout()
+        const street = wrapper.find('[name="street"]')
+
+        for (const partial of ['K', 'Ke', 'Kerkstraat', 'Kerkstraat 1', 'Kerkstraat 12A']) {
+            ;(street.element as HTMLInputElement).value = partial
+            await street.trigger('input')
+        }
+
+        expect((street.element as HTMLInputElement).value).toBe('Kerkstraat 12A')
+        expect((wrapper.find('[name="houseNumber"]').element as HTMLInputElement).value).toBe('')
+
+        await street.trigger('change')
+
+        expect((street.element as HTMLInputElement).value).toBe('Kerkstraat')
         expect((wrapper.find('[name="houseNumber"]').element as HTMLInputElement).value).toBe('12A')
     })
 
@@ -296,7 +317,7 @@ describe('checkout page', () => {
         expect(wrapper.findComponent({name: 'URadioGroup'}).exists()).toBe(true)
     })
 
-    it('the review step shows the VAT breakdown and total', async () => {
+    it('the review step shows the VAT breakdown, and the subtotal excludes shipping while the total includes it', async () => {
         wrapper = await mountCheckout()
         await reachReviewStep(wrapper)
 
@@ -304,9 +325,11 @@ describe('checkout page', () => {
         expect(wrapper.text()).toContain(eur(18.0))
         expect(wrapper.text()).toContain('VAT')
         expect(wrapper.text()).toContain(eur(3.8))
+        // Subtotal is items-only (no shipping yet); Total adds the chosen Standard shipping (4.95).
         expect(wrapper.text()).toContain('Subtotal')
-        expect(wrapper.text()).toContain('Total')
         expect(wrapper.text()).toContain(eur(21.8))
+        expect(wrapper.text()).toContain('Total')
+        expect(wrapper.text()).toContain(eur(26.75))
     })
 
     it('the review step lists already-applied promo codes with a remove option', async () => {

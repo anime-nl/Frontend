@@ -114,4 +114,11 @@ describe('DELETE /api/cart/promotions', () => {
             query: {fields: expect.stringContaining('promotions')}
         })
     })
+
+    it('surfaces a Medusa failure as a 500 instead of an unhandled rejection', async () => {
+        getCookie.mockReturnValue('cart_1')
+        medusaFetch.mockRejectedValue(new Error('network down'))
+
+        await expect(callDeleteRoute()).rejects.toMatchObject({statusCode: 500})
+    })
 })

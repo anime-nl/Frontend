@@ -51,6 +51,14 @@ describe('GET /api/cart', () => {
         expect(deleteCookie).toHaveBeenCalledWith(expect.anything(), 'cart_id', expect.anything())
     })
 
+    it('clears the cookie and returns a null cart once the cart has been completed into an order', async () => {
+        getCookie.mockReturnValue('cart_1')
+        medusaFetch.mockResolvedValue({cart: {id: 'cart_1', completed_at: '2024-01-01T00:00:00.000Z', items: []}})
+
+        await expect(callRoute()).resolves.toEqual({cart: null})
+        expect(deleteCookie).toHaveBeenCalledWith(expect.anything(), 'cart_id', expect.anything())
+    })
+
     it('answers 500 when Medusa fails for another reason', async () => {
         getCookie.mockReturnValue('cart_1')
         medusaFetch.mockRejectedValue(new Error('connect ECONNREFUSED'))

@@ -20,6 +20,8 @@ Format: **title** (where): what is wrong. Mark anything not yet reproduced as _u
 
 - **`.devcontainer/devcontainer.json` fails `bun run format:check`** on `main`: found while running `bun run check` for an unrelated fix. Not touched by that change; run `bun run format` to fix.
 
+- **`splitStreetAndHouseNumber` can misfire on a street name that itself ends in a number** (`shared/utils/checkout.ts`): a real Dutch street like "Plein 1944" (Nijmegen) would be split into street "Plein" and house number "1944" on blur, same as a genuine combined "Street 12"-style autofill value. The heuristic has no way to distinguish the two from the string alone. Only affects the small number of street names that end in digits; the customer can retype the house number field afterward.
+
 - **Home page test failures on `main`** (`test/nuxt/home-page.test.ts`, `test/nuxt/showcase-carousel.test.ts`): found while running the full nuxt test project on a fresh branch off `main`, unrelated to the change being made there. `home-page.test.ts` expects `document.title` to be `'Anime Merchandise Webshop | AnimeNL'` with a meta description, but `app/pages/index.vue:3` only sets `title: 'Home'` and no description — the page never got `useSeoMeta`. `showcase-carousel.test.ts` expects the carousel image to have class `h-80`, but `app/components/showcaseCarousel.vue:23` uses `h-100` — a test/implementation mismatch, not obviously wrong on either side without knowing the intended layout. _Unverified_ which side (test or component) is the one that should change.
 
 ## Fixed

@@ -28,20 +28,22 @@ const address = reactive<AddressRequest>({
   country: 'NL'
 })
 
-// Dutch browser autofill profiles store the full "Street 12A"-style address as one value and drop it
-// into whichever field is recognized as the street line; only split it out when houseNumber is still
-// empty, so this never overwrites something the customer typed themselves.
-watch(
-  () => address.street,
-  (value) => {
-    if (address.houseNumber) return
-    const split = splitStreetAndHouseNumber(value)
-    if (split.houseNumber) {
-      address.street = split.street
-      address.houseNumber = split.houseNumber
-    }
+/**
+ * Dutch browser autofill profiles store the full "Street 12A"-style address as one value and drop
+ * it into whichever field is recognized as the street line. Splits it out on the field's native
+ * `change` event (blur, or autofill), not on every keystroke - splitting on every input would
+ * trample a house number the customer is still in the middle of typing into the street field
+ * themselves. Only runs when houseNumber is still empty, so it never overwrites a number the
+ * customer already entered.
+ */
+function onStreetChange() {
+  if (address.houseNumber) return
+  const split = splitStreetAndHouseNumber(address.street)
+  if (split.houseNumber) {
+    address.street = split.street
+    address.houseNumber = split.houseNumber
   }
-)
+}
 
 const shippingOptions = ref<StoreShippingOption[]>([])
 const shippingOptionItems = computed(() =>
@@ -134,7 +136,7 @@ async function onPay() {
 
         <div class="grid grid-cols-1 sm:grid-cols-[2fr_1fr] gap-5">
           <UFormField name="street" label="Street" required>
-            <UInput v-model="address.street" autocomplete="address-line1" class="w-full" />
+            <UInput v-model="address.street" autocomplete="address-line1" class="w-full" @change="onStreetChange" />
           </UFormField>
           <UFormField name="houseNumber" label="House number" required>
             <UInput v-model="address.houseNumber" autocomplete="address-line2" class="w-full" />
