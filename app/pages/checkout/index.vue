@@ -4,14 +4,20 @@ import {checkoutCountries, splitStreetAndHouseNumber, validateAddressRequest} fr
 import type {AddressRequest} from '#shared/utils/checkout'
 import {formatCurrency} from '#shared/utils/currency'
 
-await useFetch('/api/cart', {key: 'cart'})
+// useFetch dedupes by key, so whichever call with a given key runs first is the one that actually
+// fires and must carry the cookie-forwarding hook - not useCart's/useCustomer's own internal call.
+const requestEvent = useRequestEvent()
+await useFetch('/api/cart', {key: 'cart', onResponse: ({response}) => forwardSetCookie(requestEvent, response)})
 const cart = useCart()
 
 if (!cart.items.value.length) {
   await navigateTo('/cart')
 }
 
-await useFetch('/api/account/me', {key: 'current-customer'})
+await useFetch('/api/account/me', {
+  key: 'current-customer',
+  onResponse: ({response}) => forwardSetCookie(requestEvent, response)
+})
 const customer = useCustomer()
 
 type Step = 'address' | 'shipping' | 'review'

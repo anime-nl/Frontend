@@ -5,7 +5,11 @@ import type {StoreCustomer} from '@medusajs/types'
  * @returns The current customer (or null), loading state and a refresh function
  */
 export function useCustomer() {
-    const {data, pending, refresh} = useFetch<{customer: StoreCustomer}>('/api/account/me', {key: 'current-customer'})
+    const requestEvent = useRequestEvent()
+    const {data, pending, refresh} = useFetch<{customer: StoreCustomer}>('/api/account/me', {
+        key: 'current-customer',
+        onResponse: ({response}) => forwardSetCookie(requestEvent, response)
+    })
     const customer = computed(() => data.value?.customer ?? null)
 
     return {customer, pending, refresh}

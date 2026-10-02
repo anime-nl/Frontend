@@ -6,7 +6,11 @@ import {formatCurrency} from '#shared/utils/currency'
  * @returns Cart state and totals, plus addItem/updateItem/removeItem to mutate it
  */
 export function useCart() {
-    const {data, pending, refresh} = useFetch<{cart: StoreCart | null}>('/api/cart', {key: 'cart'})
+    const requestEvent = useRequestEvent()
+    const {data, pending, refresh} = useFetch<{cart: StoreCart | null}>('/api/cart', {
+        key: 'cart',
+        onResponse: ({response}) => forwardSetCookie(requestEvent, response)
+    })
 
     const cart = computed(() => data.value?.cart ?? null)
     const items = computed(() => cart.value?.items ?? [])
