@@ -4,6 +4,7 @@ import {
     checkoutCountries,
     checkoutLimits,
     normalizeAddressRequest,
+    splitStreetAndHouseNumber,
     validateAddressRequest
 } from '../../shared/utils/checkout'
 import type {AddressRequest} from '../../shared/utils/checkout'
@@ -96,5 +97,34 @@ describe('validateAddressRequest', () => {
 describe('addressLine1', () => {
     it('joins street and house number', () => {
         expect(addressLine1('Kerkstraat', '12')).toBe('Kerkstraat 12')
+    })
+})
+
+describe('splitStreetAndHouseNumber', () => {
+    it('splits a plain house number off the end', () => {
+        expect(splitStreetAndHouseNumber('Kerkstraat 12')).toEqual({street: 'Kerkstraat', houseNumber: '12'})
+    })
+
+    it('splits a house number with a letter addition', () => {
+        expect(splitStreetAndHouseNumber('Kerkstraat 12A')).toEqual({street: 'Kerkstraat', houseNumber: '12A'})
+    })
+
+    it('splits a house number with a hyphenated addition', () => {
+        expect(splitStreetAndHouseNumber('Kerkstraat 12-A')).toEqual({street: 'Kerkstraat', houseNumber: '12-A'})
+    })
+
+    it('splits a house number with a word addition', () => {
+        expect(splitStreetAndHouseNumber('Kerkstraat 12 bis')).toEqual({street: 'Kerkstraat', houseNumber: '12 bis'})
+    })
+
+    it('returns the original value as street with an empty house number when there is no number', () => {
+        expect(splitStreetAndHouseNumber('Kerkstraat')).toEqual({street: 'Kerkstraat', houseNumber: ''})
+    })
+
+    it('does not consume a number from a multi-word street name', () => {
+        expect(splitStreetAndHouseNumber('Prinses Irenestraat 1')).toEqual({
+            street: 'Prinses Irenestraat',
+            houseNumber: '1'
+        })
     })
 })

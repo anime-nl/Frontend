@@ -151,6 +151,24 @@ describe('checkout page', () => {
         expect((wrapper.find('[name="lastName"]').element as HTMLInputElement).value).toBe('Bakker')
     })
 
+    it('splitting a combined autofilled street value fills the house-number field', async () => {
+        wrapper = await mountCheckout()
+
+        await wrapper.find('[name="street"]').setValue('Kerkstraat 12A')
+
+        expect((wrapper.find('[name="street"]').element as HTMLInputElement).value).toBe('Kerkstraat')
+        expect((wrapper.find('[name="houseNumber"]').element as HTMLInputElement).value).toBe('12A')
+    })
+
+    it('does not override a house number the customer already typed', async () => {
+        wrapper = await mountCheckout()
+
+        await wrapper.find('[name="houseNumber"]').setValue('5')
+        await wrapper.find('[name="street"]').setValue('Kerkstraat 12A')
+
+        expect((wrapper.find('[name="houseNumber"]').element as HTMLInputElement).value).toBe('5')
+    })
+
     it('submitting the address loads shipping options with formatted prices', async () => {
         wrapper = await mountCheckout()
 

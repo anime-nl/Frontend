@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type {StoreShippingOption} from '@medusajs/types'
-import {checkoutCountries, validateAddressRequest} from '#shared/utils/checkout'
+import {checkoutCountries, splitStreetAndHouseNumber, validateAddressRequest} from '#shared/utils/checkout'
 import type {AddressRequest} from '#shared/utils/checkout'
 import {formatCurrency} from '#shared/utils/currency'
 
@@ -27,6 +27,21 @@ const address = reactive<AddressRequest>({
   city: '',
   country: 'NL'
 })
+
+// Dutch browser autofill profiles store the full "Street 12A"-style address as one value and drop it
+// into whichever field is recognized as the street line; only split it out when houseNumber is still
+// empty, so this never overwrites something the customer typed themselves.
+watch(
+  () => address.street,
+  (value) => {
+    if (address.houseNumber) return
+    const split = splitStreetAndHouseNumber(value)
+    if (split.houseNumber) {
+      address.street = split.street
+      address.houseNumber = split.houseNumber
+    }
+  }
+)
 
 const shippingOptions = ref<StoreShippingOption[]>([])
 const shippingOptionItems = computed(() =>
@@ -122,7 +137,7 @@ async function onPay() {
             <UInput v-model="address.street" autocomplete="address-line1" class="w-full" />
           </UFormField>
           <UFormField name="houseNumber" label="House number" required>
-            <UInput v-model="address.houseNumber" class="w-full" />
+            <UInput v-model="address.houseNumber" autocomplete="address-line2" class="w-full" />
           </UFormField>
         </div>
 

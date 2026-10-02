@@ -93,3 +93,18 @@ export function validateAddressRequest(input: AddressRequest) {
 export function addressLine1(street: string, houseNumber: string): string {
     return `${street} ${houseNumber}`.trim()
 }
+
+/**
+ * Splits a trailing Dutch house-number pattern off a combined value, for when browser autofill
+ * drops a full "Street 12A"-style address into a single field.
+ * @param value The street field's current value
+ * @returns The split street and house number, or the original value as street with an empty house
+ *   number if no trailing house-number pattern is found
+ */
+export function splitStreetAndHouseNumber(value: string): {street: string; houseNumber: string} {
+    const match = value.match(/^(.+?)\s+(\d+(?:[\s-]?[a-zA-Z0-9]+)?)$/)
+    if (!match) return {street: value, houseNumber: ''}
+
+    const [, street, houseNumber] = match
+    return {street: street!, houseNumber: houseNumber!}
+}
