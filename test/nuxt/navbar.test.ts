@@ -96,4 +96,26 @@ describe('navbar', () => {
             expect(link.text()).toBe('Jan')
         })
     })
+
+    it('styles the cart and login links as plain links, not buttons', async () => {
+        wrapper = await mountNavbar()
+
+        const cartButton = wrapper.findAllComponents({name: 'UButton'}).find((button) => button.props('to') === '/cart')
+        const loginButton = wrapper
+            .findAllComponents({name: 'UButton'})
+            .find((button) => button.props('to') === '/account/login')
+
+        expect(cartButton!.props('variant')).toBe('link')
+        expect(loginButton!.props('variant')).toBe('link')
+    })
+
+    it('keeps the mobile menu button as a button', async () => {
+        wrapper = await mountNavbar()
+
+        const menuButton = wrapper
+            .findAllComponents({name: 'UButton'})
+            .find((button) => button.attributes('aria-label') === 'Open menu')
+
+        expect(menuButton!.props('variant')).toBe('ghost')
+    })
 })
