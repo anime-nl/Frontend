@@ -30,8 +30,9 @@ describe('product card', () => {
         expect(wrapper.text()).toContain('Zhongli Keychain')
     })
 
-    it('shows the calculated price of the first variant', async () => {
+    it('shows the calculated price of the first variant, locale-formatted like every other price display', async () => {
         wrapper = await mountSuspended(ProductCard, {
+            route: '/search',
             props: {
                 product: {
                     id: 'prod_1',
@@ -41,7 +42,26 @@ describe('product card', () => {
             }
         })
 
-        expect(wrapper.text()).toContain('10.90 EUR')
+        expect(wrapper.text()).toContain(
+            new Intl.NumberFormat('nl-NL', {style: 'currency', currency: 'EUR'}).format(10.9)
+        )
+    })
+
+    it('formats the price for the active locale, not just Dutch', async () => {
+        wrapper = await mountSuspended(ProductCard, {
+            route: '/en/search',
+            props: {
+                product: {
+                    id: 'prod_1',
+                    title: 'Zhongli Keychain',
+                    variants: [{calculated_price: {calculated_amount: 10.9, currency_code: 'eur'}}]
+                }
+            }
+        })
+
+        expect(wrapper.text()).toContain(
+            new Intl.NumberFormat('en-GB', {style: 'currency', currency: 'EUR'}).format(10.9)
+        )
     })
 
     it('shows a price-unavailable message when there is no calculated price, in the default (Dutch) locale', async () => {

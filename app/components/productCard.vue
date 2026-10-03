@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import {formatCurrency} from '#shared/utils/currency'
+
 // Narrowed to the fields this card actually renders, so callers (and tests) don't need a full StoreProduct
 type ProductCardProduct = {
   id: string
@@ -8,16 +10,13 @@ type ProductCardProduct = {
 }
 
 const props = defineProps<{product: ProductCardProduct}>()
-const {t} = useI18n()
+const {t, localeProperties} = useI18n()
 
 const price = computed(() => {
   const calculated = props.product?.variants?.[0]?.calculated_price
   if (calculated?.calculated_amount == null || calculated.currency_code == null) return null
 
-  return {
-    amount: calculated.calculated_amount,
-    currency: calculated.currency_code.toUpperCase()
-  }
+  return formatCurrency(calculated.calculated_amount, calculated.currency_code, localeProperties.value.language!)
 })
 </script>
 
@@ -43,7 +42,7 @@ const price = computed(() => {
 
           <hr class="border-gray-500 my-2" />
 
-          <p v-if="price" class="font-medium text-[#3fa3ee]">{{ price.amount.toFixed(2) }} {{ price.currency }}</p>
+          <p v-if="price" class="font-medium text-[#3fa3ee]">{{ price }}</p>
           <p v-else class="text-sm text-gray-400">{{ t('products.priceUnavailable') }}</p>
         </div>
       </div>
