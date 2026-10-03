@@ -141,4 +141,18 @@ describe('splitStreetAndHouseNumber', () => {
             houseNumber: '1'
         })
     })
+
+    // "Plein 1944" (Nijmegen) is a real Dutch square name, not a street with house number 1944 -
+    // a bare 4-digit number with no letter/word addition is far more likely to be part of a
+    // year-commemorating name than a genuine house number, which is virtually never four digits.
+    it('does not split a street name that ends in a bare, year-like 4-digit number', () => {
+        expect(splitStreetAndHouseNumber('Plein 1944')).toEqual({street: 'Plein 1944', houseNumber: ''})
+    })
+
+    it('still splits a 4-digit number when it has a letter addition', () => {
+        expect(splitStreetAndHouseNumber('Bedrijvenweg 1944A')).toEqual({
+            street: 'Bedrijvenweg',
+            houseNumber: '1944A'
+        })
+    })
 })

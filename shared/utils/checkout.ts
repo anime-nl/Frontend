@@ -111,5 +111,10 @@ export function splitStreetAndHouseNumber(value: string): {street: string; house
     if (!match) return {street: value, houseNumber: ''}
 
     const [, street, houseNumber] = match
+    // A bare 4+ digit number with no letter/word addition (e.g. "Plein 1944") is far more likely to
+    // be part of a year-commemorating square/street name than a genuine house number, which is
+    // virtually never four digits.
+    if (/^\d{4,}$/.test(houseNumber!)) return {street: value, houseNumber: ''}
+
     return {street: street!, houseNumber: houseNumber!}
 }
