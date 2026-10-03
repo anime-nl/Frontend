@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-const items = navigationItems
+const {t} = useI18n()
+const items = computed(() => buildNavigationItems(t))
 const mobileMenuOpen = ref(false)
 const cart = useCart()
 const customer = useCustomer()
@@ -25,33 +26,42 @@ watch(
         size="3xl"
         :ui="{base: 'h-[18px] min-w-[18px] px-1 text-[11px] leading-none'}"
       >
-        <UButton to="/cart" icon="i-lucide-shopping-cart" color="neutral" variant="link" aria-label="Cart" />
+        <UButton
+          to="/cart"
+          icon="i-lucide-shopping-cart"
+          color="neutral"
+          variant="link"
+          :aria-label="t('nav.cartAriaLabel')"
+        />
       </UChip>
+
+      <LocaleSwitcher />
 
       <UButton
         v-if="customer.customer.value"
-        :label="customer.customer.value.first_name || 'Account'"
+        :label="customer.customer.value.first_name || t('nav.accountFallback')"
         to="/account"
         color="neutral"
         variant="link"
       />
-      <UButton v-else label="Log in" to="/account/login" color="neutral" variant="link" />
+      <UButton v-else :label="t('nav.logIn')" to="/account/login" color="neutral" variant="link" />
 
       <UButton
         class="lg:hidden"
         icon="i-lucide-menu"
         color="neutral"
         variant="ghost"
-        aria-label="Open menu"
+        :aria-label="t('nav.openMenuAriaLabel')"
         @click="mobileMenuOpen = true"
       />
     </div>
   </div>
   <hr class="text-gray-600" />
 
-  <USlideover v-model:open="mobileMenuOpen" title="Menu">
+  <USlideover v-model:open="mobileMenuOpen" :title="t('nav.menuTitle')">
     <template #body>
       <UNavigationMenu :items="items" orientation="vertical" />
+      <LocaleSwitcher class="mt-4" />
     </template>
   </USlideover>
 </template>

@@ -45,7 +45,7 @@ describe('navbar', () => {
 
         expect(document.body.querySelectorAll('a[href="/support"]')).toHaveLength(1)
 
-        await wrapper.find('button[aria-label="Open menu"]').trigger('click')
+        await wrapper.find('button[aria-label="Menu openen"]').trigger('click')
         await vi.waitFor(() => {
             expect(document.body.querySelectorAll('a[href="/support"]').length).toBeGreaterThan(1)
         })
@@ -114,7 +114,7 @@ describe('navbar', () => {
 
         const menuButton = wrapper
             .findAllComponents({name: 'UButton'})
-            .find((button) => button.attributes('aria-label') === 'Open menu')
+            .find((button) => button.attributes('aria-label') === 'Menu openen')
 
         expect(menuButton!.props('variant')).toBe('ghost')
     })

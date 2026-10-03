@@ -96,7 +96,7 @@ registerEndpoint('/api/checkout/payment-session', {
 })
 
 const eur = (amount: number) => new Intl.NumberFormat('nl-NL', {style: 'currency', currency: 'EUR'}).format(amount)
-const mountCheckout = () => mountSuspended(CheckoutPage)
+const mountCheckout = (route = '/checkout') => mountSuspended(CheckoutPage, {route})
 
 const validAddress = {
     email: 'jan@example.nl',
@@ -143,6 +143,13 @@ describe('checkout page', () => {
         wrapper = await mountCheckout()
 
         expect(navigateToMock).toHaveBeenCalledWith('/cart')
+    })
+
+    it('redirects to the locale-prefixed /cart when browsing a non-default locale', async () => {
+        cart = {items: []}
+        wrapper = await mountCheckout('/en/checkout')
+
+        expect(navigateToMock).toHaveBeenCalledWith('/en/cart')
     })
 
     it('pre-fills the address form for a signed-in customer', async () => {
@@ -215,9 +222,9 @@ describe('checkout page', () => {
 
         const continueButton = wrapper
             .findAllComponents({name: 'UButton'})
-            .find((button) => button.text() === 'Continue to review')
+            .find((button) => button.text() === 'Door naar controleren')
         await continueButton!.trigger('click')
-        await vi.waitFor(() => expect(wrapper!.text()).toContain('Review your order'))
+        await vi.waitFor(() => expect(wrapper!.text()).toContain('Controleer je bestelling'))
 
         expect(wrapper.text()).toContain('Acrylic Zhongli Keychain')
         expect(wrapper.text()).toContain('Express')
@@ -231,7 +238,7 @@ describe('checkout page', () => {
         await submitAddress(wrapper)
 
         await vi.waitFor(() =>
-            expect(wrapper!.text()).toContain('Something went wrong saving your address. Please try again.')
+            expect(wrapper!.text()).toContain('Er ging iets mis bij het opslaan van je adres. Probeer het opnieuw.')
         )
         expect(wrapper.text()).not.toContain('Standard')
     })
@@ -242,7 +249,7 @@ describe('checkout page', () => {
         await submitAddress(wrapper)
         await vi.waitFor(() => expect(wrapper!.findComponent({name: 'URadioGroup'}).exists()).toBe(true))
 
-        const backButton = wrapper.findAllComponents({name: 'UButton'}).find((button) => button.text() === 'Back')
+        const backButton = wrapper.findAllComponents({name: 'UButton'}).find((button) => button.text() === 'Terug')
         await backButton!.trigger('click')
 
         expect(wrapper.find('[name="email"]').exists()).toBe(true)
@@ -259,13 +266,15 @@ describe('checkout page', () => {
         await flushPromises()
         const continueButton = wrapper
             .findAllComponents({name: 'UButton'})
-            .find((button) => button.text() === 'Continue to review')
+            .find((button) => button.text() === 'Door naar controleren')
         await continueButton!.trigger('click')
 
         await vi.waitFor(() =>
-            expect(wrapper!.text()).toContain('Something went wrong setting your shipping method. Please try again.')
+            expect(wrapper!.text()).toContain(
+                'Er ging iets mis bij het instellen van je verzendmethode. Probeer het opnieuw.'
+            )
         )
-        expect(wrapper.text()).not.toContain('Review your order')
+        expect(wrapper.text()).not.toContain('Controleer je bestelling')
     })
 
     async function reachReviewStep(w: Awaited<ReturnType<typeof mountCheckout>>) {
@@ -276,13 +285,13 @@ describe('checkout page', () => {
         await flushPromises()
         const continueButton = w
             .findAllComponents({name: 'UButton'})
-            .find((button) => button.text() === 'Continue to review')
+            .find((button) => button.text() === 'Door naar controleren')
         await continueButton!.trigger('click')
-        await vi.waitFor(() => expect(w.text()).toContain('Review your order'))
+        await vi.waitFor(() => expect(w.text()).toContain('Controleer je bestelling'))
     }
 
     function findPayButton(w: Awaited<ReturnType<typeof mountCheckout>>) {
-        return w.findAllComponents({name: 'UButton'}).find((button) => button.text() === 'Pay')
+        return w.findAllComponents({name: 'UButton'}).find((button) => button.text() === 'Betalen')
     }
 
     it('paying redirects the browser to the Mollie checkout URL', async () => {
@@ -303,7 +312,7 @@ describe('checkout page', () => {
 
         await findPayButton(wrapper)!.trigger('click')
 
-        await vi.waitFor(() => expect(wrapper!.text()).toContain('Something went wrong starting your payment'))
+        await vi.waitFor(() => expect(wrapper!.text()).toContain('Er ging iets mis bij het starten van je betaling'))
         expect(navigateToMock).not.toHaveBeenCalledWith(expect.stringContaining('mollie'), expect.anything())
     })
 
@@ -311,7 +320,7 @@ describe('checkout page', () => {
         wrapper = await mountCheckout()
         await reachReviewStep(wrapper)
 
-        const backButton = wrapper.findAllComponents({name: 'UButton'}).find((button) => button.text() === 'Back')
+        const backButton = wrapper.findAllComponents({name: 'UButton'}).find((button) => button.text() === 'Terug')
         await backButton!.trigger('click')
 
         expect(wrapper.findComponent({name: 'URadioGroup'}).exists()).toBe(true)
@@ -321,14 +330,14 @@ describe('checkout page', () => {
         wrapper = await mountCheckout()
         await reachReviewStep(wrapper)
 
-        expect(wrapper.text()).toContain('Price excl. VAT')
+        expect(wrapper.text()).toContain('Prijs excl. btw')
         expect(wrapper.text()).toContain(eur(18.0))
-        expect(wrapper.text()).toContain('VAT')
+        expect(wrapper.text()).toContain('Btw')
         expect(wrapper.text()).toContain(eur(3.8))
         // Subtotal is items-only (no shipping yet); Total adds the chosen Standard shipping (4.95).
-        expect(wrapper.text()).toContain('Subtotal')
+        expect(wrapper.text()).toContain('Subtotaal')
         expect(wrapper.text()).toContain(eur(21.8))
-        expect(wrapper.text()).toContain('Total')
+        expect(wrapper.text()).toContain('Totaal')
         expect(wrapper.text()).toContain(eur(26.75))
     })
 
@@ -347,8 +356,8 @@ describe('checkout page', () => {
         wrapper = await mountCheckout()
         await reachReviewStep(wrapper)
 
-        await wrapper.find('input[placeholder="Promo code"]').setValue('WELCOME10')
-        const applyButton = wrapper.findAllComponents({name: 'UButton'}).find((button) => button.text() === 'Apply')
+        await wrapper.find('input[placeholder="Promocode"]').setValue('WELCOME10')
+        const applyButton = wrapper.findAllComponents({name: 'UButton'}).find((button) => button.text() === 'Toepassen')
         await applyButton!.trigger('click')
 
         await vi.waitFor(() => expect(lastPromotionBody).toEqual({code: 'WELCOME10'}))

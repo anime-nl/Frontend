@@ -1,0 +1,404 @@
+{
+  "common": {
+    "appName": "AnimeNL",
+    "underConstruction": "Deze website is nog in ontwikkeling! Als je problemen ondervindt met de site, neem dan contact met ons op via de supportpagina.",
+    "greeting": "Hallo {name}",
+    "countries": {
+      "NL": "Nederland",
+      "BE": "België"
+    }
+  },
+  "cookieConsent": {
+    "title": "Wij gebruiken cookies om te begrijpen hoe bezoekers deze site gebruiken.",
+    "accept": "Accepteren",
+    "decline": "Weigeren"
+  },
+  "product": {
+    "addToCart": "In winkelwagen",
+    "backorderNow": "Nu nabestellen",
+    "backorderAlertTitle": "Beschikbaar op nabestelling",
+    "backorderAlertDescription": "Dit artikel is momenteel niet op voorraad. Je bestelling wordt verzonden zodra het weer op voorraad is.",
+    "descriptionHeading": "Beschrijving",
+    "detailsHeading": "Details",
+    "categoriesLabel": "Categorieën:",
+    "addedToCartTitle": "Toegevoegd aan winkelwagen",
+    "addToCartErrorTitle": "Kon niet toevoegen aan winkelwagen",
+    "addToCartErrorDescription": "Probeer het zo opnieuw.",
+    "stock": {
+      "unavailable": "Niet beschikbaar",
+      "inStock": "Op voorraad",
+      "inStockCount": "{count} op voorraad",
+      "backorder": "Nabestelling",
+      "outOfStock": "Niet op voorraad"
+    },
+    "details": {
+      "sku": "SKU",
+      "type": "Type",
+      "material": "Materiaal",
+      "origin": "Herkomst",
+      "weight": "Gewicht",
+      "dimensions": "Afmetingen"
+    }
+  },
+  "products": {
+    "emptyCategory": "Nog geen producten in deze categorie.",
+    "priceUnavailable": "Prijs niet beschikbaar",
+    "loading": "Laden...",
+    "loadError": "Er ging iets mis bij het laden van de producten",
+    "badges": {
+      "tcg": "TCG",
+      "figures": "Figuren",
+      "plushies": "Knuffels",
+      "keychains": "Sleutelhangers"
+    },
+    "categories": {
+      "tcg": {
+        "seoTitle": "TCG",
+        "heading": "Trading Card Game (TCG) Collectie",
+        "description": "Bekijk onze volledige catalogus met Trading Card Game-producten."
+      },
+      "singles": {
+        "seoTitle": "TCG Losse kaarten",
+        "heading": "Losse kaarten",
+        "description": "Koop losse kaarten in bulk."
+      },
+      "packs": {
+        "seoTitle": "TCG Pakjes",
+        "heading": "Pakjes",
+        "description": "Waag je geluk met losse pakjes."
+      },
+      "boosters": {
+        "seoTitle": "TCG Boosterboxen",
+        "heading": "Boosterboxen",
+        "description": "Koop dozen vol pakjes en extra's."
+      },
+      "figures": {
+        "seoTitle": "Figuren",
+        "heading": "Figuren Collectie",
+        "description": "Bekijk onze volledige catalogus met figuren."
+      },
+      "prizeFigures": {
+        "seoTitle": "Prijsfiguren",
+        "heading": "Prijsfiguren",
+        "description": "Mooie figuren voor lage prijzen."
+      },
+      "scaleFigures": {
+        "seoTitle": "Schaalfiguren",
+        "heading": "Schaalfiguren",
+        "description": "Geweldig om mee te decoreren."
+      },
+      "noodleStoppers": {
+        "seoTitle": "Noodle Stoppers",
+        "heading": "Noodle Stoppers",
+        "description": "Figuren met een functie"
+      },
+      "plush": {
+        "seoTitle": "Knuffels",
+        "heading": "Knuffels Collectie",
+        "description": "Bekijk onze volledige catalogus met knuffels."
+      },
+      "keychains": {
+        "seoTitle": "Sleutelhangers",
+        "heading": "Sleutelhangers Collectie",
+        "description": "Bekijk onze volledige catalogus met sleutelhangers."
+      },
+      "acrylic": {
+        "seoTitle": "Acrylen sleutelhangers",
+        "heading": "Acryl sleutelhangers",
+        "description": "Een brede selectie goedkope sleutelhangers."
+      },
+      "metal": {
+        "seoTitle": "Metalen sleutelhangers",
+        "heading": "Metalen sleutelhangers",
+        "description": "Supersterke sleutelhangers."
+      }
+    }
+  },
+  "search": {
+    "placeholder": "Zoek naar TCG-kaarten, figuren, pluchen en meer...",
+    "button": "Zoeken",
+    "pageTitle": "Zoeken",
+    "pageDescription": "Doorzoek de volledige AnimeNL-catalogus met TCG-kaarten, figuren, pluchen en sleutelhangers op zoekwoord, serie of categorie.",
+    "heading": "Zoeken",
+    "inputPlaceholder": "Producten zoeken...",
+    "collectionLabel": "Collectie",
+    "allCollections": "Alle collecties",
+    "categoryLabel": "Categorie",
+    "allCategories": "Alle categorieën",
+    "noResults": "Geen producten gevonden die aan je criteria voldoen.",
+    "clearFilters": "Filters wissen",
+    "loadingMore": "Meer producten laden...",
+    "endOfCatalog": "Je hebt het einde van de catalogus bereikt."
+  },
+  "home": {
+    "title": "Home",
+    "description": "Koop TCG-kaarten, figuren, pluchen en sleutelhangers bij AnimeNL, de Nederlandse webshop voor anime merchandise. Snelle verzending en eenvoudig 14 dagen retourneren.",
+    "newProducts": "Nieuwe producten",
+    "discover": "Ontdekken",
+    "loadingMore": "Meer producten laden..."
+  },
+  "cart": {
+    "title": "Je winkelwagen",
+    "removeItemAriaLabel": "Artikel verwijderen",
+    "checkoutButton": "Afrekenen",
+    "emptyMessage": "Je winkelwagen is leeg.",
+    "continueShopping": "Verder winkelen",
+    "priceExclVat": "Prijs excl. btw",
+    "vat": "Btw",
+    "discount": "Korting",
+    "subtotal": "Subtotaal",
+    "total": "Totaal",
+    "promoCodePlaceholder": "Promocode",
+    "apply": "Toepassen",
+    "removePromoAriaLabel": "{code} verwijderen",
+    "promoInvalid": "Deze promocode is niet geldig.",
+    "promoRemoveFailed": "Deze promocode kon niet worden verwijderd. Probeer het opnieuw."
+  },
+  "nav": {
+    "home": "Home",
+    "cartAriaLabel": "Winkelwagen",
+    "accountFallback": "Account",
+    "logIn": "Inloggen",
+    "openMenuAriaLabel": "Menu openen",
+    "menuTitle": "Menu",
+    "main": {
+      "home": {"label": "Home"},
+      "tcg": {
+        "label": "TCG",
+        "children": {
+          "singles": {"label": "Losse kaarten", "description": "Koop losse kaarten in bulk."},
+          "packs": {"label": "Pakjes", "description": "Waag je geluk met losse pakjes."},
+          "boosters": {"label": "Boosterboxen", "description": "Koop dozen vol pakjes en extra's."},
+          "bySeries": {"label": "Op serie", "description": "Zoek naar kaarten van de serie die je leuk vindt."}
+        }
+      },
+      "figures": {
+        "label": "Figuren",
+        "children": {
+          "prizeFigures": {"label": "Prijsfiguren", "description": "Mooie figuren voor lage prijzen."},
+          "scaleFigures": {"label": "Schaalfiguren", "description": "Geweldig om mee te decoreren."},
+          "noodleStoppers": {"label": "Noodle Stoppers", "description": "Figuren met een functie"},
+          "bySeries": {"label": "Op serie", "description": "Zoek naar figuren van de serie die je leuk vindt."}
+        }
+      },
+      "plush": {
+        "label": "Knuffels",
+        "children": {
+          "bySeries": {"label": "Op serie", "description": "Zoek naar pluchen van de serie die je leuk vindt."}
+        }
+      },
+      "keychains": {
+        "label": "Sleutelhangers",
+        "children": {
+          "acrylic": {"label": "Acryl sleutelhangers", "description": "Een brede selectie goedkope sleutelhangers."},
+          "metal": {"label": "Metalen sleutelhangers", "description": "Supersterke sleutelhangers."},
+          "bySeries": {
+            "label": "Op serie",
+            "description": "Zoek naar sleutelhangers van de serie die je leuk vindt."
+          }
+        }
+      },
+      "support": {"label": "Support"},
+      "trustpilot": {"label": "Trustpilot"}
+    }
+  },
+  "validation": {
+    "required": "Dit veld is verplicht.",
+    "invalidEmail": "Vul een geldig e-mailadres in.",
+    "invalidReason": "Kies een reden.",
+    "unknownTopic": "Onbekend support-onderwerp.",
+    "invalidCountry": "Kies een geldig land.",
+    "invalidPostalCode": "Vul een geldige postcode in.",
+    "tooLong": "Gebruik maximaal {limit} tekens."
+  },
+  "account": {
+    "signInTitle": "Inloggen",
+    "signInOptional": "Inloggen is optioneel — je kunt ook als gast afrekenen zonder account.",
+    "signInError": "Kon niet inloggen. Probeer het zo opnieuw.",
+    "signInPrompt": "Log in om je account en eerdere bestellingen te zien.",
+    "accountHeading": "Je account",
+    "logOut": "Uitloggen",
+    "orderHistory": "Bestelgeschiedenis",
+    "noOrders": "Je hebt nog geen bestellingen.",
+    "orderNumber": "Bestelling #{number}",
+    "orderStatus": {
+      "pending": "In behandeling",
+      "completed": "Afgerond",
+      "draft": "Concept",
+      "archived": "Gearchiveerd",
+      "canceled": "Geannuleerd",
+      "requires_action": "Actie vereist"
+    },
+    "callback": {
+      "signingIn": "Je wordt ingelogd…",
+      "failed": "Er ging iets mis bij het inloggen.",
+      "tryAgain": "Opnieuw proberen"
+    },
+    "oauth": {
+      "google": "Doorgaan met Google"
+    }
+  },
+  "checkout": {
+    "title": "Afrekenen",
+    "addressError": "Er ging iets mis bij het opslaan van je adres. Probeer het opnieuw.",
+    "shippingError": "Er ging iets mis bij het instellen van je verzendmethode. Probeer het opnieuw.",
+    "paymentError": "Er ging iets mis bij het starten van je betaling. Probeer het opnieuw.",
+    "continueToShipping": "Door naar verzending",
+    "continueToReview": "Door naar controleren",
+    "back": "Terug",
+    "pay": "Betalen",
+    "shippingTo": "Verzenden naar",
+    "steps": {
+      "address": {"heading": "1. Je adres"},
+      "shipping": {"heading": "2. Verzendmethode"},
+      "review": {"heading": "Controleer je bestelling"}
+    },
+    "form": {
+      "firstName": "Voornaam",
+      "lastName": "Achternaam",
+      "email": "E-mailadres",
+      "street": "Straat",
+      "houseNumber": "Huisnummer",
+      "postalCode": "Postcode",
+      "city": "Plaats",
+      "country": "Land"
+    },
+    "return": {
+      "completedTitle": "Bedankt voor je bestelling!",
+      "orderPlaced": "Bestelling #{number} is geplaatst.",
+      "viewOrders": "Bekijk je bestellingen",
+      "pendingTitle": "Betaling in behandeling",
+      "pendingBody": "We bevestigen je bestelling zodra je betaling is verwerkt.",
+      "failedTitle": "Betaling mislukt",
+      "failedBody": "Er ging iets mis met je betaling. Probeer het opnieuw.",
+      "backToCart": "Terug naar winkelwagen",
+      "idleTitle": "Niets te bevestigen",
+      "idleBody": "Er is geen lopende betaling voor deze browser."
+    }
+  },
+  "support": {
+    "breadcrumb": "Support",
+    "sendError": "Er ging iets mis bij het verzenden van je bericht. Probeer het opnieuw, of e-mail ons op {email}.",
+    "backToSupport": "Terug naar support",
+    "overview": {
+      "description": "Vind antwoorden op veelgestelde vragen over bestellingen, verzending, retourneren en producten, of neem contact op met het AnimeNL-team.",
+      "subtitle": "Hulp nodig? Bekijk de antwoorden op veelgestelde vragen hieronder, of neem contact met ons op en we helpen je verder.",
+      "topicsHeading": "Waarmee kunnen we je helpen?",
+      "faqHeading": "Veelgestelde vragen",
+      "stillNeedHelp": "Nog hulp nodig?",
+      "includeOrderNumber": "Geef je bestelnummer door, als je die hebt, zodat we je sneller kunnen helpen.",
+      "emailUs": "E-mail ons"
+    },
+    "faq": {
+      "1": {
+        "question": "Hoe lang duurt de verzending?",
+        "answer": "Verzending duurt meestal 2 tot 3 werkdagen vanaf het moment dat je je bestelling plaatst. Duurt je bestelling langer, neem dan contact met ons op met je bestelnummer en we zoeken het voor je uit."
+      },
+      "2": {
+        "question": "Welke betaalmethoden accepteren jullie?",
+        "answer": "We accepteren alle betaalmethoden die Mollie ondersteunt, waaronder iDEAL en creditcard. Bij het afrekenen zie je welke methoden voor jou beschikbaar zijn."
+      },
+      "3": {
+        "question": "Wat is jullie retourbeleid?",
+        "answer": "Je hebt een retourtermijn van 14 dagen, in lijn met de Europese consumentenregels. Het artikel moet ongebruikt zijn en in de originele verpakking, en je betaalt de verzendkosten voor de retourzending. Neem binnen 14 dagen na ontvangst van je bestelling contact met ons op om te laten weten dat je wilt retourneren."
+      },
+      "4": {
+        "question": "Hoe retourneer ik een artikel?",
+        "answer": "Neem binnen de retourtermijn van 14 dagen contact met ons op, zodat we je kunnen vertellen hoe je het artikel kunt terugsturen en het aan je bestelling kunnen koppelen. Zorg ervoor dat het ongebruikt is en in de originele verpakking; je betaalt de verzendkosten voor de retourzending."
+      },
+      "5": {
+        "question": "Hoe kan ik de status van mijn bestelling controleren?",
+        "answer": "Neem contact met ons op en geef je bestelnummer en het e-mailadres waarmee je hebt besteld. We laten je weten waar je bestelling is."
+      },
+      "6": {
+        "question": "Kan ik mijn bestelling wijzigen of annuleren?",
+        "answer": "Neem zo snel mogelijk na het bestellen contact met ons op. Zodra een bestelling is ingepakt en verzonden, kan deze niet meer worden gewijzigd, maar je kunt deze nog wel retourneren binnen de retourtermijn van 14 dagen."
+      },
+      "7": {
+        "question": "Mijn artikel is beschadigd aangekomen of is niet wat ik heb besteld.",
+        "answer": "Stuur ons je bestelnummer en een paar foto's van het artikel en de verpakking, en we zoeken samen met jou naar een oplossing."
+      },
+      "8": {
+        "question": "Wat betekent \"nabestelling\" bij een product?",
+        "answer": "Een product op nabestelling is momenteel niet op voorraad, maar we kunnen je bestelling nog wel aannemen. Het wordt verzonden zodra het weer op voorraad is."
+      },
+      "9": {
+        "question": "Een product dat ik zoek staat niet in de webshop.",
+        "answer": "Gebruik de zoekpagina om te zoeken op serie, collectie of categorie. Kun je het nog steeds niet vinden, laat het ons weten en we kijken wat we kunnen doen."
+      }
+    },
+    "sent": {
+      "title": "Bericht verzonden",
+      "description": "Bedankt {name}, we hebben je bericht ontvangen en reageren naar {email}."
+    },
+    "form": {
+      "reason": "Waarmee kunnen we je helpen?",
+      "orderNumber": "Bestelnummer",
+      "optional": "Optioneel",
+      "name": "Je naam",
+      "email": "E-mailadres",
+      "message": "Bericht",
+      "honeypotLabel": "Laat dit veld leeg",
+      "send": "Bericht versturen",
+      "cancel": "Annuleren"
+    },
+    "topics": {
+      "orders": {
+        "title": "Bestellingen",
+        "description": "Vragen over een bestelling die je hebt geplaatst of wilt wijzigen.",
+        "intro": "Laat ons weten over welke bestelling je een vraag hebt en wat je nodig hebt.",
+        "messagePlaceholder": "Bijvoorbeeld: welk artikel je gewijzigd wilt hebben, of wat je wilt weten over je bestelling.",
+        "reasons": {
+          "statusOfOrder": "Status van mijn bestelling",
+          "changeOrder": "Mijn bestelling wijzigen",
+          "cancelOrder": "Mijn bestelling annuleren",
+          "somethingElse": "Iets anders"
+        }
+      },
+      "shipping": {
+        "title": "Verzending",
+        "description": "Levertijden en problemen met een levering.",
+        "intro": "Verzending duurt meestal 2 tot 3 werkdagen vanaf het moment dat je je bestelling plaatst. Is er iets mis met je levering, laat het ons weten.",
+        "messagePlaceholder": "Bijvoorbeeld: wanneer je hebt besteld en wat de huidige verzendstatus laat zien.",
+        "reasons": {
+          "tooSlow": "Mijn bestelling duurt langer dan 2 tot 3 werkdagen",
+          "trackingShowsDeliveredButNotReceived": "Mijn tracking toont bezorgd, maar ik heb niets ontvangen",
+          "wrongAddress": "Mijn bestelling is op het verkeerde adres afgeleverd",
+          "somethingElse": "Iets anders"
+        }
+      },
+      "returns": {
+        "title": "Retourneren & terugbetalen",
+        "description": "Retourneren binnen 14 dagen, of iets beschadigd ontvangen.",
+        "intro": "Je hebt 14 dagen om een bestelling te retourneren. Geretourneerde artikelen moeten ongebruikt zijn en in de originele verpakking, en je betaalt de verzendkosten voor de retourzending. Beschrijf bij beschadigde of verkeerde artikelen wat er mis is.",
+        "messagePlaceholder": "Bijvoorbeeld: welk(e) artikel(en) je wilt retourneren en waarom, of wat er mis is met het ontvangen artikel.",
+        "reasons": {
+          "wantToReturn": "Ik wil een artikel retourneren",
+          "arrivedDamaged": "Mijn artikel is beschadigd aangekomen",
+          "wrongItemReceived": "Ik heb het verkeerde artikel ontvangen",
+          "refundQuestion": "Vraag over mijn terugbetaling"
+        }
+      },
+      "payments": {
+        "title": "Betalingen",
+        "description": "iDEAL, creditcard en andere betaalmethoden via Mollie.",
+        "intro": "Wij accepteren alle betaalmethoden die Mollie ondersteunt. Heb je geen bestelnummer omdat je betaling is mislukt, dan kun je dit veld leeg laten.",
+        "messagePlaceholder": "Bijvoorbeeld: welke betaalmethode je hebt gebruikt en wat er gebeurde tijdens het betalen.",
+        "reasons": {
+          "paymentFailed": "Mijn betaling is mislukt",
+          "chargedNoConfirmation": "Ik ben afgeschreven, maar heb geen orderbevestiging ontvangen",
+          "paymentMethodQuestion": "Vraag over betaalmethoden",
+          "somethingElse": "Iets anders"
+        }
+      }
+    },
+    "email": {
+      "subjectOrderPrefix": "Bestelling {orderNumber}",
+      "topicLabel": "Onderwerp:",
+      "reasonLabel": "Reden:",
+      "orderNumberLabel": "Bestelnummer:",
+      "nameLabel": "Naam:",
+      "emailLabel": "E-mail:"
+    }
+  }
+}

@@ -3,6 +3,8 @@ import type {StoreOrder} from '@medusajs/types'
 
 type CompleteResponse = {status: 'completed'; order: StoreOrder} | {status: 'pending' | 'failed'; cart: unknown}
 
+const {t} = useI18n()
+
 // useFetch (not a plain $fetch) is required here: only useFetch forwards the browser's cookies to
 // this internal API call during server-side rendering, which /api/checkout/complete needs to read
 // the cart_id cookie. A plain $fetch would always see no cookie on the first, server-rendered paint.
@@ -40,29 +42,29 @@ const customer = useCustomer()
   <UContainer class="flex flex-col items-center gap-6 py-16 text-center">
     <template v-if="status === 'completed'">
       <UIcon name="i-lucide-circle-check" class="text-primary size-16" />
-      <h1 class="text-3xl font-bold">Thank you for your order!</h1>
-      <p class="text-slate-300">Order #{{ order?.display_id }} has been placed.</p>
-      <UButton v-if="customer.customer.value" to="/account" label="View your orders" />
+      <h1 class="text-3xl font-bold">{{ t('checkout.return.completedTitle') }}</h1>
+      <p class="text-slate-300">{{ t('checkout.return.orderPlaced', {number: order?.display_id}) }}</p>
+      <UButton v-if="customer.customer.value" to="/account" :label="t('checkout.return.viewOrders')" />
     </template>
 
     <template v-else-if="status === 'pending'">
       <UIcon name="i-lucide-clock" class="size-16" />
-      <h1 class="text-3xl font-bold">Payment pending</h1>
-      <p class="text-slate-300">We'll confirm your order once your payment clears.</p>
+      <h1 class="text-3xl font-bold">{{ t('checkout.return.pendingTitle') }}</h1>
+      <p class="text-slate-300">{{ t('checkout.return.pendingBody') }}</p>
     </template>
 
     <template v-else-if="status === 'failed'">
       <UIcon name="i-lucide-circle-alert" class="text-error size-16" />
-      <h1 class="text-3xl font-bold">Payment failed</h1>
-      <p class="text-slate-300">Something went wrong with your payment. Please try again.</p>
-      <UButton to="/cart" label="Back to cart" />
+      <h1 class="text-3xl font-bold">{{ t('checkout.return.failedTitle') }}</h1>
+      <p class="text-slate-300">{{ t('checkout.return.failedBody') }}</p>
+      <UButton to="/cart" :label="t('checkout.return.backToCart')" />
     </template>
 
     <template v-else>
       <UIcon name="i-lucide-info" class="size-16" />
-      <h1 class="text-3xl font-bold">Nothing to confirm here</h1>
-      <p class="text-slate-300">There is no payment in progress for this browser.</p>
-      <UButton to="/" label="Continue shopping" />
+      <h1 class="text-3xl font-bold">{{ t('checkout.return.idleTitle') }}</h1>
+      <p class="text-slate-300">{{ t('checkout.return.idleBody') }}</p>
+      <UButton to="/" :label="t('cart.continueShopping')" />
     </template>
   </UContainer>
 </template>

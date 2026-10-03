@@ -3,6 +3,7 @@ import type {StoreProduct} from '@medusajs/types'
 
 const BATCH_SIZE = 24
 
+const {t} = useI18n()
 const {data: regionId} = await useDefaultRegionId()
 
 const {data: initial} = await useFetch('/api/products', {
@@ -70,7 +71,7 @@ onUnmounted(() => {
 
 <template>
   <div v-if="products.length" class="max-w-screen-2xl mx-auto p-4 md:p-8">
-    <h1 class="mx-6 my-2 text-4xl">Discover</h1>
+    <h1 class="mx-6 my-2 text-4xl">{{ t('home.discover') }}</h1>
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
       <ProductCard
         v-for="(product, index) in products"
@@ -80,7 +81,7 @@ onUnmounted(() => {
       />
     </div>
     <div ref="loadMoreSentinel" class="w-full py-12 flex justify-center">
-      <span v-if="loading" class="text-slate-400 text-sm">Loading more products...</span>
+      <span v-if="loading" class="text-slate-400 text-sm">{{ t('home.loadingMore') }}</span>
     </div>
   </div>
 </template>

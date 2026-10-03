@@ -49,10 +49,10 @@ describe('category page', () => {
         expect(productRequests[0]?.region_id).toBe('reg_nl')
     })
 
-    it('shows an empty state for a handle that does not match any category', async () => {
+    it('shows an empty state for a handle that does not match any category, in the default (Dutch) locale', async () => {
         wrapper = await mountSuspended(CategoryPage, {props: {handle: 'unknown-handle', title: 'Unknown'}})
 
-        expect(wrapper.text()).toContain('No products in this category yet.')
+        expect(wrapper.text()).toContain('Nog geen producten in deze categorie.')
         expect(productRequests).toHaveLength(0)
     })
 

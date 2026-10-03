@@ -43,7 +43,7 @@ describe('checkout return page', () => {
         wrapper = await mountSuspended(CheckoutReturnPage)
 
         expect(wrapper.text()).toContain('42')
-        expect(wrapper.text()).toContain('Thank you')
+        expect(wrapper.text()).toContain('Bedankt')
     })
 
     it('links to order history when signed in', async () => {
@@ -65,14 +65,14 @@ describe('checkout return page', () => {
         completeResponse = {status: 'pending', cart: {id: 'cart_1'}}
         wrapper = await mountSuspended(CheckoutReturnPage)
 
-        expect(wrapper.text()).toContain('confirm')
+        expect(wrapper.text()).toContain('bevestig')
     })
 
     it('shows a failed message with a link back to the cart', async () => {
         completeResponse = {status: 'failed', cart: {id: 'cart_1'}}
         wrapper = await mountSuspended(CheckoutReturnPage)
 
-        expect(wrapper.text()).toContain('failed')
+        expect(wrapper.text()).toContain('mislukt')
         expect(wrapper.find('a[href="/cart"]').exists()).toBe(true)
     })
 
@@ -80,17 +80,17 @@ describe('checkout return page', () => {
         completeError = {statusCode: 502, statusMessage: 'Could not complete order'}
         wrapper = await mountSuspended(CheckoutReturnPage)
 
-        expect(wrapper.text()).toContain('confirm')
-        expect(wrapper.text()).not.toContain('failed')
+        expect(wrapper.text()).toContain('bevestig')
+        expect(wrapper.text()).not.toContain('mislukt')
     })
 
     it('shows a neutral message when there is nothing to confirm', async () => {
         completeError = {statusCode: 400, statusMessage: 'No cart'}
         wrapper = await mountSuspended(CheckoutReturnPage)
 
-        expect(wrapper.text()).toContain('Nothing to confirm here')
-        expect(wrapper.text()).not.toContain('failed')
-        expect(wrapper.text()).not.toContain('confirm your order')
+        expect(wrapper.text()).toContain('Niets te bevestigen')
+        expect(wrapper.text()).not.toContain('mislukt')
+        expect(wrapper.text()).not.toContain('We bevestigen')
     })
 
     it('refetches the cart after a successful completion', async () => {
@@ -104,7 +104,7 @@ describe('checkout return page', () => {
         completeResponse = {status: 'pending', cart: {id: 'cart_1'}}
         wrapper = await mountSuspended(CheckoutReturnPage)
 
-        await vi.waitFor(() => expect(wrapper!.text()).toContain('confirm'))
+        await vi.waitFor(() => expect(wrapper!.text()).toContain('bevestig'))
         expect(cartFetchCount).toBe(1)
     })
 
@@ -112,7 +112,7 @@ describe('checkout return page', () => {
         completeResponse = {status: 'failed', cart: {id: 'cart_1'}}
         wrapper = await mountSuspended(CheckoutReturnPage)
 
-        await vi.waitFor(() => expect(wrapper!.text()).toContain('failed'))
+        await vi.waitFor(() => expect(wrapper!.text()).toContain('mislukt'))
         expect(cartFetchCount).toBe(1)
     })
 })

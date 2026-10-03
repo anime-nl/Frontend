@@ -51,87 +51,87 @@ afterEach(() => {
 describe.each([
     {
         page: TcgPage,
-        heading: 'Trading Card Game (TCG) Collection',
+        heading: 'Trading Card Game (TCG) Collectie',
         categoryId: 'pcat_tcg',
         title: 'TCG',
-        description: 'Browse our entire catalog of Trading Card Game products.'
+        description: 'Bekijk onze volledige catalogus met Trading Card Game-producten.'
     },
     {
         page: TcgSinglesPage,
-        heading: 'Singles',
+        heading: 'Losse kaarten',
         categoryId: 'pcat_singles',
-        title: 'TCG Singles',
-        description: 'Buy single cards in bulk.'
+        title: 'TCG Losse kaarten',
+        description: 'Koop losse kaarten in bulk.'
     },
     {
         page: TcgPacksPage,
-        heading: 'Packs',
+        heading: 'Pakjes',
         categoryId: 'pcat_packs',
-        title: 'TCG Packs',
-        description: 'Test your luck with single packs.'
+        title: 'TCG Pakjes',
+        description: 'Waag je geluk met losse pakjes.'
     },
     {
         page: TcgBoostersPage,
-        heading: 'Booster Boxes',
+        heading: 'Boosterboxen',
         categoryId: 'pcat_boosters',
-        title: 'TCG Booster Boxes',
-        description: 'Buy boxes filled with packs and extras.'
+        title: 'TCG Boosterboxen',
+        description: "Koop dozen vol pakjes en extra's."
     },
     {
         page: FiguresPage,
-        heading: 'Figures Collection',
+        heading: 'Figuren Collectie',
         categoryId: 'pcat_figures',
-        title: 'Figures',
-        description: 'Browse our entire catalog of figures.'
+        title: 'Figuren',
+        description: 'Bekijk onze volledige catalogus met figuren.'
     },
     {
         page: PrizeFiguresPage,
-        heading: 'Prize Figures',
+        heading: 'Prijsfiguren',
         categoryId: 'pcat_prize',
-        title: 'Prize Figures',
-        description: 'Great figures for low prices.'
+        title: 'Prijsfiguren',
+        description: 'Mooie figuren voor lage prijzen.'
     },
     {
         page: ScaleFiguresPage,
-        heading: 'Scale Figures',
+        heading: 'Schaalfiguren',
         categoryId: 'pcat_scale',
-        title: 'Scale Figures',
-        description: 'Great for decorating.'
+        title: 'Schaalfiguren',
+        description: 'Geweldig om mee te decoreren.'
     },
     {
         page: NoodleStoppersPage,
         heading: 'Noodle Stoppers',
         categoryId: 'pcat_noodle',
         title: 'Noodle Stoppers',
-        description: 'Figures with a function'
+        description: 'Figuren met een functie'
     },
     {
         page: PlushPage,
-        heading: 'Plushies Collection',
+        heading: 'Knuffels Collectie',
         categoryId: 'pcat_plush',
-        title: 'Plushies',
-        description: 'Browse our entire catalog of plushies.'
+        title: 'Knuffels',
+        description: 'Bekijk onze volledige catalogus met knuffels.'
     },
     {
         page: KeychainsPage,
-        heading: 'Keychains Collection',
+        heading: 'Sleutelhangers Collectie',
         categoryId: 'pcat_keychains',
-        title: 'Keychains',
-        description: 'Browse our entire catalog of keychains.'
+        title: 'Sleutelhangers',
+        description: 'Bekijk onze volledige catalogus met sleutelhangers.'
     },
     {
         page: AcrylicKeychainsPage,
-        heading: 'Acrylic keychains',
+        heading: 'Acryl sleutelhangers',
         categoryId: 'pcat_acrylic',
-        title: 'Acrylic Keychains',
-        description: 'A wide selection of cheap keychains.'
+        title: 'Acrylen sleutelhangers',
+        description: 'Een brede selectie goedkope sleutelhangers.'
     },
     {
         page: MetalKeychainsPage,
-        heading: 'Metal keychains',
+        heading: 'Metalen sleutelhangers',
         categoryId: 'pcat_metal',
-        title: 'Metal Keychains',
-        description: 'Super durable keychains.'
+        title: 'Metalen sleutelhangers',
+        description: 'Supersterke sleutelhangers.'
     }
 ])('$heading page', ({page, heading, categoryId, title, description}) => {
     it('renders its heading and requests the products of its own category', async () => {

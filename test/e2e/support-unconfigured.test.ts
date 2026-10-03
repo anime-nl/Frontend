@@ -15,7 +15,7 @@ describe('POST /api/support without an SMTP server', () => {
                 topic: 'payments',
                 name: 'Jan',
                 email: 'jan@example.nl',
-                reason: 'My payment failed',
+                reason: 'paymentFailed',
                 message: 'Help'
             })
         })

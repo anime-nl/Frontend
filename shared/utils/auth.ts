@@ -1,13 +1,13 @@
 export interface OAuthProvider {
     id: string
-    label: string
     icon: string
 }
 
-/** The only ways a customer can sign in. There is no password provider, by design. */
-export const oauthProviders: OAuthProvider[] = [
-    {id: 'google', label: 'Continue with Google', icon: 'i-simple-icons-google'}
-]
+/**
+ * The only ways a customer can sign in. There is no password provider, by design.
+ * Display labels come from account.oauth.<id> in the locale catalogs.
+ */
+export const oauthProviders: OAuthProvider[] = [{id: 'google', icon: 'i-simple-icons-google'}]
 
 /**
  * Looks up a supported OAuth provider by id.

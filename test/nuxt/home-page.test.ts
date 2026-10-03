@@ -25,14 +25,14 @@ describe('home page', () => {
     it('shows the new products in the showcase carousel', async () => {
         wrapper = await mountSuspended(IndexPage, {attachTo: document.body})
 
-        expect(wrapper.text()).toContain('New Products')
+        expect(wrapper.text()).toContain('Nieuwe producten')
         expect(wrapper.findAll('img').at(0)?.attributes('src')).toBe('https://example.com/zhongli.jpg')
     })
 
     it('shows the random product discovery grid', async () => {
         wrapper = await mountSuspended(IndexPage, {attachTo: document.body})
 
-        expect(wrapper.text()).toContain('Discover')
+        expect(wrapper.text()).toContain('Ontdekken')
         expect(wrapper.text()).toContain('Zhongli Keychain')
     })
 
@@ -42,6 +42,6 @@ describe('home page', () => {
         const order = [...wrapper.element.querySelectorAll('h1, input')].map((element) =>
             element.tagName === 'INPUT' ? 'input' : element.textContent
         )
-        expect(order).toEqual(['New Products', 'input', 'Discover'])
+        expect(order).toEqual(['Nieuwe producten', 'input', 'Ontdekken'])
     })
 })

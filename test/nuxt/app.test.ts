@@ -21,6 +21,6 @@ describe('app', () => {
         wrapper = await mountSuspended(App, {attachTo: document.body, route: '/'})
 
         expect(wrapper.find('a[href="/support"]').exists()).toBe(true)
-        expect(wrapper.text()).toContain('still under construction')
+        expect(wrapper.text()).toContain('nog in ontwikkeling')
     })
 })

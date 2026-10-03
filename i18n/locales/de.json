@@ -1,0 +1,416 @@
+{
+  "common": {
+    "appName": "AnimeNL",
+    "underConstruction": "Diese Website befindet sich noch im Aufbau! Wenn Sie auf Probleme mit der Website stoßen, kontaktieren Sie uns bitte über die Support-Seite.",
+    "greeting": "Hallo {name}",
+    "countries": {
+      "NL": "Niederlande",
+      "BE": "Belgien"
+    }
+  },
+  "cookieConsent": {
+    "title": "Wir verwenden Cookies, um zu verstehen, wie Besucher diese Website nutzen.",
+    "accept": "Akzeptieren",
+    "decline": "Ablehnen"
+  },
+  "product": {
+    "addToCart": "In den Warenkorb",
+    "backorderNow": "Jetzt nachbestellen",
+    "backorderAlertTitle": "Auf Nachbestellung verfügbar",
+    "backorderAlertDescription": "Dieser Artikel ist derzeit nicht vorrätig. Ihre Bestellung wird versandt, sobald er wieder vorrätig ist.",
+    "descriptionHeading": "Beschreibung",
+    "detailsHeading": "Details",
+    "categoriesLabel": "Kategorien:",
+    "addedToCartTitle": "Zum Warenkorb hinzugefügt",
+    "addToCartErrorTitle": "Konnte nicht zum Warenkorb hinzugefügt werden",
+    "addToCartErrorDescription": "Bitte versuchen Sie es gleich erneut.",
+    "stock": {
+      "unavailable": "Nicht verfügbar",
+      "inStock": "Auf Lager",
+      "inStockCount": "{count} auf Lager",
+      "backorder": "Nachbestellung",
+      "outOfStock": "Nicht auf Lager"
+    },
+    "details": {
+      "sku": "SKU",
+      "type": "Typ",
+      "material": "Material",
+      "origin": "Herkunft",
+      "weight": "Gewicht",
+      "dimensions": "Maße"
+    }
+  },
+  "products": {
+    "emptyCategory": "Noch keine Produkte in dieser Kategorie.",
+    "priceUnavailable": "Preis nicht verfügbar",
+    "loading": "Wird geladen...",
+    "loadError": "Beim Laden der Produkte ist etwas schiefgegangen",
+    "badges": {
+      "tcg": "TCG",
+      "figures": "Figuren",
+      "plushies": "Plüschtiere",
+      "keychains": "Schlüsselanhänger"
+    },
+    "categories": {
+      "tcg": {
+        "seoTitle": "TCG",
+        "heading": "Trading Card Game (TCG) Kollektion",
+        "description": "Entdecken Sie unseren gesamten Katalog an Trading-Card-Game-Produkten."
+      },
+      "singles": {
+        "seoTitle": "TCG Einzelkarten",
+        "heading": "Einzelkarten",
+        "description": "Kaufen Sie einzelne Karten in großen Mengen."
+      },
+      "packs": {
+        "seoTitle": "TCG Booster-Packs",
+        "heading": "Booster-Packs",
+        "description": "Versuchen Sie Ihr Glück mit einzelnen Boostern."
+      },
+      "boosters": {
+        "seoTitle": "TCG Booster-Boxen",
+        "heading": "Booster-Boxen",
+        "description": "Kaufen Sie Boxen voller Booster und Extras."
+      },
+      "figures": {
+        "seoTitle": "Figuren",
+        "heading": "Figuren Kollektion",
+        "description": "Entdecken Sie unseren gesamten Katalog an Figuren."
+      },
+      "prizeFigures": {
+        "seoTitle": "Preisfiguren",
+        "heading": "Preisfiguren",
+        "description": "Tolle Figuren zu niedrigen Preisen."
+      },
+      "scaleFigures": {
+        "seoTitle": "Sammelfiguren",
+        "heading": "Sammelfiguren",
+        "description": "Toll zum Dekorieren."
+      },
+      "noodleStoppers": {
+        "seoTitle": "Noodle Stoppers",
+        "heading": "Noodle Stoppers",
+        "description": "Figuren mit einer Funktion"
+      },
+      "plush": {
+        "seoTitle": "Plüschtiere",
+        "heading": "Plüschtiere Kollektion",
+        "description": "Entdecken Sie unseren gesamten Katalog an Plüschtieren."
+      },
+      "keychains": {
+        "seoTitle": "Schlüsselanhänger",
+        "heading": "Schlüsselanhänger Kollektion",
+        "description": "Entdecken Sie unseren gesamten Katalog an Schlüsselanhängern."
+      },
+      "acrylic": {
+        "seoTitle": "Acryl-Schlüsselanhänger",
+        "heading": "Acryl-Schlüsselanhänger",
+        "description": "Eine große Auswahl günstiger Schlüsselanhänger."
+      },
+      "metal": {
+        "seoTitle": "Metall-Schlüsselanhänger",
+        "heading": "Metall-Schlüsselanhänger",
+        "description": "Extrem robuste Schlüsselanhänger."
+      }
+    }
+  },
+  "search": {
+    "placeholder": "Suchen Sie nach TCG-Karten, Figuren, Plüschtieren und mehr...",
+    "button": "Suchen",
+    "pageTitle": "Suchen",
+    "pageDescription": "Durchsuchen Sie den gesamten AnimeNL-Katalog mit TCG-Karten, Figuren, Plüschtieren und Schlüsselanhängern nach Stichwort, Serie oder Kategorie.",
+    "heading": "Suchen",
+    "inputPlaceholder": "Produkte suchen...",
+    "collectionLabel": "Kollektion",
+    "allCollections": "Alle Kollektionen",
+    "categoryLabel": "Kategorie",
+    "allCategories": "Alle Kategorien",
+    "noResults": "Keine Produkte gefunden, die Ihren Kriterien entsprechen.",
+    "clearFilters": "Filter zurücksetzen",
+    "loadingMore": "Weitere Produkte werden geladen...",
+    "endOfCatalog": "Sie haben das Ende des Katalogs erreicht."
+  },
+  "home": {
+    "title": "Home",
+    "description": "Kaufen Sie TCG-Karten, Figuren, Plüschtiere und Schlüsselanhänger bei AnimeNL, dem niederländischen Webshop für Anime-Merchandise. Schneller Versand und einfache 14-tägige Rückgabe.",
+    "newProducts": "Neue Produkte",
+    "discover": "Entdecken",
+    "loadingMore": "Weitere Produkte werden geladen..."
+  },
+  "cart": {
+    "title": "Ihr Warenkorb",
+    "removeItemAriaLabel": "Artikel entfernen",
+    "checkoutButton": "Zur Kasse",
+    "emptyMessage": "Ihr Warenkorb ist leer.",
+    "continueShopping": "Weiter einkaufen",
+    "priceExclVat": "Preis exkl. MwSt.",
+    "vat": "MwSt.",
+    "discount": "Rabatt",
+    "subtotal": "Zwischensumme",
+    "total": "Gesamt",
+    "promoCodePlaceholder": "Gutscheincode",
+    "apply": "Anwenden",
+    "removePromoAriaLabel": "{code} entfernen",
+    "promoInvalid": "Dieser Gutscheincode ist ungültig.",
+    "promoRemoveFailed": "Dieser Gutscheincode konnte nicht entfernt werden. Bitte versuchen Sie es erneut."
+  },
+  "nav": {
+    "home": "Startseite",
+    "cartAriaLabel": "Warenkorb",
+    "accountFallback": "Konto",
+    "logIn": "Anmelden",
+    "openMenuAriaLabel": "Menü öffnen",
+    "menuTitle": "Menü",
+    "main": {
+      "home": {"label": "Startseite"},
+      "tcg": {
+        "label": "TCG",
+        "children": {
+          "singles": {"label": "Einzelkarten", "description": "Kaufen Sie einzelne Karten in großen Mengen."},
+          "packs": {"label": "Booster-Packs", "description": "Versuchen Sie Ihr Glück mit einzelnen Boostern."},
+          "boosters": {"label": "Booster-Boxen", "description": "Kaufen Sie Boxen voller Booster und Extras."},
+          "bySeries": {
+            "label": "Nach Serie",
+            "description": "Suchen Sie nach Karten aus Ihrer Lieblingsserie."
+          }
+        }
+      },
+      "figures": {
+        "label": "Figuren",
+        "children": {
+          "prizeFigures": {"label": "Preisfiguren", "description": "Tolle Figuren zu niedrigen Preisen."},
+          "scaleFigures": {"label": "Sammelfiguren", "description": "Toll zum Dekorieren."},
+          "noodleStoppers": {"label": "Noodle Stoppers", "description": "Figuren mit einer Funktion"},
+          "bySeries": {
+            "label": "Nach Serie",
+            "description": "Suchen Sie nach Figuren aus Ihrer Lieblingsserie."
+          }
+        }
+      },
+      "plush": {
+        "label": "Plüschtiere",
+        "children": {
+          "bySeries": {
+            "label": "Nach Serie",
+            "description": "Suchen Sie nach Plüschtieren aus Ihrer Lieblingsserie."
+          }
+        }
+      },
+      "keychains": {
+        "label": "Schlüsselanhänger",
+        "children": {
+          "acrylic": {
+            "label": "Acryl-Schlüsselanhänger",
+            "description": "Eine große Auswahl günstiger Schlüsselanhänger."
+          },
+          "metal": {"label": "Metall-Schlüsselanhänger", "description": "Extrem robuste Schlüsselanhänger."},
+          "bySeries": {
+            "label": "Nach Serie",
+            "description": "Suchen Sie nach Schlüsselanhängern aus Ihrer Lieblingsserie."
+          }
+        }
+      },
+      "support": {"label": "Support"},
+      "trustpilot": {"label": "Trustpilot"}
+    }
+  },
+  "validation": {
+    "required": "Dieses Feld ist erforderlich.",
+    "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+    "invalidReason": "Bitte wählen Sie einen Grund.",
+    "unknownTopic": "Unbekanntes Support-Thema.",
+    "invalidCountry": "Bitte wählen Sie ein gültiges Land.",
+    "invalidPostalCode": "Bitte geben Sie eine gültige Postleitzahl ein.",
+    "tooLong": "Verwenden Sie höchstens {limit} Zeichen."
+  },
+  "account": {
+    "signInTitle": "Anmelden",
+    "signInOptional": "Die Anmeldung ist optional — Sie können auch als Gast ohne Konto bezahlen.",
+    "signInError": "Anmeldung konnte nicht gestartet werden. Bitte versuchen Sie es gleich erneut.",
+    "signInPrompt": "Melden Sie sich an, um Ihr Konto und frühere Bestellungen zu sehen.",
+    "accountHeading": "Ihr Konto",
+    "logOut": "Abmelden",
+    "orderHistory": "Bestellverlauf",
+    "noOrders": "Sie haben noch keine Bestellungen.",
+    "orderNumber": "Bestellung #{number}",
+    "orderStatus": {
+      "pending": "Ausstehend",
+      "completed": "Abgeschlossen",
+      "draft": "Entwurf",
+      "archived": "Archiviert",
+      "canceled": "Storniert",
+      "requires_action": "Aktion erforderlich"
+    },
+    "callback": {
+      "signingIn": "Sie werden angemeldet…",
+      "failed": "Bei der Anmeldung ist etwas schiefgegangen.",
+      "tryAgain": "Erneut versuchen"
+    },
+    "oauth": {
+      "google": "Weiter mit Google"
+    }
+  },
+  "checkout": {
+    "title": "Kasse",
+    "addressError": "Beim Speichern Ihrer Adresse ist etwas schiefgegangen. Bitte versuchen Sie es erneut.",
+    "shippingError": "Beim Festlegen Ihrer Versandmethode ist etwas schiefgegangen. Bitte versuchen Sie es erneut.",
+    "paymentError": "Beim Starten Ihrer Zahlung ist etwas schiefgegangen. Bitte versuchen Sie es erneut.",
+    "continueToShipping": "Weiter zum Versand",
+    "continueToReview": "Weiter zur Überprüfung",
+    "back": "Zurück",
+    "pay": "Bezahlen",
+    "shippingTo": "Versand an",
+    "steps": {
+      "address": {"heading": "1. Ihre Adresse"},
+      "shipping": {"heading": "2. Versandmethode"},
+      "review": {"heading": "Bestellung überprüfen"}
+    },
+    "form": {
+      "firstName": "Vorname",
+      "lastName": "Nachname",
+      "email": "E-Mail-Adresse",
+      "street": "Straße",
+      "houseNumber": "Hausnummer",
+      "postalCode": "Postleitzahl",
+      "city": "Stadt",
+      "country": "Land"
+    },
+    "return": {
+      "completedTitle": "Vielen Dank für Ihre Bestellung!",
+      "orderPlaced": "Bestellung #{number} wurde aufgegeben.",
+      "viewOrders": "Ihre Bestellungen ansehen",
+      "pendingTitle": "Zahlung ausstehend",
+      "pendingBody": "Wir bestätigen Ihre Bestellung, sobald Ihre Zahlung verarbeitet wurde.",
+      "failedTitle": "Zahlung fehlgeschlagen",
+      "failedBody": "Bei Ihrer Zahlung ist etwas schiefgegangen. Bitte versuchen Sie es erneut.",
+      "backToCart": "Zurück zum Warenkorb",
+      "idleTitle": "Hier gibt es nichts zu bestätigen",
+      "idleBody": "Für diesen Browser ist keine Zahlung in Bearbeitung."
+    }
+  },
+  "support": {
+    "breadcrumb": "Support",
+    "sendError": "Beim Senden Ihrer Nachricht ist etwas schiefgegangen. Bitte versuchen Sie es erneut oder schreiben Sie uns an {email}.",
+    "backToSupport": "Zurück zum Support",
+    "overview": {
+      "description": "Finden Sie Antworten auf häufige Fragen zu Bestellungen, Versand, Rücksendungen und Produkten, oder wenden Sie sich an das AnimeNL-Team.",
+      "subtitle": "Brauchen Sie Hilfe? Finden Sie unten Antworten auf häufige Fragen, oder kontaktieren Sie uns und wir helfen Ihnen weiter.",
+      "topicsHeading": "Wobei können wir Ihnen helfen?",
+      "faqHeading": "Häufig gestellte Fragen",
+      "stillNeedHelp": "Brauchen Sie noch Hilfe?",
+      "includeOrderNumber": "Geben Sie Ihre Bestellnummer an, falls vorhanden, damit wir Ihnen schneller helfen können.",
+      "emailUs": "E-Mail senden"
+    },
+    "faq": {
+      "1": {
+        "question": "Wie lange dauert der Versand?",
+        "answer": "Der Versand dauert in der Regel 2 bis 3 Werktage ab Bestelleingang. Wenn Ihre Bestellung länger dauert, kontaktieren Sie uns mit Ihrer Bestellnummer und wir kümmern uns darum."
+      },
+      "2": {
+        "question": "Welche Zahlungsmethoden akzeptieren Sie?",
+        "answer": "Wir akzeptieren alle von Mollie unterstützten Zahlungsmethoden, einschließlich iDEAL und Kreditkarte. An der Kasse sehen Sie, welche Methoden für Sie verfügbar sind."
+      },
+      "3": {
+        "question": "Was ist Ihre Rückgaberichtlinie?",
+        "answer": "Sie haben ein 14-tägiges Rückgaberecht gemäß den EU-Verbraucherregeln. Der Artikel muss unbenutzt und in der Originalverpackung sein, und Sie tragen die Rücksendekosten. Kontaktieren Sie uns innerhalb von 14 Tagen nach Erhalt Ihrer Bestellung, um uns mitzuteilen, dass Sie zurücksenden möchten."
+      },
+      "4": {
+        "question": "Wie sende ich einen Artikel zurück?",
+        "answer": "Kontaktieren Sie uns innerhalb der 14-tägigen Rückgabefrist, damit wir Ihnen mitteilen können, wie Sie den Artikel zurücksenden, und ihn mit Ihrer Bestellung verknüpfen können. Bitte stellen Sie sicher, dass er unbenutzt und in der Originalverpackung ist; Sie tragen die Rücksendekosten."
+      },
+      "5": {
+        "question": "Wie kann ich den Status meiner Bestellung überprüfen?",
+        "answer": "Kontaktieren Sie uns und geben Sie Ihre Bestellnummer und die E-Mail-Adresse an, mit der Sie bestellt haben. Wir teilen Ihnen mit, wo sich Ihre Bestellung befindet."
+      },
+      "6": {
+        "question": "Kann ich meine Bestellung ändern oder stornieren?",
+        "answer": "Kontaktieren Sie uns so schnell wie möglich nach der Bestellung. Sobald eine Bestellung verpackt und versandt wurde, kann sie nicht mehr geändert werden, aber Sie können sie innerhalb der 14-tägigen Rückgabefrist noch zurücksenden."
+      },
+      "7": {
+        "question": "Mein Artikel ist beschädigt angekommen oder entspricht nicht meiner Bestellung.",
+        "answer": "Senden Sie uns Ihre Bestellnummer und ein paar Fotos des Artikels und seiner Verpackung, und wir finden gemeinsam mit Ihnen eine Lösung."
+      },
+      "8": {
+        "question": "Was bedeutet \"Nachbestellung\" bei einem Produkt?",
+        "answer": "Ein Produkt in Nachbestellung ist derzeit nicht vorrätig, aber wir können Ihre Bestellung trotzdem annehmen. Es wird versandt, sobald es wieder vorrätig ist."
+      },
+      "9": {
+        "question": "Ein Produkt, das ich suche, ist nicht im Shop.",
+        "answer": "Nutzen Sie die Suchseite, um nach Serie, Kollektion oder Kategorie zu suchen. Wenn Sie es immer noch nicht finden, teilen Sie es uns mit und wir sehen, was wir tun können."
+      }
+    },
+    "sent": {
+      "title": "Nachricht gesendet",
+      "description": "Danke {name}, wir haben Ihre Nachricht erhalten und antworten an {email}."
+    },
+    "form": {
+      "reason": "Wobei können wir Ihnen helfen?",
+      "orderNumber": "Bestellnummer",
+      "optional": "Optional",
+      "name": "Ihr Name",
+      "email": "E-Mail-Adresse",
+      "message": "Nachricht",
+      "honeypotLabel": "Dieses Feld leer lassen",
+      "send": "Nachricht senden",
+      "cancel": "Abbrechen"
+    },
+    "topics": {
+      "orders": {
+        "title": "Bestellungen",
+        "description": "Fragen zu einer Bestellung, die Sie aufgegeben haben oder ändern möchten.",
+        "intro": "Teilen Sie uns mit, um welche Bestellung es geht und was Sie benötigen.",
+        "messagePlaceholder": "Zum Beispiel: welchen Artikel Sie ändern möchten oder was Sie über Ihre Bestellung wissen möchten.",
+        "reasons": {
+          "statusOfOrder": "Status meiner Bestellung",
+          "changeOrder": "Meine Bestellung ändern",
+          "cancelOrder": "Meine Bestellung stornieren",
+          "somethingElse": "Etwas anderes"
+        }
+      },
+      "shipping": {
+        "title": "Versand",
+        "description": "Lieferzeiten und Probleme mit einer Lieferung.",
+        "intro": "Der Versand dauert in der Regel 2 bis 3 Werktage ab Bestelleingang. Wenn mit Ihrer Lieferung etwas nicht stimmt, teilen Sie es uns mit.",
+        "messagePlaceholder": "Zum Beispiel: wann Sie bestellt haben und was der aktuelle Lieferstatus anzeigt.",
+        "reasons": {
+          "tooSlow": "Meine Bestellung dauert länger als 2 bis 3 Werktage",
+          "trackingShowsDeliveredButNotReceived": "Meine Sendungsverfolgung zeigt \"zugestellt\", aber ich habe nichts erhalten",
+          "wrongAddress": "Meine Bestellung wurde an die falsche Adresse geliefert",
+          "somethingElse": "Etwas anderes"
+        }
+      },
+      "returns": {
+        "title": "Rücksendungen & Rückerstattungen",
+        "description": "Rücksendung innerhalb von 14 Tagen oder beschädigt erhalten.",
+        "intro": "Sie haben 14 Tage Zeit, eine Bestellung zurückzusenden. Zurückgesendete Artikel müssen unbenutzt und in der Originalverpackung sein, und Sie tragen die Rücksendekosten. Bei beschädigten oder falschen Artikeln beschreiben Sie bitte, was nicht stimmt.",
+        "messagePlaceholder": "Zum Beispiel: welche(n) Artikel Sie zurücksenden möchten und warum, oder was an dem erhaltenen Artikel nicht stimmt.",
+        "reasons": {
+          "wantToReturn": "Ich möchte einen Artikel zurücksenden",
+          "arrivedDamaged": "Mein Artikel ist beschädigt angekommen",
+          "wrongItemReceived": "Ich habe den falschen Artikel erhalten",
+          "refundQuestion": "Frage zu meiner Rückerstattung"
+        }
+      },
+      "payments": {
+        "title": "Zahlungen",
+        "description": "iDEAL, Kreditkarte und andere Zahlungsmethoden über Mollie.",
+        "intro": "Wir akzeptieren alle von Mollie unterstützten Zahlungsmethoden. Wenn Sie keine Bestellnummer haben, weil Ihre Zahlung fehlgeschlagen ist, können Sie dieses Feld leer lassen.",
+        "messagePlaceholder": "Zum Beispiel: welche Zahlungsmethode Sie verwendet haben und was beim Bezahlen passiert ist.",
+        "reasons": {
+          "paymentFailed": "Meine Zahlung ist fehlgeschlagen",
+          "chargedNoConfirmation": "Ich wurde belastet, habe aber keine Bestellbestätigung erhalten",
+          "paymentMethodQuestion": "Frage zu Zahlungsmethoden",
+          "somethingElse": "Etwas anderes"
+        }
+      }
+    },
+    "email": {
+      "subjectOrderPrefix": "Bestellung {orderNumber}",
+      "topicLabel": "Thema:",
+      "reasonLabel": "Grund:",
+      "orderNumberLabel": "Bestellnummer:",
+      "nameLabel": "Name:",
+      "emailLabel": "E-Mail:"
+    }
+  }
+}

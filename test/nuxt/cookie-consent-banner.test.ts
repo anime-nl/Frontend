@@ -50,7 +50,7 @@ describe('cookie consent banner', () => {
     it('grants analytics consent and hides the banner when the visitor accepts', async () => {
         wrapper = await mountBanner()
 
-        await clickButton('Accept')
+        await clickButton('Accepteren')
 
         expect(initializeMock).toHaveBeenCalled()
         expect(gtagMock).toHaveBeenCalledWith(
@@ -65,7 +65,7 @@ describe('cookie consent banner', () => {
     it('does not enable analytics and hides the banner when the visitor declines', async () => {
         wrapper = await mountBanner()
 
-        await clickButton('Decline')
+        await clickButton('Weigeren')
 
         expect(initializeMock).not.toHaveBeenCalled()
         expect(gtagMock).not.toHaveBeenCalled()
@@ -101,7 +101,7 @@ describe('cookie consent banner', () => {
     it('gives the Decline button a solid, high-contrast style so it is not invisible', async () => {
         wrapper = await mountBanner()
 
-        const declineButton = wrapper.findAllComponents({name: 'UButton'}).find((b) => b.text() === 'Decline')
+        const declineButton = wrapper.findAllComponents({name: 'UButton'}).find((b) => b.text() === 'Weigeren')
 
         expect(declineButton!.props('variant')).toBe('solid')
     })

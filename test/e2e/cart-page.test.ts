@@ -4,10 +4,10 @@ import {$fetch, setup} from '@nuxt/test-utils/e2e'
 await setup({server: true})
 
 describe('cart page', () => {
-    it('shows the empty-cart state for a first-time visitor', async () => {
+    it('shows the empty-cart state for a first-time visitor, in the default (Dutch) locale', async () => {
         const html = await $fetch<string>('/cart')
 
-        expect(html).toContain('Your cart is empty')
+        expect(html).toContain('Je winkelwagen is leeg')
     })
 
     // No Medusa backend is available in this test environment, so this also covers the cart page
@@ -15,6 +15,6 @@ describe('cart page', () => {
     it('still renders when it has a cart_id cookie but Medusa is unreachable', async () => {
         const html = await $fetch<string>('/cart', {headers: {cookie: 'cart_id=cart_fake'}})
 
-        expect(html).toContain('Your cart')
+        expect(html).toContain('Je winkelwagen')
     })
 })

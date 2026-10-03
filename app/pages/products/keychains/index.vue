@@ -1,12 +1,16 @@
 <script setup lang="ts">
-useSeoMeta({title: 'Keychains', description: 'Browse our entire catalog of keychains.'})
+const {t} = useI18n()
+useSeoMeta({
+  title: t('products.categories.keychains.seoTitle'),
+  description: t('products.categories.keychains.description')
+})
 </script>
 
 <template>
   <CategoryPage
-    badge="Keychains"
-    description="Browse our entire catalog of keychains."
+    :badge="t('products.badges.keychains')"
+    :description="t('products.categories.keychains.description')"
     handle="keychains"
-    title="Keychains Collection"
+    :title="t('products.categories.keychains.heading')"
   />
 </template>

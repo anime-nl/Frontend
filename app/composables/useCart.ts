@@ -7,6 +7,7 @@ import {formatCurrency} from '#shared/utils/currency'
  */
 export function useCart() {
     const requestEvent = useRequestEvent()
+    const {localeProperties} = useI18n()
     const {data, pending, refresh} = useFetch<{cart: StoreCart | null}>('/api/cart', {
         key: 'cart',
         onResponse: ({response}) => forwardSetCookie(requestEvent, response)
@@ -18,7 +19,7 @@ export function useCart() {
 
     const format = (amount: number) => {
         const currency = cart.value?.currency_code
-        return currency ? formatCurrency(amount, currency) : null
+        return currency ? formatCurrency(amount, currency, localeProperties.value.language!) : null
     }
 
     // The excl./incl.-VAT breakdown uses items-only, same-basis fields (item_subtotal and

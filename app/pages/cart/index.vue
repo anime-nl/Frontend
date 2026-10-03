@@ -2,6 +2,7 @@
 // Blocks on the shared 'cart' key so this page's first render already has the cart, instead of
 // flashing the empty state until useCart's own fetch resolves. useFetch dedupes by key, so this
 // call (not useCart's own) is the one that actually fires and must carry the cookie-forwarding hook.
+const {t} = useI18n()
 const requestEvent = useRequestEvent()
 await useFetch('/api/cart', {key: 'cart', onResponse: ({response}) => forwardSetCookie(requestEvent, response)})
 const cart = useCart()
@@ -29,7 +30,7 @@ async function onRemove(itemId: string) {
 
 <template>
   <UContainer class="flex flex-col gap-8 py-8">
-    <h1 class="text-3xl font-bold">Your cart</h1>
+    <h1 class="text-3xl font-bold">{{ t('cart.title') }}</h1>
 
     <div v-if="cart.items.value.length" class="flex flex-col gap-6">
       <div
@@ -54,7 +55,7 @@ async function onRemove(itemId: string) {
           icon="i-lucide-trash-2"
           color="neutral"
           variant="ghost"
-          aria-label="Remove item"
+          :aria-label="t('cart.removeItemAriaLabel')"
           :disabled="updating === item.id"
           @click="onRemove(item.id)"
         />
@@ -62,12 +63,12 @@ async function onRemove(itemId: string) {
 
       <CartSummary />
 
-      <UButton to="/checkout" size="xl" class="self-end justify-center">Checkout</UButton>
+      <UButton to="/checkout" size="xl" class="self-end justify-center">{{ t('cart.checkoutButton') }}</UButton>
     </div>
 
     <div v-else class="flex flex-col items-center gap-4 py-12 text-center text-slate-400">
-      <p>Your cart is empty.</p>
-      <UButton to="/products" variant="outline">Continue shopping</UButton>
+      <p>{{ t('cart.emptyMessage') }}</p>
+      <UButton to="/products" variant="outline">{{ t('cart.continueShopping') }}</UButton>
     </div>
   </UContainer>
 </template>

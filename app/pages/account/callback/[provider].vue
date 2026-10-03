@@ -1,4 +1,12 @@
 <script setup lang="ts">
+import {isSupportedLocale} from '#shared/utils/i18n'
+
+const {t} = useI18n()
+const localePath = useLocalePath()
+// The provider always redirects back to this page's own fixed, unprefixed URL (it's registered as
+// such with the OAuth app), so the route itself carries no locale. The visitor's locale from
+// before they left for sign-in only survives in the cookie @nuxtjs/i18n already maintains.
+const cookieLocale = useCookieLocale()
 const route = useRoute()
 const customer = useCustomer()
 const failed = ref(false)
@@ -10,7 +18,7 @@ onMounted(async () => {
   try {
     await $fetch(`/api/auth/${route.params.provider}/callback`, {method: 'POST', body: route.query})
     await customer.refresh()
-    await navigateTo('/account')
+    await navigateTo(localePath('/account', isSupportedLocale(cookieLocale.value) ? cookieLocale.value : undefined))
   } catch {
     failed.value = true
   }
@@ -19,10 +27,10 @@ onMounted(async () => {
 
 <template>
   <UContainer v-if="failed" class="flex flex-col items-center gap-6 py-16 text-center">
-    <p>Something went wrong signing you in.</p>
-    <UButton to="/account/login">Try again</UButton>
+    <p>{{ t('account.callback.failed') }}</p>
+    <UButton to="/account/login">{{ t('account.callback.tryAgain') }}</UButton>
   </UContainer>
   <UContainer v-else class="flex flex-col items-center gap-6 py-16 text-center">
-    <p>Signing you in…</p>
+    <p>{{ t('account.callback.signingIn') }}</p>
   </UContainer>
 </template>

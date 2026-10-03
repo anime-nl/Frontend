@@ -2,7 +2,7 @@ import {afterEach, describe, expect, it} from 'vitest'
 import {mountSuspended} from '@nuxt/test-utils/runtime'
 import SearchBar from '~/components/searchBar.vue'
 
-const mountSearchBar = () => mountSuspended(SearchBar, {attachTo: document.body})
+const mountSearchBar = (route = '/') => mountSuspended(SearchBar, {route, attachTo: document.body})
 
 let wrapper: Awaited<ReturnType<typeof mountSearchBar>> | undefined
 
@@ -39,5 +39,13 @@ describe('search bar', () => {
         await wrapper.find('input').setValue('   ')
 
         expect(wrapper.find('a').attributes('href')).toBe('/search')
+    })
+
+    it('links to the locale-prefixed search page when browsing a non-default locale', async () => {
+        wrapper = await mountSearchBar('/en')
+
+        await wrapper.find('input').setValue('Zhongli')
+
+        expect(wrapper.find('a').attributes('href')).toBe('/en/search?q=Zhongli')
     })
 })

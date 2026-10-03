@@ -37,6 +37,7 @@ let lastDeletedItemId: string | undefined
 let lastPromotionBody: unknown
 let applyShouldFail = false
 let applyFailureStatusMessage = 'That promo code is not valid.'
+let applyFailureCode: string | undefined
 let removeShouldFail = false
 
 registerEndpoint('/api/cart', () => ({cart}))
@@ -44,7 +45,13 @@ registerEndpoint('/api/cart/promotions', {
     method: 'POST',
     handler: async (event) => {
         lastPromotionBody = await readBody(event)
-        if (applyShouldFail) throw createError({statusCode: 400, statusMessage: applyFailureStatusMessage})
+        if (applyShouldFail) {
+            throw createError({
+                statusCode: 400,
+                statusMessage: applyFailureStatusMessage,
+                data: applyFailureCode ? {code: applyFailureCode} : undefined
+            })
+        }
         cart = {...cartWithItems, promotions: [{id: 'promo_1', code: (lastPromotionBody as {code: string}).code}]}
         return {cart}
     }
@@ -90,6 +97,7 @@ beforeEach(() => {
     lastPromotionBody = undefined
     applyShouldFail = false
     applyFailureStatusMessage = 'That promo code is not valid.'
+    applyFailureCode = undefined
     removeShouldFail = false
     forwardSetCookieMock.mockClear()
 })
@@ -111,19 +119,19 @@ describe('cart page', () => {
     it('shows the price excl. VAT, the VAT amount, the incl.-VAT subtotal and the total', async () => {
         wrapper = await mountCart()
 
-        expect(wrapper.text()).toContain('Price excl. VAT')
+        expect(wrapper.text()).toContain('Prijs excl. btw')
         expect(wrapper.text()).toContain(eur(18.0))
-        expect(wrapper.text()).toContain('VAT')
+        expect(wrapper.text()).toContain('Btw')
         expect(wrapper.text()).toContain(eur(3.8))
-        expect(wrapper.text()).toContain('Subtotal')
-        expect(wrapper.text()).toContain('Total')
+        expect(wrapper.text()).toContain('Subtotaal')
+        expect(wrapper.text()).toContain('Totaal')
         expect(wrapper.text()).toContain(eur(21.8))
     })
 
     it('does not show a discount row when there is no discount', async () => {
         wrapper = await mountCart()
 
-        expect(wrapper.text()).not.toContain('Discount')
+        expect(wrapper.text()).not.toContain('Korting')
     })
 
     it('shows a discount row, and the breakdown rows reconcile, when a discount is applied', async () => {
@@ -140,7 +148,7 @@ describe('cart page', () => {
 
         expect(wrapper.text()).toContain(eur(100.0))
         expect(wrapper.text()).toContain(eur(21.0))
-        expect(wrapper.text()).toContain('Discount')
+        expect(wrapper.text()).toContain('Korting')
         expect(wrapper.text()).toContain(eur(12.1))
         expect(wrapper.text()).toContain(eur(108.9))
     })
@@ -156,7 +164,7 @@ describe('cart page', () => {
         cart = {...cartWithItems, items: []}
         wrapper = await mountCart()
 
-        expect(wrapper.text().toLowerCase()).toContain('empty')
+        expect(wrapper.text().toLowerCase()).toContain('leeg')
     })
 
     it('removing an item calls the delete endpoint', async () => {
@@ -190,32 +198,36 @@ describe('cart page', () => {
         cart = {...cartWithItems, item_subtotal: null as unknown as number}
         wrapper = await mountCart()
 
-        expect(wrapper.text()).not.toContain('Price excl. VAT')
+        expect(wrapper.text()).not.toContain('Prijs excl. btw')
     })
 
     it('applying a valid promo code adds it to the applied list and clears the input', async () => {
         applyShouldFail = false
         wrapper = await mountCart()
 
-        await wrapper.find('input[placeholder="Promo code"]').setValue('WELCOME10')
-        const applyButton = wrapper.findAllComponents({name: 'UButton'}).find((button) => button.text() === 'Apply')
+        await wrapper.find('input[placeholder="Promocode"]').setValue('WELCOME10')
+        const applyButton = wrapper.findAllComponents({name: 'UButton'}).find((button) => button.text() === 'Toepassen')
         await applyButton!.trigger('click')
 
         await vi.waitFor(() => expect(lastPromotionBody).toEqual({code: 'WELCOME10'}))
         await vi.waitFor(() => expect(wrapper!.text()).toContain('WELCOME10'))
-        expect((wrapper.find('input[placeholder="Promo code"]').element as HTMLInputElement).value).toBe('')
+        expect((wrapper.find('input[placeholder="Promocode"]').element as HTMLInputElement).value).toBe('')
     })
 
-    it('applying an invalid promo code shows an error and keeps the input value', async () => {
+    // The server tags a 400 with no Medusa-specific message as {data: {code: 'invalidPromoCode'}}
+    // (see server/api/cart/promotions.post.ts), since its own English fallback statusMessage can't
+    // be pre-translated; the client must show its own translated message for this code instead.
+    it('applying an invalid promo code shows a translated error and keeps the input value', async () => {
         applyShouldFail = true
+        applyFailureCode = 'invalidPromoCode'
         wrapper = await mountCart()
 
-        await wrapper.find('input[placeholder="Promo code"]').setValue('BADCODE')
-        const applyButton = wrapper.findAllComponents({name: 'UButton'}).find((button) => button.text() === 'Apply')
+        await wrapper.find('input[placeholder="Promocode"]').setValue('BADCODE')
+        const applyButton = wrapper.findAllComponents({name: 'UButton'}).find((button) => button.text() === 'Toepassen')
         await applyButton!.trigger('click')
 
-        await vi.waitFor(() => expect(wrapper!.text()).toContain('not valid'))
-        expect((wrapper.find('input[placeholder="Promo code"]').element as HTMLInputElement).value).toBe('BADCODE')
+        await vi.waitFor(() => expect(wrapper!.text()).toContain('Deze promocode is niet geldig.'))
+        expect((wrapper.find('input[placeholder="Promocode"]').element as HTMLInputElement).value).toBe('BADCODE')
     })
 
     it('shows the server error message when applying a promo code fails for a reason other than an invalid code', async () => {
@@ -223,8 +235,8 @@ describe('cart page', () => {
         applyFailureStatusMessage = 'Could not apply promo code'
         wrapper = await mountCart()
 
-        await wrapper.find('input[placeholder="Promo code"]').setValue('WELCOME10')
-        const applyButton = wrapper.findAllComponents({name: 'UButton'}).find((button) => button.text() === 'Apply')
+        await wrapper.find('input[placeholder="Promocode"]').setValue('WELCOME10')
+        const applyButton = wrapper.findAllComponents({name: 'UButton'}).find((button) => button.text() === 'Toepassen')
         await applyButton!.trigger('click')
 
         await vi.waitFor(() => expect(wrapper!.text()).toContain('Could not apply promo code'))
@@ -255,7 +267,7 @@ describe('cart page', () => {
             .find((button) => button.props('icon') === 'i-lucide-x')
         await removeButton!.trigger('click')
 
-        await vi.waitFor(() => expect(wrapper!.text()).toContain('could not be removed'))
+        await vi.waitFor(() => expect(wrapper!.text()).toContain('kon niet worden verwijderd'))
         expect(wrapper.text()).toContain('WELCOME10')
     })
 

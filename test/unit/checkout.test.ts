@@ -20,8 +20,8 @@ const validRequest: AddressRequest = {
     country: 'NL'
 }
 
-const errorFields = (request: Partial<AddressRequest>) =>
-    validateAddressRequest({...validRequest, ...request}).map((error) => error.name)
+const errorCode = (request: Partial<AddressRequest>, field: keyof AddressRequest) =>
+    validateAddressRequest({...validRequest, ...request}).find((error) => error.name === field)?.code
 
 describe('checkoutCountries', () => {
     it('offers only NL and BE', () => {
@@ -69,28 +69,42 @@ describe('validateAddressRequest', () => {
     })
 
     it.each(['', 'jan', 'jan@', 'jan@example', 'jan @example.nl'])('rejects the email "%s"', (email) => {
-        expect(errorFields({email})).toEqual(['email'])
+        expect(validateAddressRequest({...validRequest, email})).toEqual([{name: 'email', code: 'invalidEmail'}])
     })
 
     it.each(['firstName', 'lastName', 'street', 'houseNumber', 'city'] as const)('requires %s', (field) => {
-        expect(errorFields({[field]: '   '})).toEqual([field])
+        expect(validateAddressRequest({...validRequest, [field]: '   '})).toEqual([{name: field, code: 'required'}])
     })
 
     it('rejects an unknown country', () => {
-        expect(errorFields({country: 'DE'})).toEqual(['country'])
+        expect(validateAddressRequest({...validRequest, country: 'DE'})).toEqual([
+            {name: 'country', code: 'invalidCountry'}
+        ])
     })
 
     it('rejects an NL postal code without 4 digits and 2 letters', () => {
-        expect(errorFields({postalCode: '12345'})).toEqual(['postalCode'])
-        expect(errorFields({postalCode: '1234'})).toEqual(['postalCode'])
+        expect(validateAddressRequest({...validRequest, postalCode: '12345'})).toEqual([
+            {name: 'postalCode', code: 'invalidPostalCode'}
+        ])
+        expect(validateAddressRequest({...validRequest, postalCode: '1234'})).toEqual([
+            {name: 'postalCode', code: 'invalidPostalCode'}
+        ])
     })
 
     it('rejects a BE postal code that is not 4 digits', () => {
-        expect(errorFields({country: 'BE', postalCode: '1234 AB'})).toEqual(['postalCode'])
+        expect(validateAddressRequest({...validRequest, country: 'BE', postalCode: '1234 AB'})).toEqual([
+            {name: 'postalCode', code: 'invalidPostalCode'}
+        ])
     })
 
     it.each(['firstName', 'lastName', 'street', 'houseNumber', 'city'] as const)('limits the length of %s', (field) => {
-        expect(errorFields({[field]: 'a'.repeat(checkoutLimits[field] + 1)})).toContain(field)
+        expect(errorCode({[field]: 'a'.repeat(checkoutLimits[field] + 1)}, field)).toBe('tooLong')
+    })
+
+    it('includes the limit as a param on a tooLong error', () => {
+        expect(
+            validateAddressRequest({...validRequest, firstName: 'a'.repeat(checkoutLimits.firstName + 1)})
+        ).toContainEqual({name: 'firstName', code: 'tooLong', params: {limit: checkoutLimits.firstName}})
     })
 })
 
@@ -125,6 +139,20 @@ describe('splitStreetAndHouseNumber', () => {
         expect(splitStreetAndHouseNumber('Prinses Irenestraat 1')).toEqual({
             street: 'Prinses Irenestraat',
             houseNumber: '1'
+        })
+    })
+
+    // "Plein 1944" (Nijmegen) is a real Dutch square name, not a street with house number 1944 -
+    // a bare 4-digit number with no letter/word addition is far more likely to be part of a
+    // year-commemorating name than a genuine house number, which is virtually never four digits.
+    it('does not split a street name that ends in a bare, year-like 4-digit number', () => {
+        expect(splitStreetAndHouseNumber('Plein 1944')).toEqual({street: 'Plein 1944', houseNumber: ''})
+    })
+
+    it('still splits a 4-digit number when it has a letter addition', () => {
+        expect(splitStreetAndHouseNumber('Bedrijvenweg 1944A')).toEqual({
+            street: 'Bedrijvenweg',
+            houseNumber: '1944A'
         })
     })
 })

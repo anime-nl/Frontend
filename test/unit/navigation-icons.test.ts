@@ -1,6 +1,9 @@
 import {createRequire} from 'node:module'
 import {describe, expect, it} from 'vitest'
-import {navigationItems} from '../../app/utils/navigation'
+import {buildNavigationItems} from '../../app/utils/navigation'
+
+// This test only checks icon validity, so a translator that echoes the key back is enough.
+const navigationItems = buildNavigationItems((key) => key)
 
 const require = createRequire(import.meta.url)
 

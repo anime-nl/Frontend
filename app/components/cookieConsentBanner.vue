@@ -5,6 +5,7 @@ const props = defineProps<{
   /** Whether this build has Google Analytics configured; the banner never shows otherwise */
   gaEnabled: boolean
 }>()
+const {t} = useI18n()
 const {gtag, initialize} = useGtag()
 
 const showBanner = ref(false)
@@ -41,6 +42,11 @@ function decline() {
   setCookieConsent('denied')
   showBanner.value = false
 }
+
+const actions = computed(() => [
+  {label: t('cookieConsent.accept'), color: 'primary' as const, variant: 'solid' as const, onClick: accept},
+  {label: t('cookieConsent.decline'), color: 'neutral' as const, variant: 'solid' as const, onClick: decline}
+])
 </script>
 
 <template>
@@ -48,10 +54,7 @@ function decline() {
     v-if="showBanner"
     color="neutral"
     icon="i-lucide-cookie"
-    title="We use cookies to understand how visitors use this site."
-    :actions="[
-      {label: 'Accept', color: 'primary', variant: 'solid', onClick: accept},
-      {label: 'Decline', color: 'neutral', variant: 'solid', onClick: decline}
-    ]"
+    :title="t('cookieConsent.title')"
+    :actions="actions"
   />
 </template>

@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+const {t} = useI18n()
 const {data: regionId} = await useDefaultRegionId()
 const {data} = await useFetch('/api/products', {
   key: 'showcase-products',
@@ -9,7 +10,7 @@ const products = computed(() => (data.value?.products ?? []).filter((product) =>
 
 <template>
   <div v-if="products.length" class="w-full max-w-screen-2xl px-4 md:w-2/3 mx-auto my-16">
-    <h1 class="mx-6 my-2 text-4xl">New Products</h1>
+    <h1 class="mx-6 my-2 text-4xl">{{ t('home.newProducts') }}</h1>
     <UCarousel
       v-slot="{item}"
       :autoplay="{delay: 5000}"
@@ -19,9 +20,9 @@ const products = computed(() => (data.value?.products ?? []).filter((product) =>
       dots
       loop
     >
-      <NuxtLink :to="`/product/${item.id}`" class="block">
+      <NuxtLinkLocale :to="`/product/${item.id}`" class="block">
         <img :src="item.thumbnail!" :alt="item.title" class="rounded-lg object-cover w-full h-100" loading="lazy" />
-      </NuxtLink>
+      </NuxtLinkLocale>
     </UCarousel>
   </div>
 </template>

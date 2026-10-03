@@ -6,6 +6,7 @@ const route = useRoute()
 const toast = useToast()
 const requestUrl = useRequestURL()
 const cart = useCart()
+const {t, localeProperties} = useI18n()
 
 const {data, error} = await useFetch<{product: StoreProduct; region_id?: string; sales_channel_id?: string}>(
   () => `/api/products/${route.params.id}`,
@@ -56,57 +57,83 @@ const price = computed(() => {
   const currency = calculated.currency_code!
   const original = calculated.original_amount ?? calculated.calculated_amount
   return {
-    current: formatCurrency(calculated.calculated_amount, currency),
-    original: original > calculated.calculated_amount ? formatCurrency(original, currency) : null
+    current: formatCurrency(calculated.calculated_amount, currency, localeProperties.value.language!),
+    original:
+      original > calculated.calculated_amount
+        ? formatCurrency(original, currency, localeProperties.value.language!)
+        : null
   }
 })
 
 const stock = computed(() => {
   const variant = selectedVariant.value
-  if (!variant) return {label: 'Unavailable', color: 'error' as const, purchasable: false, max: 0}
+  if (!variant) {
+    return {
+      label: t('product.stock.unavailable'),
+      color: 'error' as const,
+      purchasable: false,
+      max: 0,
+      isBackorder: false
+    }
+  }
 
   if (!variant.manage_inventory) {
-    return {label: 'In stock', color: 'success' as const, purchasable: true, max: undefined}
+    return {
+      label: t('product.stock.inStock'),
+      color: 'success' as const,
+      purchasable: true,
+      max: undefined,
+      isBackorder: false
+    }
   }
 
   const available = variant.inventory_quantity ?? 0
   if (available > 0) {
     return {
-      label: `${available} in stock`,
+      label: t('product.stock.inStockCount', {count: available}),
       color: 'success' as const,
       purchasable: true,
       // A backorderable variant has no maximum, even while stock remains
-      max: variant.allow_backorder ? undefined : available
+      max: variant.allow_backorder ? undefined : available,
+      isBackorder: false
     }
   }
   if (variant.allow_backorder) {
-    return {label: 'Backorder', color: 'warning' as const, purchasable: true, max: undefined}
+    return {
+      label: t('product.stock.backorder'),
+      color: 'warning' as const,
+      purchasable: true,
+      max: undefined,
+      isBackorder: true
+    }
   }
-  return {label: 'Out of stock', color: 'error' as const, purchasable: false, max: 0}
+  return {label: t('product.stock.outOfStock'), color: 'error' as const, purchasable: false, max: 0, isBackorder: false}
 })
 
 watch(selectedVariant, () => {
   quantity.value = 1
 })
 
-const countryNames = new Intl.DisplayNames(['en'], {type: 'region'})
-
 const details = computed(() => {
   const p = product.value
+  const countryNames = new Intl.DisplayNames([localeProperties.value.language!], {type: 'region'})
   const entries: [string, string | number | null | undefined][] = [
-    ['SKU', selectedVariant.value?.sku],
-    ['Type', p.type?.value],
-    ['Material', p.material],
-    ['Origin', p.origin_country ? countryNames.of(p.origin_country.toUpperCase()) : null],
-    ['Weight', p.weight ? `${p.weight} g` : null],
-    ['Dimensions', p.length && p.width && p.height ? `${p.length} × ${p.width} × ${p.height} mm` : null]
+    [t('product.details.sku'), selectedVariant.value?.sku],
+    [t('product.details.type'), p.type?.value],
+    [t('product.details.material'), p.material],
+    [t('product.details.origin'), p.origin_country ? countryNames.of(p.origin_country.toUpperCase()) : null],
+    [t('product.details.weight'), p.weight ? `${p.weight} g` : null],
+    [
+      t('product.details.dimensions'),
+      p.length && p.width && p.height ? `${p.length} × ${p.width} × ${p.height} mm` : null
+    ]
   ]
   return entries.filter((entry): entry is [string, string | number] => entry[1] != null && entry[1] !== '')
 })
 
 const breadcrumbs = computed(() => [
-  {label: 'Home', to: '/'},
-  {label: 'Search', to: '/search'},
+  {label: t('nav.home'), to: '/'},
+  {label: t('search.heading'), to: '/search'},
   ...(product.value.collection
     ? [
         {
@@ -128,7 +155,7 @@ async function addToCart() {
     await cart.addItem(selectedVariant.value.id, quantity.value)
 
     toast.add({
-      title: 'Added to cart',
+      title: t('product.addedToCartTitle'),
       description: `${quantity.value} × ${product.value.title}`,
       icon: 'i-lucide-shopping-cart',
       color: 'success'
@@ -136,8 +163,8 @@ async function addToCart() {
   } catch (e) {
     console.error('Failed to add to cart:', e)
     toast.add({
-      title: 'Could not add to cart',
-      description: 'Please try again in a moment.',
+      title: t('product.addToCartErrorTitle'),
+      description: t('product.addToCartErrorDescription'),
       icon: 'i-lucide-circle-alert',
       color: 'error'
     })
@@ -154,7 +181,7 @@ useSeoMeta({
 
 const offerAvailability = computed(() => {
   if (!stock.value.purchasable) return 'https://schema.org/OutOfStock'
-  return stock.value.label === 'Backorder' ? 'https://schema.org/BackOrder' : 'https://schema.org/InStock'
+  return stock.value.isBackorder ? 'https://schema.org/BackOrder' : 'https://schema.org/InStock'
 })
 
 const productJsonLd = computed(() => {
@@ -247,7 +274,7 @@ useHead({
             <span class="text-3xl font-bold text-primary">{{ price.current }}</span>
             <span v-if="price.original" class="text-xl text-slate-400 line-through">{{ price.original }}</span>
           </template>
-          <span v-else class="text-lg text-slate-400">Price unavailable</span>
+          <span v-else class="text-lg text-slate-400">{{ t('products.priceUnavailable') }}</span>
           <UBadge :color="stock.color" :label="stock.label" size="lg" variant="subtle" />
         </div>
 
@@ -273,7 +300,7 @@ useHead({
           <UInputNumber v-model="quantity" :disabled="!stock.purchasable" :max="stock.max" :min="1" size="xl" />
           <UButton
             :disabled="!stock.purchasable"
-            :label="stock.label === 'Backorder' ? 'Backorder now' : 'Add to cart'"
+            :label="stock.isBackorder ? t('product.backorderNow') : t('product.addToCart')"
             :loading="adding"
             class="flex-1 justify-center"
             icon="i-lucide-shopping-cart"
@@ -283,21 +310,21 @@ useHead({
         </div>
 
         <UAlert
-          v-if="stock.label === 'Backorder'"
+          v-if="stock.isBackorder"
           color="warning"
-          description="This item is currently out of stock. Your order will be shipped as soon as it is back in stock."
+          :description="t('product.backorderAlertDescription')"
           icon="i-lucide-clock"
-          title="Available on backorder"
+          :title="t('product.backorderAlertTitle')"
           variant="subtle"
         />
 
         <div v-if="product.description" class="flex flex-col gap-2">
-          <h2 class="text-2xl font-bold">Description</h2>
+          <h2 class="text-2xl font-bold">{{ t('product.descriptionHeading') }}</h2>
           <p class="whitespace-pre-line font-light leading-relaxed">{{ product.description }}</p>
         </div>
 
         <div v-if="details.length" class="flex flex-col gap-2">
-          <h2 class="text-2xl font-bold">Details</h2>
+          <h2 class="text-2xl font-bold">{{ t('product.detailsHeading') }}</h2>
           <dl class="grid grid-cols-[max-content_1fr] gap-x-8 gap-y-2 rounded-2xl border border-sky-200/20 p-6">
             <template v-for="[label, value] in details" :key="label">
               <dt class="font-semibold text-secondary">{{ label }}</dt>
@@ -307,7 +334,7 @@ useHead({
         </div>
 
         <div v-if="product.categories?.length" class="flex flex-wrap items-center gap-2">
-          <span class="font-semibold text-secondary">Categories:</span>
+          <span class="font-semibold text-secondary">{{ t('product.categoriesLabel') }}</span>
           <UButton
             v-for="category in product.categories"
             :key="category.id"

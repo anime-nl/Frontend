@@ -74,7 +74,7 @@ describe('search page', () => {
     it('sets a page title and meta description for search engines', async () => {
         wrapper = await mountSearch('')
 
-        await vi.waitFor(() => expect(document.title).toBe('Search | AnimeNL'))
+        await vi.waitFor(() => expect(document.title).toBe('Zoeken | AnimeNL'))
         expect(document.querySelector('meta[name="description"]')?.getAttribute('content')).toContain('catalog')
     })
 
@@ -132,7 +132,7 @@ describe('search page', () => {
     it('shows a message and clears the filters when nothing matches', async () => {
         wrapper = await mountSearch('category=tcg')
 
-        await vi.waitFor(() => expect(wrapper!.text()).toContain('No products found'))
+        await vi.waitFor(() => expect(wrapper!.text()).toContain('Geen producten gevonden'))
         await wrapper.find('button').trigger('click')
 
         expect(selectValue('category-select')).toBe('')
@@ -172,7 +172,7 @@ describe('search page', () => {
         FakeIntersectionObserver.instances[0]?.intersect()
 
         await vi.waitFor(() => expect(wrapper!.findAllComponents({name: 'ProductCard'})).toHaveLength(15))
-        expect(wrapper.text()).toContain("You've reached the end of the catalog.")
+        expect(wrapper.text()).toContain('Je hebt het einde van de catalogus bereikt.')
     })
 
     it('recovers without crashing when the products request fails', async () => {
@@ -180,7 +180,7 @@ describe('search page', () => {
         wrapper = await mountSearch('')
 
         await vi.waitFor(() => expect(productRequests.length).toBeGreaterThan(0))
-        expect(wrapper.text()).toContain('No products found')
+        expect(wrapper.text()).toContain('Geen producten gevonden')
     })
 
     it('still loads products when only the collections lookup fails', async () => {
@@ -200,6 +200,6 @@ describe('search page', () => {
             expect(document.querySelector('#collection-select option[value="pcol_pokemon"]')).not.toBeNull()
         )
         expect(productRequests).toHaveLength(0)
-        expect(wrapper.text()).toContain('No products found')
+        expect(wrapper.text()).toContain('Geen producten gevonden')
     })
 })

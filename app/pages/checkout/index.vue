@@ -4,6 +4,9 @@ import {checkoutCountries, splitStreetAndHouseNumber, validateAddressRequest} fr
 import type {AddressRequest} from '#shared/utils/checkout'
 import {formatCurrency} from '#shared/utils/currency'
 
+const {t, localeProperties} = useI18n()
+const localePath = useLocalePath()
+
 // useFetch dedupes by key, so whichever call with a given key runs first is the one that actually
 // fires and must carry the cookie-forwarding hook - not useCart's/useCustomer's own internal call.
 const requestEvent = useRequestEvent()
@@ -11,7 +14,7 @@ await useFetch('/api/cart', {key: 'cart', onResponse: ({response}) => forwardSet
 const cart = useCart()
 
 if (!cart.items.value.length) {
-  await navigateTo('/cart')
+  await navigateTo(localePath('/cart'))
 }
 
 await useFetch('/api/account/me', {
@@ -35,6 +38,22 @@ const address = reactive<AddressRequest>({
 })
 
 /**
+ * Adapts validateAddressRequest's codes to UForm's expected {name, message} shape.
+ * @param input Current form state
+ * @returns Translated field errors for UForm to display
+ */
+function validateAddress(input: AddressRequest) {
+  return validateAddressRequest(input).map((error) => ({
+    name: error.name,
+    message: t(`validation.${error.code}`, error.params ?? {})
+  }))
+}
+
+const countryItems = computed(() =>
+  checkoutCountries.map((country) => ({label: t(`common.countries.${country.code}`), value: country.code as string}))
+)
+
+/**
  * Dutch browser autofill profiles store the full "Street 12A"-style address as one value and drop
  * it into whichever field is recognized as the street line. Splits it out on the field's native
  * `change` event (blur, or autofill), not on every keystroke - splitting on every input would
@@ -55,7 +74,7 @@ const shippingOptions = ref<StoreShippingOption[]>([])
 const shippingOptionItems = computed(() =>
   shippingOptions.value.map((option) => ({
     value: option.id,
-    label: `${option.name} — ${formatCurrency(option.amount, cart.cart.value?.currency_code ?? 'EUR')}`
+    label: `${option.name} — ${formatCurrency(option.amount, cart.cart.value?.currency_code ?? 'EUR', localeProperties.value.language!)}`
   }))
 )
 const selectedOptionId = ref('')
@@ -78,7 +97,7 @@ async function onAddressSubmit() {
 
     step.value = 'shipping'
   } catch {
-    addressError.value = 'Something went wrong saving your address. Please try again.'
+    addressError.value = t('checkout.addressError')
   } finally {
     submittingAddress.value = false
   }
@@ -96,7 +115,7 @@ async function onShippingContinue() {
     await cart.refresh()
     step.value = 'review'
   } catch {
-    shippingError.value = 'Something went wrong setting your shipping method. Please try again.'
+    shippingError.value = t('checkout.shippingError')
   } finally {
     submittingShipping.value = false
   }
@@ -113,7 +132,7 @@ async function onPay() {
     const {redirect_url} = await $fetch<{redirect_url: string}>('/api/checkout/payment-session', {method: 'POST'})
     await navigateTo(redirect_url, {external: true})
   } catch {
-    paymentError.value = 'Something went wrong starting your payment. Please try again.'
+    paymentError.value = t('checkout.paymentError')
     submittingPayment.value = false
   }
 }
@@ -121,47 +140,43 @@ async function onPay() {
 
 <template>
   <UContainer class="flex flex-col gap-8 py-8">
-    <h1 class="text-3xl font-bold">Checkout</h1>
+    <h1 class="text-3xl font-bold">{{ t('checkout.title') }}</h1>
 
     <UCard v-if="step === 'address'">
-      <UForm :state="address" :validate="validateAddressRequest" class="flex flex-col gap-5" @submit="onAddressSubmit">
-        <h2 class="text-xl font-semibold">1. Your address</h2>
+      <UForm :state="address" :validate="validateAddress" class="flex flex-col gap-5" @submit="onAddressSubmit">
+        <h2 class="text-xl font-semibold">{{ t('checkout.steps.address.heading') }}</h2>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          <UFormField name="firstName" label="First name" required>
+          <UFormField name="firstName" :label="t('checkout.form.firstName')" required>
             <UInput v-model="address.firstName" autocomplete="given-name" class="w-full" />
           </UFormField>
-          <UFormField name="lastName" label="Last name" required>
+          <UFormField name="lastName" :label="t('checkout.form.lastName')" required>
             <UInput v-model="address.lastName" autocomplete="family-name" class="w-full" />
           </UFormField>
         </div>
 
-        <UFormField name="email" label="Email address" required>
+        <UFormField name="email" :label="t('checkout.form.email')" required>
           <UInput v-model="address.email" type="email" autocomplete="email" class="w-full" />
         </UFormField>
 
         <div class="grid grid-cols-1 sm:grid-cols-[2fr_1fr] gap-5">
-          <UFormField name="street" label="Street" required>
+          <UFormField name="street" :label="t('checkout.form.street')" required>
             <UInput v-model="address.street" autocomplete="address-line1" class="w-full" @change="onStreetChange" />
           </UFormField>
-          <UFormField name="houseNumber" label="House number" required>
+          <UFormField name="houseNumber" :label="t('checkout.form.houseNumber')" required>
             <UInput v-model="address.houseNumber" autocomplete="address-line2" class="w-full" />
           </UFormField>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-[1fr_2fr_1fr] gap-5">
-          <UFormField name="postalCode" label="Postal code" required>
+          <UFormField name="postalCode" :label="t('checkout.form.postalCode')" required>
             <UInput v-model="address.postalCode" autocomplete="postal-code" class="w-full" />
           </UFormField>
-          <UFormField name="city" label="City" required>
+          <UFormField name="city" :label="t('checkout.form.city')" required>
             <UInput v-model="address.city" autocomplete="address-level2" class="w-full" />
           </UFormField>
-          <UFormField name="country" label="Country" required>
-            <USelect
-              v-model="address.country"
-              :items="checkoutCountries.map((country) => ({label: country.label, value: country.code as string}))"
-              class="w-full"
-            />
+          <UFormField name="country" :label="t('checkout.form.country')" required>
+            <USelect v-model="address.country" :items="countryItems" class="w-full" />
           </UFormField>
         </div>
 
@@ -173,13 +188,19 @@ async function onPay() {
           :description="addressError"
         />
 
-        <UButton type="submit" label="Continue to shipping" size="lg" class="self-end" :loading="submittingAddress" />
+        <UButton
+          type="submit"
+          :label="t('checkout.continueToShipping')"
+          size="lg"
+          class="self-end"
+          :loading="submittingAddress"
+        />
       </UForm>
     </UCard>
 
     <UCard v-else-if="step === 'shipping'">
       <div class="flex flex-col gap-5">
-        <h2 class="text-xl font-semibold">2. Shipping method</h2>
+        <h2 class="text-xl font-semibold">{{ t('checkout.steps.shipping.heading') }}</h2>
 
         <URadioGroup v-model="selectedOptionId" :items="shippingOptionItems" />
 
@@ -192,9 +213,9 @@ async function onPay() {
         />
 
         <div class="flex justify-between">
-          <UButton label="Back" color="neutral" variant="ghost" @click="step = 'address'" />
+          <UButton :label="t('checkout.back')" color="neutral" variant="ghost" @click="step = 'address'" />
           <UButton
-            label="Continue to review"
+            :label="t('checkout.continueToReview')"
             size="lg"
             :disabled="!selectedOptionId"
             :loading="submittingShipping"
@@ -206,10 +227,10 @@ async function onPay() {
 
     <UCard v-else>
       <div class="flex flex-col gap-6">
-        <h2 class="text-xl font-semibold">Review your order</h2>
+        <h2 class="text-xl font-semibold">{{ t('checkout.steps.review.heading') }}</h2>
 
         <div class="flex flex-col gap-2">
-          <p class="font-semibold">Shipping to</p>
+          <p class="font-semibold">{{ t('checkout.shippingTo') }}</p>
           <p class="text-slate-300">
             {{ address.firstName }} {{ address.lastName }}<br />
             {{ address.street }} {{ address.houseNumber }}<br />
@@ -240,8 +261,8 @@ async function onPay() {
         />
 
         <div class="flex justify-between">
-          <UButton label="Back" color="neutral" variant="ghost" @click="step = 'shipping'" />
-          <UButton label="Pay" size="lg" :loading="submittingPayment" @click="onPay" />
+          <UButton :label="t('checkout.back')" color="neutral" variant="ghost" @click="step = 'shipping'" />
+          <UButton :label="t('checkout.pay')" size="lg" :loading="submittingPayment" @click="onPay" />
         </div>
       </div>
     </UCard>
