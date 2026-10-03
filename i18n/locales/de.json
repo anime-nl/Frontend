@@ -1,6 +1,7 @@
 {
   "common": {
     "appName": "AnimeNL",
+    "underConstruction": "Diese Website befindet sich noch im Aufbau! Wenn Sie auf Probleme mit der Website stoßen, kontaktieren Sie uns bitte über die Support-Seite.",
     "greeting": "Hallo {name}",
     "countries": {
       "NL": "Niederlande",

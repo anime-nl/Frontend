@@ -2,18 +2,21 @@
 const {
   public: {gaEnabled}
 } = useRuntimeConfig()
+const {t} = useI18n()
+
+const i18nHead = useLocaleHead()
+useHead(() => ({
+  htmlAttrs: {lang: i18nHead.value.htmlAttrs?.lang},
+  link: [...(i18nHead.value.link || [])],
+  meta: [...(i18nHead.value.meta || [])]
+}))
 </script>
 
 <template>
   <UApp>
     <Navbar />
 
-    <UBanner
-      class="z-0"
-      close
-      icon="i-lucide-info"
-      title="This website is still under construction! If you encounter any problems with the site, please contact us via the Support page."
-    />
+    <UBanner class="z-0" close icon="i-lucide-info" :title="t('common.underConstruction')" />
 
     <CookieConsentBanner :ga-enabled="gaEnabled" />
 

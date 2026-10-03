@@ -19,26 +19,48 @@ async function callRoute() {
     return (handler as (event: H3Event) => Promise<unknown>)({} as H3Event)
 }
 
+const alternativesFor = (id: string) => [
+    {hreflang: 'nl-NL', href: `/product/${id}`},
+    {hreflang: 'en-GB', href: `/en/product/${id}`},
+    {hreflang: 'de-DE', href: `/de/product/${id}`}
+]
+
 describe('GET /api/sitemap-urls', () => {
-    it('returns a sitemap entry for every product', async () => {
+    it('returns one entry per locale for every product, cross-linked via alternatives', async () => {
         medusaFetch.mockResolvedValue({
-            products: [
-                {id: 'prod_1', updated_at: '2026-01-01T00:00:00.000Z'},
-                {id: 'prod_2', updated_at: '2026-01-02T00:00:00.000Z'}
-            ],
-            count: 2
+            products: [{id: 'prod_1', updated_at: '2026-01-01T00:00:00.000Z'}],
+            count: 1
         })
 
         await expect(callRoute()).resolves.toEqual([
-            {loc: '/product/prod_1', lastmod: '2026-01-01T00:00:00.000Z'},
-            {loc: '/product/prod_2', lastmod: '2026-01-02T00:00:00.000Z'}
+            {
+                loc: '/product/prod_1',
+                lastmod: '2026-01-01T00:00:00.000Z',
+                _sitemap: 'nl-NL',
+                alternatives: alternativesFor('prod_1')
+            },
+            {
+                loc: '/en/product/prod_1',
+                lastmod: '2026-01-01T00:00:00.000Z',
+                _sitemap: 'en-GB',
+                alternatives: alternativesFor('prod_1')
+            },
+            {
+                loc: '/de/product/prod_1',
+                lastmod: '2026-01-01T00:00:00.000Z',
+                _sitemap: 'de-DE',
+                alternatives: alternativesFor('prod_1')
+            }
         ])
     })
 
     it('omits lastmod for a product with no updated_at', async () => {
         medusaFetch.mockResolvedValue({products: [{id: 'prod_1', updated_at: null}], count: 1})
 
-        await expect(callRoute()).resolves.toEqual([{loc: '/product/prod_1', lastmod: undefined}])
+        const urls = (await callRoute()) as {lastmod?: string}[]
+
+        expect(urls).toHaveLength(3)
+        expect(urls.every((url) => url.lastmod === undefined)).toBe(true)
     })
 
     it('pages through the full catalog when it is larger than one page', async () => {
@@ -64,8 +86,9 @@ describe('GET /api/sitemap-urls', () => {
         expect(medusaFetch).toHaveBeenNthCalledWith(2, expect.anything(), 'products', {
             query: {limit: 100, offset: 100, fields: 'id,updated_at'}
         })
-        expect(urls).toHaveLength(101)
-        expect(urls.at(-1)).toEqual({loc: '/product/prod_100', lastmod: '2026-01-01T00:00:00.000Z'})
+        // 101 products × 3 locales
+        expect(urls).toHaveLength(303)
+        expect(urls.at(-1)?.loc).toBe('/de/product/prod_100')
     })
 
     it('answers 500 when Medusa fails, instead of crashing the sitemap route', async () => {
