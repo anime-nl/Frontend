@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const {t} = useI18n()
 const route = useRoute()
 const customer = useCustomer()
 const failed = ref(false)
@@ -19,10 +20,10 @@ onMounted(async () => {
 
 <template>
   <UContainer v-if="failed" class="flex flex-col items-center gap-6 py-16 text-center">
-    <p>Something went wrong signing you in.</p>
-    <UButton to="/account/login">Try again</UButton>
+    <p>{{ t('account.callback.failed') }}</p>
+    <UButton to="/account/login">{{ t('account.callback.tryAgain') }}</UButton>
   </UContainer>
   <UContainer v-else class="flex flex-col items-center gap-6 py-16 text-center">
-    <p>Signing you in…</p>
+    <p>{{ t('account.callback.signingIn') }}</p>
   </UContainer>
 </template>

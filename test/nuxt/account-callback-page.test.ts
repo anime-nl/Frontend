@@ -45,7 +45,7 @@ describe('account OAuth callback page', () => {
         callbackShouldFail = true
         wrapper = await mountCallback()
 
-        await vi.waitFor(() => expect(wrapper!.text().toLowerCase()).toContain('went wrong'))
+        await vi.waitFor(() => expect(wrapper!.text().toLowerCase()).toContain('ging iets mis'))
         expect(wrapper.find('a[href="/account/login"]').exists()).toBe(true)
         expect(navigateToMock).not.toHaveBeenCalled()
     })

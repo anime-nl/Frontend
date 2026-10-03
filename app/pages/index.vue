@@ -1,9 +1,6 @@
 <script lang="ts" setup>
-useSeoMeta({
-  title: 'Home',
-  description:
-    'Shop TCG cards, figures, plushies and keychains at AnimeNL, the Dutch webshop for anime merchandise. Fast shipping and easy 14-day returns.'
-})
+const {t} = useI18n()
+useSeoMeta({title: t('home.title'), description: t('home.description')})
 </script>
 
 <template>

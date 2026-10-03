@@ -51,7 +51,7 @@ describe('account page', () => {
         signedIn = false
         wrapper = await mountAccount()
 
-        expect(wrapper.text().toLowerCase()).toContain('sign in')
+        expect(wrapper.text().toLowerCase()).toContain('inloggen')
         expect(wrapper.find('a[href="/account/login"]').exists()).toBe(true)
         expect(ordersCallCount).toBe(0)
     })
@@ -60,13 +60,13 @@ describe('account page', () => {
         wrapper = await mountAccount()
 
         expect(wrapper.text()).toContain('jan@example.nl')
-        expect(wrapper.text().toLowerCase()).toContain('log out')
+        expect(wrapper.text().toLowerCase()).toContain('uitloggen')
     })
 
     it('shows a message when there are no orders yet', async () => {
         wrapper = await mountAccount()
 
-        expect(wrapper.text().toLowerCase()).toContain('no orders')
+        expect(wrapper.text().toLowerCase()).toContain('nog geen bestellingen')
     })
 
     it('shows order history when there are orders', async () => {
@@ -89,11 +89,11 @@ describe('account page', () => {
 
         const logoutButton = wrapper
             .findAllComponents({name: 'UButton'})
-            .find((button) => button.text().toLowerCase().includes('log out'))
+            .find((button) => button.text().toLowerCase().includes('uitloggen'))
         await logoutButton!.trigger('click')
 
         expect(logoutCallCount).toBe(1)
-        await vi.waitFor(() => expect(wrapper!.text().toLowerCase()).toContain('sign in'))
+        await vi.waitFor(() => expect(wrapper!.text().toLowerCase()).toContain('inloggen'))
     })
 
     it('forwards the /api/account/me response onto the real browser response during SSR', async () => {

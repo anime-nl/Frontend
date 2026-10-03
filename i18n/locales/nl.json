@@ -88,14 +88,33 @@
   },
   "search": {
     "placeholder": "Zoek naar TCG-kaarten, figuren, pluchen en meer...",
-    "button": "Zoeken"
+    "button": "Zoeken",
+    "pageTitle": "Zoeken",
+    "pageDescription": "Doorzoek de volledige AnimeNL-catalogus met TCG-kaarten, figuren, pluchen en sleutelhangers op zoekwoord, serie of categorie.",
+    "heading": "Zoeken",
+    "inputPlaceholder": "Producten zoeken...",
+    "collectionLabel": "Collectie",
+    "allCollections": "Alle collecties",
+    "categoryLabel": "Categorie",
+    "allCategories": "Alle categorieën",
+    "noResults": "Geen producten gevonden die aan je criteria voldoen.",
+    "clearFilters": "Filters wissen",
+    "loadingMore": "Meer producten laden...",
+    "endOfCatalog": "Je hebt het einde van de catalogus bereikt."
   },
   "home": {
+    "title": "Home",
+    "description": "Koop TCG-kaarten, figuren, pluchen en sleutelhangers bij AnimeNL, de Nederlandse webshop voor anime merchandise. Snelle verzending en eenvoudig 14 dagen retourneren.",
     "newProducts": "Nieuwe producten",
     "discover": "Ontdekken",
     "loadingMore": "Meer producten laden..."
   },
   "cart": {
+    "title": "Je winkelwagen",
+    "removeItemAriaLabel": "Artikel verwijderen",
+    "checkoutButton": "Afrekenen",
+    "emptyMessage": "Je winkelwagen is leeg.",
+    "continueShopping": "Verder winkelen",
     "priceExclVat": "Prijs excl. btw",
     "vat": "Btw",
     "discount": "Korting",
@@ -168,6 +187,17 @@
     "signInTitle": "Inloggen",
     "signInOptional": "Inloggen is optioneel — je kunt ook als gast afrekenen zonder account.",
     "signInError": "Kon niet inloggen. Probeer het zo opnieuw.",
+    "signInPrompt": "Log in om je account en eerdere bestellingen te zien.",
+    "accountHeading": "Je account",
+    "logOut": "Uitloggen",
+    "orderHistory": "Bestelgeschiedenis",
+    "noOrders": "Je hebt nog geen bestellingen.",
+    "orderNumber": "Bestelling #{number}",
+    "callback": {
+      "signingIn": "Je wordt ingelogd…",
+      "failed": "Er ging iets mis bij het inloggen.",
+      "tryAgain": "Opnieuw proberen"
+    },
     "oauth": {
       "google": "Doorgaan met Google"
     }
@@ -196,6 +226,18 @@
       "postalCode": "Postcode",
       "city": "Plaats",
       "country": "Land"
+    },
+    "return": {
+      "completedTitle": "Bedankt voor je bestelling!",
+      "orderPlaced": "Bestelling #{number} is geplaatst.",
+      "viewOrders": "Bekijk je bestellingen",
+      "pendingTitle": "Betaling in behandeling",
+      "pendingBody": "We bevestigen je bestelling zodra je betaling is verwerkt.",
+      "failedTitle": "Betaling mislukt",
+      "failedBody": "Er ging iets mis met je betaling. Probeer het opnieuw.",
+      "backToCart": "Terug naar winkelwagen",
+      "idleTitle": "Niets te bevestigen",
+      "idleBody": "Er is geen lopende betaling voor deze browser."
     }
   },
   "support": {

@@ -1,11 +1,8 @@
 <script lang="ts" setup>
 import type {StoreProduct} from '@medusajs/types'
 
-useSeoMeta({
-  title: 'Search',
-  description:
-    'Search the full AnimeNL catalog of TCG cards, figures, plushies and keychains by keyword, series or category.'
-})
+const {t} = useI18n()
+useSeoMeta({title: t('search.pageTitle'), description: t('search.pageDescription')})
 
 interface Collection {
   id: string
@@ -166,25 +163,27 @@ onUnmounted(() => {
     <aside class="w-full md:w-72 shrink-0">
       <div class="sticky top-8 space-y-6 p-6 rounded-2xl border border-sky-200/20 bg-slate-900">
         <div>
-          <label for="search-input" class="block text-xl font-bold mb-3">Search</label>
+          <label for="search-input" class="block text-xl font-bold mb-3">{{ t('search.heading') }}</label>
           <input
             id="search-input"
             v-model="filters.q"
             type="text"
-            placeholder="Search products..."
+            :placeholder="t('search.inputPlaceholder')"
             class="w-full bg-slate-900 border border-sky-200/40 rounded-xl p-3 text-sm focus:ring-2 hover:ring-sky-400 hover:border-sky-400 outline-none placeholder-slate-400 transition-colors"
           />
         </div>
 
         <div>
-          <label for="collection-select" class="block font-semibold mb-2 text-sky-200">Collection</label>
+          <label for="collection-select" class="block font-semibold mb-2 text-sky-200">{{
+            t('search.collectionLabel')
+          }}</label>
           <select
             id="collection-select"
             ref="collectionSelect"
             v-model="filters.collection"
             class="w-full bg-slate-900 border border-sky-200/40 rounded-xl p-3 text-sm text-white focus:ring-2 hover:ring-sky-400 outline-none transition-colors"
           >
-            <option value="">All Collections</option>
+            <option value="">{{ t('search.allCollections') }}</option>
             <option v-for="col in availableCollections" :key="col.id" :value="col.id">
               {{ col.title }}
             </option>
@@ -192,13 +191,15 @@ onUnmounted(() => {
         </div>
 
         <div>
-          <label for="category-select" class="block font-semibold mb-2 text-sky-200">Category</label>
+          <label for="category-select" class="block font-semibold mb-2 text-sky-200">{{
+            t('search.categoryLabel')
+          }}</label>
           <select
             id="category-select"
             v-model="filters.category"
             class="w-full bg-slate-900 border border-sky-200/40 rounded-xl p-3 text-sm text-white focus:ring-2 hover:ring-sky-400 outline-none transition-colors"
           >
-            <option value="">All Categories</option>
+            <option value="">{{ t('search.allCategories') }}</option>
             <option v-for="cat in availableCategories" :key="cat.id" :value="cat.id">
               {{ cat.name }}
             </option>
@@ -213,12 +214,12 @@ onUnmounted(() => {
       </div>
 
       <div v-if="!loading && products.length === 0" class="text-center py-20 text-slate-400">
-        <p class="text-lg">No products found matching your criteria.</p>
+        <p class="text-lg">{{ t('search.noResults') }}</p>
         <button
           class="mt-4 text-sky-400 hover:text-sky-200 underline transition-colors focus:outline-none"
           @click="resetFilters"
         >
-          Clear filters
+          {{ t('search.clearFilters') }}
         </button>
       </div>
 
@@ -237,10 +238,10 @@ onUnmounted(() => {
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
             />
           </svg>
-          <span class="text-sm font-medium text-sky-200">Loading more products...</span>
+          <span class="text-sm font-medium text-sky-200">{{ t('search.loadingMore') }}</span>
         </div>
         <div v-else-if="!hasMore && products.length > 0" class="text-sky-200/60 text-sm">
-          You've reached the end of the catalog.
+          {{ t('search.endOfCatalog') }}
         </div>
       </div>
     </main>

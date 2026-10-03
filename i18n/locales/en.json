@@ -88,14 +88,33 @@
   },
   "search": {
     "placeholder": "Search for TCG cards, figures, plushies and more...",
-    "button": "Search"
+    "button": "Search",
+    "pageTitle": "Search",
+    "pageDescription": "Search the full AnimeNL catalog of TCG cards, figures, plushies and keychains by keyword, series or category.",
+    "heading": "Search",
+    "inputPlaceholder": "Search products...",
+    "collectionLabel": "Collection",
+    "allCollections": "All Collections",
+    "categoryLabel": "Category",
+    "allCategories": "All Categories",
+    "noResults": "No products found matching your criteria.",
+    "clearFilters": "Clear filters",
+    "loadingMore": "Loading more products...",
+    "endOfCatalog": "You've reached the end of the catalog."
   },
   "home": {
+    "title": "Home",
+    "description": "Shop TCG cards, figures, plushies and keychains at AnimeNL, the Dutch webshop for anime merchandise. Fast shipping and easy 14-day returns.",
     "newProducts": "New Products",
     "discover": "Discover",
     "loadingMore": "Loading more products..."
   },
   "cart": {
+    "title": "Your cart",
+    "removeItemAriaLabel": "Remove item",
+    "checkoutButton": "Checkout",
+    "emptyMessage": "Your cart is empty.",
+    "continueShopping": "Continue shopping",
     "priceExclVat": "Price excl. VAT",
     "vat": "VAT",
     "discount": "Discount",
@@ -165,6 +184,17 @@
     "signInTitle": "Sign in",
     "signInOptional": "Signing in is optional — you can check out as a guest without an account.",
     "signInError": "Could not start sign-in. Please try again in a moment.",
+    "signInPrompt": "Sign in to see your account and past orders.",
+    "accountHeading": "Your account",
+    "logOut": "Log out",
+    "orderHistory": "Order history",
+    "noOrders": "You have no orders yet.",
+    "orderNumber": "Order #{number}",
+    "callback": {
+      "signingIn": "Signing you in…",
+      "failed": "Something went wrong signing you in.",
+      "tryAgain": "Try again"
+    },
     "oauth": {
       "google": "Continue with Google"
     }
@@ -193,6 +223,18 @@
       "postalCode": "Postal code",
       "city": "City",
       "country": "Country"
+    },
+    "return": {
+      "completedTitle": "Thank you for your order!",
+      "orderPlaced": "Order #{number} has been placed.",
+      "viewOrders": "View your orders",
+      "pendingTitle": "Payment pending",
+      "pendingBody": "We'll confirm your order once your payment clears.",
+      "failedTitle": "Payment failed",
+      "failedBody": "Something went wrong with your payment. Please try again.",
+      "backToCart": "Back to cart",
+      "idleTitle": "Nothing to confirm here",
+      "idleBody": "There is no payment in progress for this browser."
     }
   },
   "support": {

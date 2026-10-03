@@ -31,10 +31,10 @@ describe('POST /api/checkout/complete', () => {
 })
 
 describe('checkout return page', () => {
-    it('renders the neutral state gracefully when there is no cart', async () => {
+    it('renders the neutral state gracefully when there is no cart, in the default (Dutch) locale', async () => {
         const html = await $fetch<string>('/checkout/return')
 
-        expect(html).toContain('Nothing to confirm here')
+        expect(html).toContain('Niets te bevestigen')
     })
 
     // No Medusa backend is available in this test environment, so this also covers the return page
@@ -46,6 +46,6 @@ describe('checkout return page', () => {
     it('renders the pending state gracefully when Medusa is unreachable', async () => {
         const html = await $fetch<string>('/checkout/return', {headers: {cookie: 'cart_id=cart_fake'}})
 
-        expect(html).toContain('Payment pending')
+        expect(html).toContain('Betaling in behandeling')
     })
 })

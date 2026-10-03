@@ -14,10 +14,10 @@ describe('account pages', () => {
         expect(html).toContain('Doorgaan met Google')
     })
 
-    it('/account prompts a first-time visitor to sign in', async () => {
+    it('/account prompts a first-time visitor to sign in, in the default (Dutch) locale', async () => {
         const html = await $fetch<string>('/account')
 
-        expect(html).toContain('Sign in to see your account')
+        expect(html).toContain('Log in om je account')
     })
 
     // No Medusa backend is available in this test environment, so this also covers /account
@@ -25,7 +25,7 @@ describe('account pages', () => {
     it('/account still renders when it has a session cookie but Medusa is unreachable', async () => {
         const html = await $fetch<string>('/account', {headers: {cookie: 'medusa_session=tok_fake'}})
 
-        expect(html).toContain('Sign in to see your account')
+        expect(html).toContain('Log in om je account')
     })
 
     // The sign-in exchange must happen from the browser, not during server-side rendering: an
@@ -36,8 +36,8 @@ describe('account pages', () => {
         const response = await fetch('/account/callback/google?code=abc&state=xyz')
         const html = await response.text()
 
-        expect(html).toContain('Signing you in')
-        expect(html).not.toContain('Something went wrong signing you in')
+        expect(html).toContain('wordt ingelogd')
+        expect(html).not.toContain('ging iets mis bij het inloggen')
         // The i18n module sets its own locale-detection cookie on every response; only a session
         // cookie here would mean a sign-in was (wrongly) attempted during SSR.
         expect(response.headers.get('set-cookie')).not.toContain(SESSION_COOKIE)

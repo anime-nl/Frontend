@@ -88,14 +88,33 @@
   },
   "search": {
     "placeholder": "Suchen Sie nach TCG-Karten, Figuren, Plüschtieren und mehr...",
-    "button": "Suchen"
+    "button": "Suchen",
+    "pageTitle": "Suchen",
+    "pageDescription": "Durchsuchen Sie den gesamten AnimeNL-Katalog mit TCG-Karten, Figuren, Plüschtieren und Schlüsselanhängern nach Stichwort, Serie oder Kategorie.",
+    "heading": "Suchen",
+    "inputPlaceholder": "Produkte suchen...",
+    "collectionLabel": "Kollektion",
+    "allCollections": "Alle Kollektionen",
+    "categoryLabel": "Kategorie",
+    "allCategories": "Alle Kategorien",
+    "noResults": "Keine Produkte gefunden, die Ihren Kriterien entsprechen.",
+    "clearFilters": "Filter zurücksetzen",
+    "loadingMore": "Weitere Produkte werden geladen...",
+    "endOfCatalog": "Sie haben das Ende des Katalogs erreicht."
   },
   "home": {
+    "title": "Home",
+    "description": "Kaufen Sie TCG-Karten, Figuren, Plüschtiere und Schlüsselanhänger bei AnimeNL, dem niederländischen Webshop für Anime-Merchandise. Schneller Versand und einfache 14-tägige Rückgabe.",
     "newProducts": "Neue Produkte",
     "discover": "Entdecken",
     "loadingMore": "Weitere Produkte werden geladen..."
   },
   "cart": {
+    "title": "Ihr Warenkorb",
+    "removeItemAriaLabel": "Artikel entfernen",
+    "checkoutButton": "Zur Kasse",
+    "emptyMessage": "Ihr Warenkorb ist leer.",
+    "continueShopping": "Weiter einkaufen",
     "priceExclVat": "Preis exkl. MwSt.",
     "vat": "MwSt.",
     "discount": "Rabatt",
@@ -180,6 +199,17 @@
     "signInTitle": "Anmelden",
     "signInOptional": "Die Anmeldung ist optional — Sie können auch als Gast ohne Konto bezahlen.",
     "signInError": "Anmeldung konnte nicht gestartet werden. Bitte versuchen Sie es gleich erneut.",
+    "signInPrompt": "Melden Sie sich an, um Ihr Konto und frühere Bestellungen zu sehen.",
+    "accountHeading": "Ihr Konto",
+    "logOut": "Abmelden",
+    "orderHistory": "Bestellverlauf",
+    "noOrders": "Sie haben noch keine Bestellungen.",
+    "orderNumber": "Bestellung #{number}",
+    "callback": {
+      "signingIn": "Sie werden angemeldet…",
+      "failed": "Bei der Anmeldung ist etwas schiefgegangen.",
+      "tryAgain": "Erneut versuchen"
+    },
     "oauth": {
       "google": "Weiter mit Google"
     }
@@ -208,6 +238,18 @@
       "postalCode": "Postleitzahl",
       "city": "Stadt",
       "country": "Land"
+    },
+    "return": {
+      "completedTitle": "Vielen Dank für Ihre Bestellung!",
+      "orderPlaced": "Bestellung #{number} wurde aufgegeben.",
+      "viewOrders": "Ihre Bestellungen ansehen",
+      "pendingTitle": "Zahlung ausstehend",
+      "pendingBody": "Wir bestätigen Ihre Bestellung, sobald Ihre Zahlung verarbeitet wurde.",
+      "failedTitle": "Zahlung fehlgeschlagen",
+      "failedBody": "Bei Ihrer Zahlung ist etwas schiefgegangen. Bitte versuchen Sie es erneut.",
+      "backToCart": "Zurück zum Warenkorb",
+      "idleTitle": "Hier gibt es nichts zu bestätigen",
+      "idleBody": "Für diesen Browser ist keine Zahlung in Bearbeitung."
     }
   },
   "support": {

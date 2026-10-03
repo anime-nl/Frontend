@@ -156,7 +156,7 @@ describe('cart page', () => {
         cart = {...cartWithItems, items: []}
         wrapper = await mountCart()
 
-        expect(wrapper.text().toLowerCase()).toContain('empty')
+        expect(wrapper.text().toLowerCase()).toContain('leeg')
     })
 
     it('removing an item calls the delete endpoint', async () => {
