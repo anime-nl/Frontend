@@ -2,14 +2,15 @@
 // Not linked from navigation and duplicates /search without its filters, so keep it out of search results.
 useSeoMeta({robots: 'noindex'})
 
+const {t} = useI18n()
 const {data, pending, error} = await useFetch('/api/products')
 </script>
 
 <template>
   <div>
-    <p v-if="pending">Loading...</p>
+    <p v-if="pending">{{ t('products.loading') }}</p>
 
-    <p v-if="error">Something went wrong while loading the products</p>
+    <p v-if="error">{{ t('products.loadError') }}</p>
 
     <div v-if="data">
       <ProductCard v-for="product in data.products" :key="product.id" :product="product" />

@@ -1,12 +1,16 @@
 <script setup lang="ts">
-useSeoMeta({title: 'Noodle Stoppers', description: 'Figures with a function'})
+const {t} = useI18n()
+useSeoMeta({
+  title: t('products.categories.noodleStoppers.seoTitle'),
+  description: t('products.categories.noodleStoppers.description')
+})
 </script>
 
 <template>
   <CategoryPage
-    badge="Figures"
-    description="Figures with a function"
+    :badge="t('products.badges.figures')"
+    :description="t('products.categories.noodleStoppers.description')"
     handle="noodle-stoppers"
-    title="Noodle Stoppers"
+    :title="t('products.categories.noodleStoppers.heading')"
   />
 </template>

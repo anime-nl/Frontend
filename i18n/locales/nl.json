@@ -14,7 +14,77 @@
   },
   "products": {
     "emptyCategory": "Nog geen producten in deze categorie.",
-    "priceUnavailable": "Prijs niet beschikbaar"
+    "priceUnavailable": "Prijs niet beschikbaar",
+    "loading": "Laden...",
+    "loadError": "Er ging iets mis bij het laden van de producten",
+    "badges": {
+      "tcg": "TCG",
+      "figures": "Figuren",
+      "plushies": "Knuffels",
+      "keychains": "Sleutelhangers"
+    },
+    "categories": {
+      "tcg": {
+        "seoTitle": "TCG",
+        "heading": "Trading Card Game (TCG) Collectie",
+        "description": "Bekijk onze volledige catalogus met Trading Card Game-producten."
+      },
+      "singles": {
+        "seoTitle": "TCG Losse kaarten",
+        "heading": "Losse kaarten",
+        "description": "Koop losse kaarten in bulk."
+      },
+      "packs": {
+        "seoTitle": "TCG Pakjes",
+        "heading": "Pakjes",
+        "description": "Waag je geluk met losse pakjes."
+      },
+      "boosters": {
+        "seoTitle": "TCG Boosterboxen",
+        "heading": "Boosterboxen",
+        "description": "Koop dozen vol pakjes en extra's."
+      },
+      "figures": {
+        "seoTitle": "Figuren",
+        "heading": "Figuren Collectie",
+        "description": "Bekijk onze volledige catalogus met figuren."
+      },
+      "prizeFigures": {
+        "seoTitle": "Prijsfiguren",
+        "heading": "Prijsfiguren",
+        "description": "Mooie figuren voor lage prijzen."
+      },
+      "scaleFigures": {
+        "seoTitle": "Schaalfiguren",
+        "heading": "Schaalfiguren",
+        "description": "Geweldig om mee te decoreren."
+      },
+      "noodleStoppers": {
+        "seoTitle": "Noodle Stoppers",
+        "heading": "Noodle Stoppers",
+        "description": "Figuren met een functie"
+      },
+      "plush": {
+        "seoTitle": "Knuffels",
+        "heading": "Knuffels Collectie",
+        "description": "Bekijk onze volledige catalogus met knuffels."
+      },
+      "keychains": {
+        "seoTitle": "Sleutelhangers",
+        "heading": "Sleutelhangers Collectie",
+        "description": "Bekijk onze volledige catalogus met sleutelhangers."
+      },
+      "acrylic": {
+        "seoTitle": "Acrylen sleutelhangers",
+        "heading": "Acryl sleutelhangers",
+        "description": "Een brede selectie goedkope sleutelhangers."
+      },
+      "metal": {
+        "seoTitle": "Metalen sleutelhangers",
+        "heading": "Metalen sleutelhangers",
+        "description": "Supersterke sleutelhangers."
+      }
+    }
   },
   "search": {
     "placeholder": "Zoek naar TCG-kaarten, figuren, pluchen en meer...",

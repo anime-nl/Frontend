@@ -14,7 +14,77 @@
   },
   "products": {
     "emptyCategory": "No products in this category yet.",
-    "priceUnavailable": "Price unavailable"
+    "priceUnavailable": "Price unavailable",
+    "loading": "Loading...",
+    "loadError": "Something went wrong while loading the products",
+    "badges": {
+      "tcg": "TCG",
+      "figures": "Figures",
+      "plushies": "Plushies",
+      "keychains": "Keychains"
+    },
+    "categories": {
+      "tcg": {
+        "seoTitle": "TCG",
+        "heading": "Trading Card Game (TCG) Collection",
+        "description": "Browse our entire catalog of Trading Card Game products."
+      },
+      "singles": {
+        "seoTitle": "TCG Singles",
+        "heading": "Singles",
+        "description": "Buy single cards in bulk."
+      },
+      "packs": {
+        "seoTitle": "TCG Packs",
+        "heading": "Packs",
+        "description": "Test your luck with single packs."
+      },
+      "boosters": {
+        "seoTitle": "TCG Booster Boxes",
+        "heading": "Booster Boxes",
+        "description": "Buy boxes filled with packs and extras."
+      },
+      "figures": {
+        "seoTitle": "Figures",
+        "heading": "Figures Collection",
+        "description": "Browse our entire catalog of figures."
+      },
+      "prizeFigures": {
+        "seoTitle": "Prize Figures",
+        "heading": "Prize Figures",
+        "description": "Great figures for low prices."
+      },
+      "scaleFigures": {
+        "seoTitle": "Scale Figures",
+        "heading": "Scale Figures",
+        "description": "Great for decorating."
+      },
+      "noodleStoppers": {
+        "seoTitle": "Noodle Stoppers",
+        "heading": "Noodle Stoppers",
+        "description": "Figures with a function"
+      },
+      "plush": {
+        "seoTitle": "Plushies",
+        "heading": "Plushies Collection",
+        "description": "Browse our entire catalog of plushies."
+      },
+      "keychains": {
+        "seoTitle": "Keychains",
+        "heading": "Keychains Collection",
+        "description": "Browse our entire catalog of keychains."
+      },
+      "acrylic": {
+        "seoTitle": "Acrylic Keychains",
+        "heading": "Acrylic keychains",
+        "description": "A wide selection of cheap keychains."
+      },
+      "metal": {
+        "seoTitle": "Metal Keychains",
+        "heading": "Metal keychains",
+        "description": "Super durable keychains."
+      }
+    }
   },
   "search": {
     "placeholder": "Search for TCG cards, figures, plushies and more...",

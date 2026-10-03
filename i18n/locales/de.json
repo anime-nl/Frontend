@@ -14,7 +14,77 @@
   },
   "products": {
     "emptyCategory": "Noch keine Produkte in dieser Kategorie.",
-    "priceUnavailable": "Preis nicht verfügbar"
+    "priceUnavailable": "Preis nicht verfügbar",
+    "loading": "Wird geladen...",
+    "loadError": "Beim Laden der Produkte ist etwas schiefgegangen",
+    "badges": {
+      "tcg": "TCG",
+      "figures": "Figuren",
+      "plushies": "Plüschtiere",
+      "keychains": "Schlüsselanhänger"
+    },
+    "categories": {
+      "tcg": {
+        "seoTitle": "TCG",
+        "heading": "Trading Card Game (TCG) Kollektion",
+        "description": "Entdecken Sie unseren gesamten Katalog an Trading-Card-Game-Produkten."
+      },
+      "singles": {
+        "seoTitle": "TCG Einzelkarten",
+        "heading": "Einzelkarten",
+        "description": "Kaufen Sie einzelne Karten in großen Mengen."
+      },
+      "packs": {
+        "seoTitle": "TCG Booster-Packs",
+        "heading": "Booster-Packs",
+        "description": "Versuchen Sie Ihr Glück mit einzelnen Boostern."
+      },
+      "boosters": {
+        "seoTitle": "TCG Booster-Boxen",
+        "heading": "Booster-Boxen",
+        "description": "Kaufen Sie Boxen voller Booster und Extras."
+      },
+      "figures": {
+        "seoTitle": "Figuren",
+        "heading": "Figuren Kollektion",
+        "description": "Entdecken Sie unseren gesamten Katalog an Figuren."
+      },
+      "prizeFigures": {
+        "seoTitle": "Preisfiguren",
+        "heading": "Preisfiguren",
+        "description": "Tolle Figuren zu niedrigen Preisen."
+      },
+      "scaleFigures": {
+        "seoTitle": "Sammelfiguren",
+        "heading": "Sammelfiguren",
+        "description": "Toll zum Dekorieren."
+      },
+      "noodleStoppers": {
+        "seoTitle": "Noodle Stoppers",
+        "heading": "Noodle Stoppers",
+        "description": "Figuren mit einer Funktion"
+      },
+      "plush": {
+        "seoTitle": "Plüschtiere",
+        "heading": "Plüschtiere Kollektion",
+        "description": "Entdecken Sie unseren gesamten Katalog an Plüschtieren."
+      },
+      "keychains": {
+        "seoTitle": "Schlüsselanhänger",
+        "heading": "Schlüsselanhänger Kollektion",
+        "description": "Entdecken Sie unseren gesamten Katalog an Schlüsselanhängern."
+      },
+      "acrylic": {
+        "seoTitle": "Acryl-Schlüsselanhänger",
+        "heading": "Acryl-Schlüsselanhänger",
+        "description": "Eine große Auswahl günstiger Schlüsselanhänger."
+      },
+      "metal": {
+        "seoTitle": "Metall-Schlüsselanhänger",
+        "heading": "Metall-Schlüsselanhänger",
+        "description": "Extrem robuste Schlüsselanhänger."
+      }
+    }
   },
   "search": {
     "placeholder": "Suchen Sie nach TCG-Karten, Figuren, Plüschtieren und mehr...",

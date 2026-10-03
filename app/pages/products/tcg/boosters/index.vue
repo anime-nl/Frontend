@@ -1,12 +1,16 @@
 <script setup lang="ts">
-useSeoMeta({title: 'TCG Booster Boxes', description: 'Buy boxes filled with packs and extras.'})
+const {t} = useI18n()
+useSeoMeta({
+  title: t('products.categories.boosters.seoTitle'),
+  description: t('products.categories.boosters.description')
+})
 </script>
 
 <template>
   <CategoryPage
-    badge="TCG"
-    description="Buy boxes filled with packs and extras."
+    :badge="t('products.badges.tcg')"
+    :description="t('products.categories.boosters.description')"
     handle="boosters"
-    title="Booster Boxes"
+    :title="t('products.categories.boosters.heading')"
   />
 </template>

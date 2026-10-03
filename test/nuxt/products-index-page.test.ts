@@ -35,10 +35,10 @@ describe('products index page', () => {
         )
     })
 
-    it('shows an error message when the products request fails', async () => {
+    it('shows an error message when the products request fails, in the default (Dutch) locale', async () => {
         shouldFail = true
         wrapper = await mountSuspended(ProductsIndexPage)
 
-        expect(wrapper.text()).toContain('Something went wrong while loading the products')
+        expect(wrapper.text()).toContain('Er ging iets mis bij het laden van de producten')
     })
 })
