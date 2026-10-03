@@ -32,6 +32,7 @@ beforeEach(() => {
 
 afterEach(() => {
     wrapper?.unmount()
+    document.cookie = 'i18n_redirected=; expires=Thu, 01 Jan 1970 00:00:00 GMT'
 })
 
 describe('account OAuth callback page', () => {
@@ -44,6 +45,17 @@ describe('account OAuth callback page', () => {
 
     it('redirects to the locale-prefixed /account on success when browsing a non-default locale', async () => {
         wrapper = await mountCallback('/en/account/callback/google?code=abc123&state=xyz')
+
+        await vi.waitFor(() => expect(navigateToMock).toHaveBeenCalledWith('/en/account'))
+    })
+
+    // Google always redirects back to the fixed, unprefixed callback URL registered with the OAuth
+    // app - it is never reached as /en/account/callback/... in real use, unlike the test above. The
+    // visitor's locale from before they left for Google is only recoverable from the cookie
+    // @nuxtjs/i18n already maintains.
+    it('redirects to the locale-prefixed /account using the i18n_redirected cookie, since the callback URL itself is always unprefixed', async () => {
+        document.cookie = 'i18n_redirected=en'
+        wrapper = await mountCallback('/account/callback/google?code=abc123&state=xyz')
 
         await vi.waitFor(() => expect(navigateToMock).toHaveBeenCalledWith('/en/account'))
     })

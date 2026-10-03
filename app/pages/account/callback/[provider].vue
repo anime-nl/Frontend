@@ -1,6 +1,12 @@
 <script setup lang="ts">
+import {isSupportedLocale} from '#shared/utils/i18n'
+
 const {t} = useI18n()
 const localePath = useLocalePath()
+// The provider always redirects back to this page's own fixed, unprefixed URL (it's registered as
+// such with the OAuth app), so the route itself carries no locale. The visitor's locale from
+// before they left for sign-in only survives in the cookie @nuxtjs/i18n already maintains.
+const cookieLocale = useCookieLocale()
 const route = useRoute()
 const customer = useCustomer()
 const failed = ref(false)
@@ -12,7 +18,7 @@ onMounted(async () => {
   try {
     await $fetch(`/api/auth/${route.params.provider}/callback`, {method: 'POST', body: route.query})
     await customer.refresh()
-    await navigateTo(localePath('/account'))
+    await navigateTo(localePath('/account', isSupportedLocale(cookieLocale.value) ? cookieLocale.value : undefined))
   } catch {
     failed.value = true
   }
