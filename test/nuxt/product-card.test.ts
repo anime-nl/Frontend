@@ -15,6 +15,15 @@ describe('product card', () => {
         expect(wrapper.find('a').attributes('href')).toBe('/product/prod_1')
     })
 
+    it('links to the locale-prefixed product page when browsing a non-default locale', async () => {
+        wrapper = await mountSuspended(ProductCard, {
+            route: '/en/search',
+            props: {product: {id: 'prod_1', title: 'Zhongli Keychain'}}
+        })
+
+        expect(wrapper.find('a').attributes('href')).toBe('/en/product/prod_1')
+    })
+
     it('shows the title', async () => {
         wrapper = await mountSuspended(ProductCard, {props: {product: {id: 'prod_1', title: 'Zhongli Keychain'}}})
 

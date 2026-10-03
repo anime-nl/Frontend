@@ -37,6 +37,7 @@ let lastDeletedItemId: string | undefined
 let lastPromotionBody: unknown
 let applyShouldFail = false
 let applyFailureStatusMessage = 'That promo code is not valid.'
+let applyFailureCode: string | undefined
 let removeShouldFail = false
 
 registerEndpoint('/api/cart', () => ({cart}))
@@ -44,7 +45,13 @@ registerEndpoint('/api/cart/promotions', {
     method: 'POST',
     handler: async (event) => {
         lastPromotionBody = await readBody(event)
-        if (applyShouldFail) throw createError({statusCode: 400, statusMessage: applyFailureStatusMessage})
+        if (applyShouldFail) {
+            throw createError({
+                statusCode: 400,
+                statusMessage: applyFailureStatusMessage,
+                data: applyFailureCode ? {code: applyFailureCode} : undefined
+            })
+        }
         cart = {...cartWithItems, promotions: [{id: 'promo_1', code: (lastPromotionBody as {code: string}).code}]}
         return {cart}
     }
@@ -90,6 +97,7 @@ beforeEach(() => {
     lastPromotionBody = undefined
     applyShouldFail = false
     applyFailureStatusMessage = 'That promo code is not valid.'
+    applyFailureCode = undefined
     removeShouldFail = false
     forwardSetCookieMock.mockClear()
 })
@@ -206,15 +214,19 @@ describe('cart page', () => {
         expect((wrapper.find('input[placeholder="Promocode"]').element as HTMLInputElement).value).toBe('')
     })
 
-    it('applying an invalid promo code shows an error and keeps the input value', async () => {
+    // The server tags a 400 with no Medusa-specific message as {data: {code: 'invalidPromoCode'}}
+    // (see server/api/cart/promotions.post.ts), since its own English fallback statusMessage can't
+    // be pre-translated; the client must show its own translated message for this code instead.
+    it('applying an invalid promo code shows a translated error and keeps the input value', async () => {
         applyShouldFail = true
+        applyFailureCode = 'invalidPromoCode'
         wrapper = await mountCart()
 
         await wrapper.find('input[placeholder="Promocode"]').setValue('BADCODE')
         const applyButton = wrapper.findAllComponents({name: 'UButton'}).find((button) => button.text() === 'Toepassen')
         await applyButton!.trigger('click')
 
-        await vi.waitFor(() => expect(wrapper!.text()).toContain('not valid'))
+        await vi.waitFor(() => expect(wrapper!.text()).toContain('Deze promocode is niet geldig.'))
         expect((wrapper.find('input[placeholder="Promocode"]').element as HTMLInputElement).value).toBe('BADCODE')
     })
 

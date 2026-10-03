@@ -218,6 +218,14 @@
     "orderHistory": "Order history",
     "noOrders": "You have no orders yet.",
     "orderNumber": "Order #{number}",
+    "orderStatus": {
+      "pending": "Pending",
+      "completed": "Completed",
+      "draft": "Draft",
+      "archived": "Archived",
+      "canceled": "Canceled",
+      "requires_action": "Requires action"
+    },
     "callback": {
       "signingIn": "Signing you in…",
       "failed": "Something went wrong signing you in.",

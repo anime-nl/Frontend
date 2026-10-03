@@ -33,7 +33,10 @@ export function decodeMimeMessage(raw: string): string {
     const blankLineIndex = headersDecoded.indexOf('\n\n')
     if (blankLineIndex === -1) return headersDecoded
 
-    const headers = headersDecoded.slice(0, blankLineIndex)
+    // RFC 5322 header folding: nodemailer wraps long plain-ASCII header lines (e.g. a long Subject)
+    // at a space, continuing on a line that starts with whitespace. Unfolding unwraps that back to
+    // a single space, same as it would render in any real mail client.
+    const headers = headersDecoded.slice(0, blankLineIndex).replace(/\n[ \t]+/g, ' ')
     const body = headersDecoded.slice(blankLineIndex + 2)
     return `${headers}\n\n${decodeQuotedPrintableRun(body.replace(/=\n/g, ''))}`
 }

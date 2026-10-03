@@ -83,17 +83,19 @@ describe('validateSupportRequest', () => {
     })
 
     it.each(['name', 'message'] as const)('requires %s', (field) => {
-        expect(errorCode({[field]: '   '}, field)).toBe('required')
+        expect(validateSupportRequest({...validRequest, [field]: '   '})).toEqual([{name: field, code: 'required'}])
     })
 
     it.each(['', 'jan', 'jan@', 'jan@example', 'jan @example.nl'])('rejects the email "%s"', (email) => {
-        expect(errorCode({email}, 'email')).toBe('invalidEmail')
+        expect(validateSupportRequest({...validRequest, email})).toEqual([{name: 'email', code: 'invalidEmail'}])
     })
 
     it('requires an order number for orders, shipping and returns', () => {
         for (const topic of ['orders', 'shipping', 'returns']) {
             const reason = findSupportTopic(topic)!.reasons[0]!
-            expect(errorCode({topic, reason, orderNumber: ''}, 'orderNumber'), topic).toBe('required')
+            expect(validateSupportRequest({...validRequest, topic, reason, orderNumber: ''}), topic).toEqual([
+                {name: 'orderNumber', code: 'required'}
+            ])
         }
     })
 
@@ -103,7 +105,9 @@ describe('validateSupportRequest', () => {
     })
 
     it('rejects a reason that belongs to another topic', () => {
-        expect(errorCode({reason: 'paymentFailed'}, 'reason')).toBe('invalidReason')
+        expect(validateSupportRequest({...validRequest, reason: 'paymentFailed'})).toEqual([
+            {name: 'reason', code: 'invalidReason'}
+        ])
     })
 
     it.each(['name', 'email', 'orderNumber', 'message'] as const)('limits the length of %s', (field) => {

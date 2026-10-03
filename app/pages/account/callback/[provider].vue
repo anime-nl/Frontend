@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const {t} = useI18n()
+const localePath = useLocalePath()
 const route = useRoute()
 const customer = useCustomer()
 const failed = ref(false)
@@ -11,7 +12,7 @@ onMounted(async () => {
   try {
     await $fetch(`/api/auth/${route.params.provider}/callback`, {method: 'POST', body: route.query})
     await customer.refresh()
-    await navigateTo('/account')
+    await navigateTo(localePath('/account'))
   } catch {
     failed.value = true
   }

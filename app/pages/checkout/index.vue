@@ -5,6 +5,7 @@ import type {AddressRequest} from '#shared/utils/checkout'
 import {formatCurrency} from '#shared/utils/currency'
 
 const {t, localeProperties} = useI18n()
+const localePath = useLocalePath()
 
 // useFetch dedupes by key, so whichever call with a given key runs first is the one that actually
 // fires and must carry the cookie-forwarding hook - not useCart's/useCustomer's own internal call.
@@ -13,7 +14,7 @@ await useFetch('/api/cart', {key: 'cart', onResponse: ({response}) => forwardSet
 const cart = useCart()
 
 if (!cart.items.value.length) {
-  await navigateTo('/cart')
+  await navigateTo(localePath('/cart'))
 }
 
 await useFetch('/api/account/me', {
@@ -36,6 +37,11 @@ const address = reactive<AddressRequest>({
   country: 'NL'
 })
 
+/**
+ * Adapts validateAddressRequest's codes to UForm's expected {name, message} shape.
+ * @param input Current form state
+ * @returns Translated field errors for UForm to display
+ */
 function validateAddress(input: AddressRequest) {
   return validateAddressRequest(input).map((error) => ({
     name: error.name,

@@ -71,12 +71,20 @@ describe('support pages', () => {
 
 describe('POST /api/support', () => {
     it.each([
-        ['nl', 'Retourneren & terugbetalen', 'Ik wil een artikel retourneren', 'Bestelnummer:'],
-        ['en', 'Returns & refunds', 'I want to return an item', 'Order number:'],
-        ['de', 'Rücksendungen & Rückerstattungen', 'Ich möchte einen Artikel zurücksenden', 'Bestellnummer:']
+        [
+            'nl',
+            'Subject: [Retourneren & terugbetalen] Bestelling 1001 - Ik wil een artikel retourneren',
+            'Bestelnummer: 1001'
+        ],
+        ['en', 'Subject: [Returns & refunds] Order 1001 - I want to return an item', 'Order number: 1001'],
+        [
+            'de',
+            'Subject: [Rücksendungen & Rückerstattungen] Bestellung 1001 - Ich möchte einen Artikel zurücksenden',
+            'Bestellnummer: 1001'
+        ]
     ] as const)(
         'emails the request to the support address, composed in %s',
-        async (locale, topicTitle, reasonText, orderLabel) => {
+        async (locale, expectedSubject, expectedOrderLine) => {
             const response = await postSupport(validRequest, undefined, locale)
 
             expect(response.status).toBe(200)
@@ -86,9 +94,8 @@ describe('POST /api/support', () => {
             expect(mail).toContain('From: info@animenl.nl')
             expect(mail).toContain('To: info@animenl.nl')
             expect(mail).toContain('Reply-To: Jan Jansen <jan@example.nl>')
-            expect(mail).toContain(`Subject: [${topicTitle}]`)
-            expect(mail).toContain(reasonText)
-            expect(mail).toContain(orderLabel)
+            expect(mail).toContain(expectedSubject)
+            expect(mail).toContain(expectedOrderLine)
             expect(mail).toContain('Please help')
         }
     )

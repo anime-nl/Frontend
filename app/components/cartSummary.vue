@@ -17,7 +17,13 @@ async function onApplyCode() {
     await cart.applyPromoCode(trimmed)
     code.value = ''
   } catch (error) {
-    promoError.value = (error as {statusMessage?: string}).statusMessage ?? t('cart.promoInvalid')
+    // ofetch's `error.data` is the whole H3 error response body, so a custom `data` field set via
+    // createError({data}) lands nested at `error.data.data`, not `error.data` itself.
+    const {statusMessage, data} = error as {statusMessage?: string; data?: {data?: {code?: string}}}
+    // A stable `code` means the server had no Medusa-specific message to show (see
+    // server/api/cart/promotions.post.ts) - translate it instead of its English fallback.
+    promoError.value =
+      data?.data?.code === 'invalidPromoCode' ? t('cart.promoInvalid') : (statusMessage ?? t('cart.promoInvalid'))
   } finally {
     applying.value = false
   }

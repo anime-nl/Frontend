@@ -233,6 +233,14 @@
     "orderHistory": "Bestellverlauf",
     "noOrders": "Sie haben noch keine Bestellungen.",
     "orderNumber": "Bestellung #{number}",
+    "orderStatus": {
+      "pending": "Ausstehend",
+      "completed": "Abgeschlossen",
+      "draft": "Entwurf",
+      "archived": "Archiviert",
+      "canceled": "Storniert",
+      "requires_action": "Aktion erforderlich"
+    },
     "callback": {
       "signingIn": "Sie werden angemeldet…",
       "failed": "Bei der Anmeldung ist etwas schiefgegangen.",

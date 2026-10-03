@@ -19,7 +19,8 @@ registerEndpoint('/api/auth/google/callback', {
 })
 registerEndpoint('/api/account/me', () => ({customer: {id: 'cus_1', email: 'jan@example.nl'}}))
 
-const mountCallback = () => mountSuspended(CallbackPage, {route: '/account/callback/google?code=abc123&state=xyz'})
+const mountCallback = (route = '/account/callback/google?code=abc123&state=xyz') =>
+    mountSuspended(CallbackPage, {route})
 
 let wrapper: Awaited<ReturnType<typeof mountCallback>> | undefined
 
@@ -39,6 +40,12 @@ describe('account OAuth callback page', () => {
 
         await vi.waitFor(() => expect(navigateToMock).toHaveBeenCalledWith('/account'))
         expect(lastCallbackQuery).toEqual({code: 'abc123', state: 'xyz'})
+    })
+
+    it('redirects to the locale-prefixed /account on success when browsing a non-default locale', async () => {
+        wrapper = await mountCallback('/en/account/callback/google?code=abc123&state=xyz')
+
+        await vi.waitFor(() => expect(navigateToMock).toHaveBeenCalledWith('/en/account'))
     })
 
     it('shows a retry link when sign-in fails', async () => {

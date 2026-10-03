@@ -31,7 +31,14 @@ export default defineEventHandler(async (event) => {
     } catch (error) {
         const {statusCode, data} = error as {statusCode?: number; data?: {message?: string}}
         if (statusCode === 400) {
-            throw createError({statusCode: 400, statusMessage: data?.message ?? 'That promo code is not valid'})
+            // Medusa's own message is specific to the code/cart and can't be pre-translated; absent
+            // that, tag the error with a stable code so the client can show a translated message
+            // instead of this English fallback.
+            throw createError({
+                statusCode: 400,
+                statusMessage: data?.message ?? 'That promo code is not valid',
+                data: data?.message ? undefined : {code: 'invalidPromoCode'}
+            })
         }
         throw createError({statusCode: 500, statusMessage: 'Could not apply promo code'})
     }

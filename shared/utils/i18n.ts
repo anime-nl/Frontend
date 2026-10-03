@@ -8,6 +8,12 @@ export const DEFAULT_LOCALE: SupportedLocale = 'nl'
 
 const catalogs: Record<SupportedLocale, Record<string, unknown>> = {nl, en, de}
 
+/**
+ * Resolves a dot-separated key path into a catalog object.
+ * @param catalog Locale catalog to look up into
+ * @param key Dot-separated path, e.g. "support.email.subject"
+ * @returns The matching string value, or undefined if the path doesn't resolve to a string
+ */
 function lookup(catalog: Record<string, unknown>, key: string): string | undefined {
     const value = key.split('.').reduce<unknown>((node, segment) => {
         if (typeof node !== 'object' || node === null) return undefined

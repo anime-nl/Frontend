@@ -79,6 +79,16 @@ describe('POST /api/cart/promotions', () => {
         })
     })
 
+    it('tags a 400 with no Medusa message with a stable code, so the client can translate it', async () => {
+        getCookie.mockReturnValue('cart_1')
+        medusaFetch.mockRejectedValue({statusCode: 400, data: {}})
+
+        await expect(callPostRoute()).rejects.toMatchObject({
+            statusCode: 400,
+            data: {code: 'invalidPromoCode'}
+        })
+    })
+
     it('surfaces an unexpected error as a 500', async () => {
         getCookie.mockReturnValue('cart_1')
         medusaFetch.mockRejectedValue(new Error('network down'))

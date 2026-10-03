@@ -44,20 +44,22 @@ describe('i18n SEO tags', () => {
         expect(html).toContain('lang="en-GB"')
     })
 
+    // Search engines require hreflang/canonical alternates to be fully-qualified URLs - a relative
+    // href is ignored - so these assert on the absolute form, not just the path.
     it('emits hreflang alternates for every locale plus x-default, pointing at the unprefixed Dutch URL', async () => {
         const html = await $fetch<string>('/support')
 
-        expect(html).toContain('href="/support" hreflang="x-default"')
-        expect(html).toContain('href="/support" hreflang="nl"')
-        expect(html).toContain('href="/en/support" hreflang="en"')
-        expect(html).toContain('href="/de/support" hreflang="de"')
+        expect(html).toContain('href="https://animenl.nl/support" hreflang="x-default"')
+        expect(html).toContain('href="https://animenl.nl/support" hreflang="nl"')
+        expect(html).toContain('href="https://animenl.nl/en/support" hreflang="en"')
+        expect(html).toContain('href="https://animenl.nl/de/support" hreflang="de"')
     })
 
     it('emits a canonical link pointing at the current locale-specific URL', async () => {
         const nl = await $fetch<string>('/support')
         const en = await $fetch<string>('/en/support')
 
-        expect(nl).toContain('rel="canonical" href="/support"')
-        expect(en).toContain('rel="canonical" href="/en/support"')
+        expect(nl).toContain('rel="canonical" href="https://animenl.nl/support"')
+        expect(en).toContain('rel="canonical" href="https://animenl.nl/en/support"')
     })
 })

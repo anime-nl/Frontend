@@ -69,13 +69,24 @@ describe('account page', () => {
         expect(wrapper.text().toLowerCase()).toContain('nog geen bestellingen')
     })
 
-    it('shows order history when there are orders', async () => {
+    it('shows order history when there are orders, with a translated status', async () => {
         orders = [{id: 'order_1', display_id: 42, status: 'completed', currency_code: 'eur', total: 21.8}]
         wrapper = await mountAccount()
 
         expect(wrapper.text()).toContain('42')
-        expect(wrapper.text()).toContain('completed')
+        expect(wrapper.text()).toContain('Afgerond')
+        expect(wrapper.text()).not.toContain('completed')
     })
+
+    it.each(['pending', 'draft', 'archived', 'canceled', 'requires_action'] as const)(
+        'translates the %s order status',
+        async (status) => {
+            orders = [{id: 'order_1', display_id: 42, status, currency_code: 'eur', total: 21.8}]
+            wrapper = await mountAccount()
+
+            expect(wrapper.text()).not.toContain(status)
+        }
+    )
 
     it('falls back to the order id when it has no display id', async () => {
         orders = [{id: 'order_1', display_id: null, status: 'completed', currency_code: 'eur', total: 21.8}]

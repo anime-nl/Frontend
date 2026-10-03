@@ -31,6 +31,9 @@ export default defineNuxtConfig({
         // Dutch has no URL prefix (primary market); English and German are prefixed (/en/..., /de/...)
         defaultLocale: 'nl',
         strategy: 'prefix_except_default',
+        // Required to emit fully-qualified hreflang/canonical URLs (useLocaleHead in app.vue) -
+        // search engines ignore a relative alternate link
+        baseUrl: process.env.SITE_URL || 'https://animenl.nl',
         locales: [
             {code: 'nl', language: 'nl-NL', name: 'Nederlands', file: 'nl.json'},
             // en-GB over en-US: pricing is always EUR, and GB number formatting reads more naturally for EUR

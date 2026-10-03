@@ -36,6 +36,12 @@ const submit = async (wrapper: Awaited<ReturnType<typeof mountTopic>>) => {
     await flushPromises()
 }
 
+/** The error message UFormField renders for one named field, via its input's aria-describedby. */
+function fieldError(wrapper: Awaited<ReturnType<typeof mountTopic>>, fieldName: string): string {
+    const describedBy = wrapper.find(`[name="${fieldName}"]`).attributes('aria-describedby')
+    return describedBy ? wrapper.find(`#${describedBy}`).text() : ''
+}
+
 describe('support topic page', () => {
     it('answers 404 for an unknown topic', async () => {
         await expect(mountTopic('unknown-topic')).rejects.toThrow()
@@ -65,13 +71,15 @@ describe('support topic page', () => {
         expect(returns.text()).not.toContain('Optioneel')
     })
 
-    it('shows errors and sends nothing when the form is incomplete', async () => {
+    it('shows a field-specific error for every required field left empty, and sends nothing', async () => {
         const wrapper = await mountTopic('returns')
 
         await submit(wrapper)
 
-        expect(wrapper.text()).toContain('Dit veld is verplicht.')
-        expect(wrapper.text()).toContain('Vul een geldig e-mailadres in.')
+        expect(fieldError(wrapper, 'orderNumber')).toBe('Dit veld is verplicht.')
+        expect(fieldError(wrapper, 'name')).toBe('Dit veld is verplicht.')
+        expect(fieldError(wrapper, 'email')).toBe('Vul een geldig e-mailadres in.')
+        expect(fieldError(wrapper, 'message')).toBe('Dit veld is verplicht.')
         expect(submittedBodies).toEqual([])
     })
 

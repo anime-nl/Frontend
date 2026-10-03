@@ -49,7 +49,7 @@ async function logout() {
           class="flex items-center justify-between border-b border-sky-200/20 pb-2"
         >
           <span>{{ t('account.orderNumber', {number: order.display_id ?? order.id}) }}</span>
-          <UBadge :label="order.status" color="neutral" variant="subtle" />
+          <UBadge :label="t(`account.orderStatus.${order.status}`)" color="neutral" variant="subtle" />
           <span class="font-semibold">{{
             formatCurrency(order.total, order.currency_code, localeProperties.language!)
           }}</span>

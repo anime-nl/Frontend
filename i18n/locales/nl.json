@@ -221,6 +221,14 @@
     "orderHistory": "Bestelgeschiedenis",
     "noOrders": "Je hebt nog geen bestellingen.",
     "orderNumber": "Bestelling #{number}",
+    "orderStatus": {
+      "pending": "In behandeling",
+      "completed": "Afgerond",
+      "draft": "Concept",
+      "archived": "Gearchiveerd",
+      "canceled": "Geannuleerd",
+      "requires_action": "Actie vereist"
+    },
     "callback": {
       "signingIn": "Je wordt ingelogd…",
       "failed": "Er ging iets mis bij het inloggen.",

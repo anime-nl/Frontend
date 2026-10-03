@@ -96,7 +96,7 @@ registerEndpoint('/api/checkout/payment-session', {
 })
 
 const eur = (amount: number) => new Intl.NumberFormat('nl-NL', {style: 'currency', currency: 'EUR'}).format(amount)
-const mountCheckout = () => mountSuspended(CheckoutPage, {route: '/checkout'})
+const mountCheckout = (route = '/checkout') => mountSuspended(CheckoutPage, {route})
 
 const validAddress = {
     email: 'jan@example.nl',
@@ -143,6 +143,13 @@ describe('checkout page', () => {
         wrapper = await mountCheckout()
 
         expect(navigateToMock).toHaveBeenCalledWith('/cart')
+    })
+
+    it('redirects to the locale-prefixed /cart when browsing a non-default locale', async () => {
+        cart = {items: []}
+        wrapper = await mountCheckout('/en/checkout')
+
+        expect(navigateToMock).toHaveBeenCalledWith('/en/cart')
     })
 
     it('pre-fills the address form for a signed-in customer', async () => {

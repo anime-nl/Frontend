@@ -22,7 +22,7 @@ const price = computed(() => {
 </script>
 
 <template>
-  <NuxtLink :to="`/product/${product.id}`" class="block">
+  <NuxtLinkLocale :to="`/product/${product.id}`" class="block">
     <div class="w-full h-full rounded-2xl bg-gray-900">
       <div class="text-white relative h-full group overflow-hidden rounded-2xl">
         <img
@@ -48,5 +48,5 @@ const price = computed(() => {
         </div>
       </div>
     </div>
-  </NuxtLink>
+  </NuxtLinkLocale>
 </template>

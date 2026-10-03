@@ -34,6 +34,11 @@ const state = reactive<SupportRequest>({
   website: ''
 })
 
+/**
+ * Adapts validateSupportRequest's codes to UForm's expected {name, message} shape.
+ * @param input Current form state
+ * @returns Translated field errors for UForm to display
+ */
 function validate(input: SupportRequest) {
   return validateSupportRequest(input).map((error) => ({
     name: error.name,

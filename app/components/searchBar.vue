@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 const {t} = useI18n()
+const localePath = useLocalePath()
 const query = ref('')
 
-const searchLink = computed(() => ({
-  path: '/search',
-  query: query.value.trim() ? {q: query.value.trim()} : {}
-}))
+const searchLink = computed(() =>
+  localePath({path: '/search', query: query.value.trim() ? {q: query.value.trim()} : {}})
+)
 </script>
 
 <template>

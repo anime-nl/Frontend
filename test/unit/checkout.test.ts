@@ -69,24 +69,32 @@ describe('validateAddressRequest', () => {
     })
 
     it.each(['', 'jan', 'jan@', 'jan@example', 'jan @example.nl'])('rejects the email "%s"', (email) => {
-        expect(errorCode({email}, 'email')).toBe('invalidEmail')
+        expect(validateAddressRequest({...validRequest, email})).toEqual([{name: 'email', code: 'invalidEmail'}])
     })
 
     it.each(['firstName', 'lastName', 'street', 'houseNumber', 'city'] as const)('requires %s', (field) => {
-        expect(errorCode({[field]: '   '}, field)).toBe('required')
+        expect(validateAddressRequest({...validRequest, [field]: '   '})).toEqual([{name: field, code: 'required'}])
     })
 
     it('rejects an unknown country', () => {
-        expect(errorCode({country: 'DE'}, 'country')).toBe('invalidCountry')
+        expect(validateAddressRequest({...validRequest, country: 'DE'})).toEqual([
+            {name: 'country', code: 'invalidCountry'}
+        ])
     })
 
     it('rejects an NL postal code without 4 digits and 2 letters', () => {
-        expect(errorCode({postalCode: '12345'}, 'postalCode')).toBe('invalidPostalCode')
-        expect(errorCode({postalCode: '1234'}, 'postalCode')).toBe('invalidPostalCode')
+        expect(validateAddressRequest({...validRequest, postalCode: '12345'})).toEqual([
+            {name: 'postalCode', code: 'invalidPostalCode'}
+        ])
+        expect(validateAddressRequest({...validRequest, postalCode: '1234'})).toEqual([
+            {name: 'postalCode', code: 'invalidPostalCode'}
+        ])
     })
 
     it('rejects a BE postal code that is not 4 digits', () => {
-        expect(errorCode({country: 'BE', postalCode: '1234 AB'}, 'postalCode')).toBe('invalidPostalCode')
+        expect(validateAddressRequest({...validRequest, country: 'BE', postalCode: '1234 AB'})).toEqual([
+            {name: 'postalCode', code: 'invalidPostalCode'}
+        ])
     })
 
     it.each(['firstName', 'lastName', 'street', 'houseNumber', 'city'] as const)('limits the length of %s', (field) => {

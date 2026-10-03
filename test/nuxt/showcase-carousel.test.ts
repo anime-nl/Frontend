@@ -16,7 +16,7 @@ registerEndpoint('/api/products', (event) => {
     return {products}
 })
 
-const mountCarousel = () => mountSuspended(ShowcaseCarousel, {attachTo: document.body})
+const mountCarousel = (route = '/') => mountSuspended(ShowcaseCarousel, {route, attachTo: document.body})
 
 let wrapper: Awaited<ReturnType<typeof mountCarousel>> | undefined
 
@@ -46,6 +46,13 @@ describe('showcase carousel', () => {
 
         const links = wrapper.findAll('a').map((link) => link.attributes('href'))
         expect(links).toContain('/product/prod_1')
+    })
+
+    it('links to the locale-prefixed product page when browsing a non-default locale', async () => {
+        wrapper = await mountCarousel('/en')
+
+        const links = wrapper.findAll('a').map((link) => link.attributes('href'))
+        expect(links).toContain('/en/product/prod_1')
     })
 
     it('caps its width so it does not blow up on ultrawide screens', async () => {
