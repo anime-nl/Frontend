@@ -1,13 +1,12 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     ssr: true,
-    modules: ['@nuxt/ui', '@nuxtjs/sitemap', '@nuxt/eslint', 'nuxt-gtag'],
+    modules: ['@nuxt/ui', '@nuxtjs/sitemap', '@nuxt/eslint', 'nuxt-gtag', '@nuxtjs/i18n'],
     css: ['~/assets/css/main.css'],
     compatibilityDate: '2025-07-15',
     devtools: {enabled: true},
     app: {
         head: {
-            htmlAttrs: {lang: 'en'},
             title: 'AnimeNL',
             titleTemplate: '%s | AnimeNL',
             link: [
@@ -27,6 +26,23 @@ export default defineNuxtConfig({
     sitemap: {
         // Product URLs change as the Medusa catalog changes, so they are fetched at request time instead of at build
         sources: ['/api/sitemap-urls']
+    },
+    i18n: {
+        // Dutch has no URL prefix (primary market); English and German are prefixed (/en/..., /de/...)
+        defaultLocale: 'nl',
+        strategy: 'prefix_except_default',
+        locales: [
+            {code: 'nl', language: 'nl-NL', name: 'Nederlands', file: 'nl.json'},
+            // en-GB over en-US: pricing is always EUR, and GB number formatting reads more naturally for EUR
+            {code: 'en', language: 'en-GB', name: 'English', file: 'en.json'},
+            {code: 'de', language: 'de-DE', name: 'Deutsch', file: 'de.json'}
+        ],
+        detectBrowserLanguage: {
+            useCookie: true,
+            cookieKey: 'i18n_redirected',
+            redirectOn: 'root',
+            fallbackLocale: 'nl'
+        }
     },
     gtag: {
         id: process.env.GA_MEASUREMENT_ID || '',

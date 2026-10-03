@@ -1,6 +1,10 @@
 import {describe, expect, it} from 'vitest'
 import {$fetch, fetch, setup} from '@nuxt/test-utils/e2e'
 
+// Matches server/utils/session.ts's SESSION_COOKIE; not imported directly since that module also
+// pulls in '#shared/utils/env', an alias the e2e vitest project doesn't configure.
+const SESSION_COOKIE = 'medusa_session'
+
 await setup({server: true})
 
 describe('account pages', () => {
@@ -34,6 +38,8 @@ describe('account pages', () => {
 
         expect(html).toContain('Signing you in')
         expect(html).not.toContain('Something went wrong signing you in')
-        expect(response.headers.get('set-cookie')).toBeNull()
+        // The i18n module sets its own locale-detection cookie on every response; only a session
+        // cookie here would mean a sign-in was (wrongly) attempted during SSR.
+        expect(response.headers.get('set-cookie')).not.toContain(SESSION_COOKIE)
     })
 })
