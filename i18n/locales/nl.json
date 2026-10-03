@@ -8,7 +8,47 @@
     }
   },
   "nav": {
-    "home": "Home"
+    "home": "Home",
+    "main": {
+      "home": {"label": "Home"},
+      "tcg": {
+        "label": "TCG",
+        "children": {
+          "singles": {"label": "Losse kaarten", "description": "Koop losse kaarten in bulk."},
+          "packs": {"label": "Pakjes", "description": "Waag je geluk met losse pakjes."},
+          "boosters": {"label": "Boosterboxen", "description": "Koop dozen vol pakjes en extra's."},
+          "bySeries": {"label": "Op serie", "description": "Zoek naar kaarten van de serie die je leuk vindt."}
+        }
+      },
+      "figures": {
+        "label": "Figuren",
+        "children": {
+          "prizeFigures": {"label": "Prijsfiguren", "description": "Mooie figuren voor lage prijzen."},
+          "scaleFigures": {"label": "Schaalfiguren", "description": "Geweldig om mee te decoreren."},
+          "noodleStoppers": {"label": "Noodle Stoppers", "description": "Figuren met een functie"},
+          "bySeries": {"label": "Op serie", "description": "Zoek naar figuren van de serie die je leuk vindt."}
+        }
+      },
+      "plush": {
+        "label": "Knuffels",
+        "children": {
+          "bySeries": {"label": "Op serie", "description": "Zoek naar pluchen van de serie die je leuk vindt."}
+        }
+      },
+      "keychains": {
+        "label": "Sleutelhangers",
+        "children": {
+          "acrylic": {"label": "Acryl sleutelhangers", "description": "Een brede selectie goedkope sleutelhangers."},
+          "metal": {"label": "Metalen sleutelhangers", "description": "Supersterke sleutelhangers."},
+          "bySeries": {
+            "label": "Op serie",
+            "description": "Zoek naar sleutelhangers van de serie die je leuk vindt."
+          }
+        }
+      },
+      "support": {"label": "Support"},
+      "trustpilot": {"label": "Trustpilot"}
+    }
   },
   "validation": {
     "required": "Dit veld is verplicht.",

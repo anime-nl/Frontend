@@ -8,7 +8,59 @@
     }
   },
   "nav": {
-    "home": "Startseite"
+    "home": "Startseite",
+    "main": {
+      "home": {"label": "Startseite"},
+      "tcg": {
+        "label": "TCG",
+        "children": {
+          "singles": {"label": "Einzelkarten", "description": "Kaufen Sie einzelne Karten in großen Mengen."},
+          "packs": {"label": "Booster-Packs", "description": "Versuchen Sie Ihr Glück mit einzelnen Boostern."},
+          "boosters": {"label": "Booster-Boxen", "description": "Kaufen Sie Boxen voller Booster und Extras."},
+          "bySeries": {
+            "label": "Nach Serie",
+            "description": "Suchen Sie nach Karten aus Ihrer Lieblingsserie."
+          }
+        }
+      },
+      "figures": {
+        "label": "Figuren",
+        "children": {
+          "prizeFigures": {"label": "Preisfiguren", "description": "Tolle Figuren zu niedrigen Preisen."},
+          "scaleFigures": {"label": "Sammelfiguren", "description": "Toll zum Dekorieren."},
+          "noodleStoppers": {"label": "Noodle Stoppers", "description": "Figuren mit einer Funktion"},
+          "bySeries": {
+            "label": "Nach Serie",
+            "description": "Suchen Sie nach Figuren aus Ihrer Lieblingsserie."
+          }
+        }
+      },
+      "plush": {
+        "label": "Plüschtiere",
+        "children": {
+          "bySeries": {
+            "label": "Nach Serie",
+            "description": "Suchen Sie nach Plüschtieren aus Ihrer Lieblingsserie."
+          }
+        }
+      },
+      "keychains": {
+        "label": "Schlüsselanhänger",
+        "children": {
+          "acrylic": {
+            "label": "Acryl-Schlüsselanhänger",
+            "description": "Eine große Auswahl günstiger Schlüsselanhänger."
+          },
+          "metal": {"label": "Metall-Schlüsselanhänger", "description": "Extrem robuste Schlüsselanhänger."},
+          "bySeries": {
+            "label": "Nach Serie",
+            "description": "Suchen Sie nach Schlüsselanhängern aus Ihrer Lieblingsserie."
+          }
+        }
+      },
+      "support": {"label": "Support"},
+      "trustpilot": {"label": "Trustpilot"}
+    }
   },
   "validation": {
     "required": "Dieses Feld ist erforderlich.",

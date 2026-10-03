@@ -8,7 +8,44 @@
     }
   },
   "nav": {
-    "home": "Home"
+    "home": "Home",
+    "main": {
+      "home": {"label": "Home"},
+      "tcg": {
+        "label": "TCG",
+        "children": {
+          "singles": {"label": "Singles", "description": "Buy single cards in bulk."},
+          "packs": {"label": "Packs", "description": "Test your luck with single packs."},
+          "boosters": {"label": "Booster Boxes", "description": "Buy boxes filled with packs and extras."},
+          "bySeries": {"label": "By series", "description": "Search for cards from the series you enjoy."}
+        }
+      },
+      "figures": {
+        "label": "Figures",
+        "children": {
+          "prizeFigures": {"label": "Prize Figures", "description": "Great figures for low prices."},
+          "scaleFigures": {"label": "Scale Figures", "description": "Great for decorating."},
+          "noodleStoppers": {"label": "Noodle Stoppers", "description": "Figures with a function"},
+          "bySeries": {"label": "By series", "description": "Search for figures from the series you enjoy."}
+        }
+      },
+      "plush": {
+        "label": "Plushies",
+        "children": {
+          "bySeries": {"label": "By series", "description": "Search for plushies from the series you enjoy."}
+        }
+      },
+      "keychains": {
+        "label": "Keychains",
+        "children": {
+          "acrylic": {"label": "Acrylic keychains", "description": "A wide selection of cheap keychains."},
+          "metal": {"label": "Metal keychains", "description": "Super durable keychains."},
+          "bySeries": {"label": "By series", "description": "Search for keychains from the series you enjoy."}
+        }
+      },
+      "support": {"label": "Support"},
+      "trustpilot": {"label": "Trustpilot"}
+    }
   },
   "validation": {
     "required": "This field is required.",

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-const items = navigationItems
+const {t} = useI18n()
+const items = computed(() => buildNavigationItems(t))
 const mobileMenuOpen = ref(false)
 const cart = useCart()
 const customer = useCustomer()
