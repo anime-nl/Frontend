@@ -1,11 +1,13 @@
 import nodemailer from 'nodemailer'
 import {findSupportTopic, normalizeSupportRequest, validateSupportRequest} from '#shared/utils/support'
+import {DEFAULT_LOCALE, isSupportedLocale, translate} from '#shared/utils/i18n'
 import {isRateLimited} from '../utils/rateLimit'
 
 const SUPPORT_RATE_LIMIT = {limit: 5, windowMs: 10 * 60 * 1000}
 
 /**
- * POST /api/support - validates a support request and emails it to the support inbox.
+ * POST /api/support - validates a support request and emails it to the support inbox, composed in
+ * the locale from the `x-site-locale` request header (falling back to Dutch if missing/unsupported).
  * @returns Confirmation that the request was handled, including silently for bots and dev without SMTP
  */
 export default defineEventHandler(async (event) => {
@@ -26,13 +28,20 @@ export default defineEventHandler(async (event) => {
 
     const config = useRuntimeConfig(event)
     const topic = findSupportTopic(body.topic)!
-    const subject = `[${topic.title}] ${body.orderNumber ? `Order ${body.orderNumber} - ` : ''}${body.reason}`
+    const requestedLocale = getRequestHeader(event, 'x-site-locale')
+    const locale = isSupportedLocale(requestedLocale) ? requestedLocale : DEFAULT_LOCALE
+    const topicTitle = translate(locale, `support.topics.${topic.slug}.title`)
+    const reasonText = translate(locale, `support.topics.${topic.slug}.reasons.${body.reason}`)
+    const orderPrefix = body.orderNumber
+        ? `${translate(locale, 'support.email.subjectOrderPrefix', {orderNumber: body.orderNumber})} - `
+        : ''
+    const subject = `[${topicTitle}] ${orderPrefix}${reasonText}`
     const text = [
-        `Topic: ${topic.title}`,
-        `Reason: ${body.reason}`,
-        `Order number: ${body.orderNumber || '-'}`,
-        `Name: ${body.name}`,
-        `Email: ${body.email}`,
+        `${translate(locale, 'support.email.topicLabel')} ${topicTitle}`,
+        `${translate(locale, 'support.email.reasonLabel')} ${reasonText}`,
+        `${translate(locale, 'support.email.orderNumberLabel')} ${body.orderNumber || '-'}`,
+        `${translate(locale, 'support.email.nameLabel')} ${body.name}`,
+        `${translate(locale, 'support.email.emailLabel')} ${body.email}`,
         '',
         body.message
     ].join('\n')

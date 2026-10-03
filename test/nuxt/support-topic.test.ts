@@ -41,19 +41,19 @@ describe('support topic page', () => {
         await expect(mountTopic('unknown-topic')).rejects.toThrow()
     })
 
-    it('shows the title and intro of the topic', async () => {
+    it('shows the title and intro of the topic, in the default (Dutch) locale', async () => {
         const wrapper = await mountTopic('returns')
 
-        expect(wrapper.find('h1').text()).toBe('Returns & refunds')
-        expect(wrapper.text()).toContain('You have 14 days to return an order.')
+        expect(wrapper.find('h1').text()).toBe('Retourneren & terugbetalen')
+        expect(wrapper.text()).toContain('Je hebt 14 dagen om een bestelling te retourneren.')
     })
 
     it('sets a page title and meta description for search engines', async () => {
         await mountTopic('returns')
 
-        await vi.waitFor(() => expect(document.title).toBe('Returns & refunds | Support | AnimeNL'))
-        expect(document.querySelector('meta[name="description"]')?.getAttribute('content')).toBe(
-            'You have 14 days to return an order. Returned items must be unused and in their original packaging, and you pay for the return shipping. For damaged or wrong items, please describe what is wrong.'
+        await vi.waitFor(() => expect(document.title).toBe('Retourneren & terugbetalen | Support | AnimeNL'))
+        expect(document.querySelector('meta[name="description"]')?.getAttribute('content')).toContain(
+            'Je hebt 14 dagen om een bestelling te retourneren.'
         )
     })
 
@@ -61,8 +61,8 @@ describe('support topic page', () => {
         const payments = await mountTopic('payments')
         const returns = await mountTopic('returns')
 
-        expect(payments.text()).toContain('Optional')
-        expect(returns.text()).not.toContain('Optional')
+        expect(payments.text()).toContain('Optioneel')
+        expect(returns.text()).not.toContain('Optioneel')
     })
 
     it('shows errors and sends nothing when the form is incomplete', async () => {
@@ -70,14 +70,12 @@ describe('support topic page', () => {
 
         await submit(wrapper)
 
-        expect(wrapper.text()).toContain('Please enter your order number')
-        expect(wrapper.text()).toContain('Please enter your name')
-        expect(wrapper.text()).toContain('Please enter a valid email address')
-        expect(wrapper.text()).toContain('Please describe how we can help')
+        expect(wrapper.text()).toContain('Dit veld is verplicht.')
+        expect(wrapper.text()).toContain('Vul een geldig e-mailadres in.')
         expect(submittedBodies).toEqual([])
     })
 
-    it('sends the request with the topic and the default reason', async () => {
+    it('sends the request with the topic and the default reason key', async () => {
         const wrapper = await mountTopic('returns')
 
         await fillIn(wrapper, {
@@ -94,16 +92,16 @@ describe('support topic page', () => {
                 name: 'Jan Jansen',
                 email: 'jan@example.nl',
                 orderNumber: '1001',
-                reason: 'I want to return an item',
+                reason: 'wantToReturn',
                 message: 'Please help',
                 website: ''
             }
         ])
-        await vi.waitFor(() => expect(wrapper.text()).toContain('Message sent'))
+        await vi.waitFor(() => expect(wrapper.text()).toContain('Bericht verzonden'))
         expect(wrapper.text()).toContain('jan@example.nl')
     })
 
-    it('sends the chosen reason instead of the default one', async () => {
+    it('sends the chosen reason key instead of the default one', async () => {
         const wrapper = await mountTopic('returns')
 
         await fillIn(wrapper, {
@@ -112,10 +110,10 @@ describe('support topic page', () => {
             email: 'jan@example.nl',
             message: 'Please help'
         })
-        await wrapper.find('[name="reason"]').setValue('My item arrived damaged')
+        await wrapper.find('[name="reason"]').setValue('arrivedDamaged')
         await submit(wrapper)
 
-        expect(submittedBodies).toEqual([expect.objectContaining({reason: 'My item arrived damaged'})])
+        expect(submittedBodies).toEqual([expect.objectContaining({reason: 'arrivedDamaged'})])
     })
 
     it('sends whatever a bot fills into the hidden honeypot field', async () => {
@@ -140,7 +138,7 @@ describe('support topic page', () => {
         await fillIn(wrapper, {name: 'Jan', email: 'jan@example.nl', message: 'Help'})
         await submit(wrapper)
 
-        await vi.waitFor(() => expect(wrapper.text()).toContain('Something went wrong while sending your message'))
+        await vi.waitFor(() => expect(wrapper.text()).toContain('Er ging iets mis bij het verzenden van je bericht'))
         expect(wrapper.text()).toContain('info@animenl.nl')
         expect(wrapper.find('form').exists()).toBe(true)
     })

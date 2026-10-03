@@ -16,7 +16,7 @@ registerEndpoint('/api/auth/google/start', {
     }
 })
 
-const mountLogin = () => mountSuspended(LoginPage)
+const mountLogin = () => mountSuspended(LoginPage, {route: '/account/login'})
 
 let wrapper: Awaited<ReturnType<typeof mountLogin>> | undefined
 
@@ -30,16 +30,16 @@ afterEach(() => {
 })
 
 describe('account login page', () => {
-    it('shows a button to continue with Google', async () => {
+    it('shows a button to continue with Google, in the default (Dutch) locale', async () => {
         wrapper = await mountLogin()
 
-        expect(wrapper.text()).toContain('Continue with Google')
+        expect(wrapper.text()).toContain('Doorgaan met Google')
     })
 
     it('mentions that signing in is optional', async () => {
         wrapper = await mountLogin()
 
-        expect(wrapper.text().toLowerCase()).toContain('guest')
+        expect(wrapper.text().toLowerCase()).toContain('gast')
     })
 
     it('starts the OAuth flow and follows the redirect', async () => {
@@ -62,7 +62,7 @@ describe('account login page', () => {
         const button = wrapper.findComponent({name: 'UButton'})
         await button.trigger('click')
 
-        await vi.waitFor(() => expect(wrapper!.text().toLowerCase()).toContain('could not'))
+        await vi.waitFor(() => expect(wrapper!.text().toLowerCase()).toContain('kon niet'))
         expect(navigateToMock).not.toHaveBeenCalled()
     })
 })

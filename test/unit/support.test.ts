@@ -13,13 +13,16 @@ const validRequest: SupportRequest = {
     name: 'Jan Jansen',
     email: 'jan@example.nl',
     orderNumber: '1001',
-    reason: 'I want to return an item',
+    reason: 'wantToReturn',
     message: 'Please help',
     website: ''
 }
 
 const errorFields = (request: Partial<SupportRequest>) =>
     validateSupportRequest({...validRequest, ...request}).map((error) => error.name)
+
+const errorCode = (request: Partial<SupportRequest>, field: keyof SupportRequest) =>
+    validateSupportRequest({...validRequest, ...request}).find((error) => error.name === field)?.code
 
 describe('supportTopics', () => {
     it('has unique slugs', () => {
@@ -34,7 +37,7 @@ describe('supportTopics', () => {
     })
 
     it('finds a topic by slug', () => {
-        expect(findSupportTopic('payments')?.title).toBe('Payments')
+        expect(findSupportTopic('payments')?.slug).toBe('payments')
     })
 
     it('returns undefined for an unknown slug', () => {
@@ -76,37 +79,45 @@ describe('validateSupportRequest', () => {
     })
 
     it('rejects an unknown topic', () => {
-        expect(errorFields({topic: 'bogus'})).toContain('topic')
+        expect(errorCode({topic: 'bogus'}, 'topic')).toBe('unknownTopic')
     })
 
     it.each(['name', 'message'] as const)('requires %s', (field) => {
-        expect(errorFields({[field]: '   '})).toEqual([field])
+        expect(errorCode({[field]: '   '}, field)).toBe('required')
     })
 
     it.each(['', 'jan', 'jan@', 'jan@example', 'jan @example.nl'])('rejects the email "%s"', (email) => {
-        expect(errorFields({email})).toEqual(['email'])
+        expect(errorCode({email}, 'email')).toBe('invalidEmail')
     })
 
     it('requires an order number for orders, shipping and returns', () => {
         for (const topic of ['orders', 'shipping', 'returns']) {
-            const reason = findSupportTopic(topic)!.reasons[0]
-            expect(errorFields({topic, reason, orderNumber: ''}), topic).toEqual(['orderNumber'])
+            const reason = findSupportTopic(topic)!.reasons[0]!
+            expect(errorCode({topic, reason, orderNumber: ''}, 'orderNumber'), topic).toBe('required')
         }
     })
 
     it('does not require an order number for payments', () => {
-        const reason = findSupportTopic('payments')!.reasons[0]
+        const reason = findSupportTopic('payments')!.reasons[0]!
         expect(errorFields({topic: 'payments', reason, orderNumber: ''})).toEqual([])
     })
 
     it('rejects a reason that belongs to another topic', () => {
-        expect(errorFields({reason: 'My payment failed'})).toEqual(['reason'])
+        expect(errorCode({reason: 'paymentFailed'}, 'reason')).toBe('invalidReason')
     })
 
     it.each(['name', 'email', 'orderNumber', 'message'] as const)('limits the length of %s', (field) => {
         const tooLong =
             field === 'email' ? `${'a'.repeat(supportLimits.email)}@example.nl` : 'a'.repeat(supportLimits[field] + 1)
-        expect(errorFields({[field]: tooLong})).toContain(field)
+        expect(errorCode({[field]: tooLong}, field)).toBe('tooLong')
+    })
+
+    it('includes the limit as a param on a tooLong error', () => {
+        expect(validateSupportRequest({...validRequest, name: 'a'.repeat(supportLimits.name + 1)})).toContainEqual({
+            name: 'name',
+            code: 'tooLong',
+            params: {limit: supportLimits.name}
+        })
     })
 
     it('accepts values exactly at the length limit', () => {

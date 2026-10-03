@@ -20,8 +20,8 @@ const validRequest: AddressRequest = {
     country: 'NL'
 }
 
-const errorFields = (request: Partial<AddressRequest>) =>
-    validateAddressRequest({...validRequest, ...request}).map((error) => error.name)
+const errorCode = (request: Partial<AddressRequest>, field: keyof AddressRequest) =>
+    validateAddressRequest({...validRequest, ...request}).find((error) => error.name === field)?.code
 
 describe('checkoutCountries', () => {
     it('offers only NL and BE', () => {
@@ -69,28 +69,34 @@ describe('validateAddressRequest', () => {
     })
 
     it.each(['', 'jan', 'jan@', 'jan@example', 'jan @example.nl'])('rejects the email "%s"', (email) => {
-        expect(errorFields({email})).toEqual(['email'])
+        expect(errorCode({email}, 'email')).toBe('invalidEmail')
     })
 
     it.each(['firstName', 'lastName', 'street', 'houseNumber', 'city'] as const)('requires %s', (field) => {
-        expect(errorFields({[field]: '   '})).toEqual([field])
+        expect(errorCode({[field]: '   '}, field)).toBe('required')
     })
 
     it('rejects an unknown country', () => {
-        expect(errorFields({country: 'DE'})).toEqual(['country'])
+        expect(errorCode({country: 'DE'}, 'country')).toBe('invalidCountry')
     })
 
     it('rejects an NL postal code without 4 digits and 2 letters', () => {
-        expect(errorFields({postalCode: '12345'})).toEqual(['postalCode'])
-        expect(errorFields({postalCode: '1234'})).toEqual(['postalCode'])
+        expect(errorCode({postalCode: '12345'}, 'postalCode')).toBe('invalidPostalCode')
+        expect(errorCode({postalCode: '1234'}, 'postalCode')).toBe('invalidPostalCode')
     })
 
     it('rejects a BE postal code that is not 4 digits', () => {
-        expect(errorFields({country: 'BE', postalCode: '1234 AB'})).toEqual(['postalCode'])
+        expect(errorCode({country: 'BE', postalCode: '1234 AB'}, 'postalCode')).toBe('invalidPostalCode')
     })
 
     it.each(['firstName', 'lastName', 'street', 'houseNumber', 'city'] as const)('limits the length of %s', (field) => {
-        expect(errorFields({[field]: 'a'.repeat(checkoutLimits[field] + 1)})).toContain(field)
+        expect(errorCode({[field]: 'a'.repeat(checkoutLimits[field] + 1)}, field)).toBe('tooLong')
+    })
+
+    it('includes the limit as a param on a tooLong error', () => {
+        expect(
+            validateAddressRequest({...validRequest, firstName: 'a'.repeat(checkoutLimits.firstName + 1)})
+        ).toContainEqual({name: 'firstName', code: 'tooLong', params: {limit: checkoutLimits.firstName}})
     })
 })
 

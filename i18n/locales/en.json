@@ -1,6 +1,181 @@
 {
   "common": {
     "appName": "AnimeNL",
-    "greeting": "Hello {name}"
+    "greeting": "Hello {name}",
+    "countries": {
+      "NL": "Netherlands",
+      "BE": "Belgium"
+    }
+  },
+  "nav": {
+    "home": "Home"
+  },
+  "validation": {
+    "required": "This field is required.",
+    "invalidEmail": "Please enter a valid email address.",
+    "invalidReason": "Please choose a reason.",
+    "unknownTopic": "Unknown support topic.",
+    "invalidCountry": "Please choose a valid country.",
+    "invalidPostalCode": "Please enter a valid postal code.",
+    "tooLong": "Please use at most {limit} characters."
+  },
+  "account": {
+    "signInTitle": "Sign in",
+    "signInOptional": "Signing in is optional — you can check out as a guest without an account.",
+    "signInError": "Could not start sign-in. Please try again in a moment.",
+    "oauth": {
+      "google": "Continue with Google"
+    }
+  },
+  "checkout": {
+    "title": "Checkout",
+    "addressError": "Something went wrong saving your address. Please try again.",
+    "shippingError": "Something went wrong setting your shipping method. Please try again.",
+    "paymentError": "Something went wrong starting your payment. Please try again.",
+    "continueToShipping": "Continue to shipping",
+    "continueToReview": "Continue to review",
+    "back": "Back",
+    "pay": "Pay",
+    "shippingTo": "Shipping to",
+    "steps": {
+      "address": {"heading": "1. Your address"},
+      "shipping": {"heading": "2. Shipping method"},
+      "review": {"heading": "Review your order"}
+    },
+    "form": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email address",
+      "street": "Street",
+      "houseNumber": "House number",
+      "postalCode": "Postal code",
+      "city": "City",
+      "country": "Country"
+    }
+  },
+  "support": {
+    "breadcrumb": "Support",
+    "sendError": "Something went wrong while sending your message. Please try again, or email us at {email}.",
+    "backToSupport": "Back to support",
+    "overview": {
+      "description": "Find answers to common questions about orders, shipping, returns and products, or get in touch with the AnimeNL team.",
+      "subtitle": "Need a hand? Find answers to common questions below, or get in touch and we will help you out.",
+      "topicsHeading": "What do you need help with?",
+      "faqHeading": "Frequently asked questions",
+      "stillNeedHelp": "Still need help?",
+      "includeOrderNumber": "Include your order number, if you have one, so we can help you faster.",
+      "emailUs": "Email us"
+    },
+    "faq": {
+      "1": {
+        "question": "How long does shipping take?",
+        "answer": "Shipping usually takes 2 to 3 business days from when you place your order. If your order is taking longer, contact us with your order number and we will look into it."
+      },
+      "2": {
+        "question": "Which payment methods do you accept?",
+        "answer": "We accept all payment methods supported by Mollie, including iDEAL and credit card. You can see the methods available to you at checkout."
+      },
+      "3": {
+        "question": "What is your return policy?",
+        "answer": "You have a 14-day return period, in line with EU consumer rules. The item must be unused and in its original packaging, and you pay for the return shipping. Contact us within 14 days of receiving your order to let us know you want to return it."
+      },
+      "4": {
+        "question": "How do I return an item?",
+        "answer": "Contact us within the 14-day return period, so we can tell you how to send the item back and link it to your order. Please make sure it is unused and in its original packaging; you pay for the return shipping."
+      },
+      "5": {
+        "question": "How can I check the status of my order?",
+        "answer": "Contact us and include your order number and the email address you ordered with. We will let you know where your order is."
+      },
+      "6": {
+        "question": "Can I change or cancel my order?",
+        "answer": "Contact us as soon as possible after ordering. Once an order has been packed and shipped it can no longer be changed, but you can still return it within the 14-day return period."
+      },
+      "7": {
+        "question": "My item arrived damaged or is not what I ordered.",
+        "answer": "Send us your order number and a few photos of the item and its packaging, and we will work out a solution with you."
+      },
+      "8": {
+        "question": "What does \"backorder\" mean on a product?",
+        "answer": "A product on backorder is currently out of stock, but we can still take your order. It will be shipped once it is back in stock."
+      },
+      "9": {
+        "question": "A product I am looking for is not in the shop.",
+        "answer": "Try the search page to look by series, collection or category. If you still cannot find it, let us know and we will see what we can do."
+      }
+    },
+    "sent": {
+      "title": "Message sent",
+      "description": "Thanks {name}, we received your message and will reply to {email}."
+    },
+    "form": {
+      "reason": "What do you need help with?",
+      "orderNumber": "Order number",
+      "optional": "Optional",
+      "name": "Your name",
+      "email": "Email address",
+      "message": "Message",
+      "honeypotLabel": "Leave this field empty",
+      "send": "Send message",
+      "cancel": "Cancel"
+    },
+    "topics": {
+      "orders": {
+        "title": "Orders",
+        "description": "Questions about an order you placed or want to change.",
+        "intro": "Tell us which order you are asking about and what you need.",
+        "messagePlaceholder": "For example: which item you want changed, or what you would like to know about your order.",
+        "reasons": {
+          "statusOfOrder": "Status of my order",
+          "changeOrder": "Change my order",
+          "cancelOrder": "Cancel my order",
+          "somethingElse": "Something else"
+        }
+      },
+      "shipping": {
+        "title": "Shipping",
+        "description": "Delivery times and problems with a delivery.",
+        "intro": "Shipping usually takes 2 to 3 business days from when you place your order. If something is wrong with your delivery, let us know.",
+        "messagePlaceholder": "For example: when you ordered, and what the delivery status currently shows.",
+        "reasons": {
+          "tooSlow": "My order is taking longer than 2 to 3 business days",
+          "trackingShowsDeliveredButNotReceived": "My tracking shows delivered, but I did not receive it",
+          "wrongAddress": "My order was delivered to the wrong address",
+          "somethingElse": "Something else"
+        }
+      },
+      "returns": {
+        "title": "Returns & refunds",
+        "description": "Returning within 14 days, or received something damaged.",
+        "intro": "You have 14 days to return an order. Returned items must be unused and in their original packaging, and you pay for the return shipping. For damaged or wrong items, please describe what is wrong.",
+        "messagePlaceholder": "For example: which item(s) you want to return and why, or what is wrong with the item you received.",
+        "reasons": {
+          "wantToReturn": "I want to return an item",
+          "arrivedDamaged": "My item arrived damaged",
+          "wrongItemReceived": "I received the wrong item",
+          "refundQuestion": "Question about my refund"
+        }
+      },
+      "payments": {
+        "title": "Payments",
+        "description": "iDEAL, credit card and other Mollie payment methods.",
+        "intro": "We accept all payment methods supported by Mollie. If you have no order number because your payment failed, you can leave it empty.",
+        "messagePlaceholder": "For example: which payment method you used, and what happened when you paid.",
+        "reasons": {
+          "paymentFailed": "My payment failed",
+          "chargedNoConfirmation": "I was charged, but got no order confirmation",
+          "paymentMethodQuestion": "Question about payment methods",
+          "somethingElse": "Something else"
+        }
+      }
+    },
+    "email": {
+      "subjectOrderPrefix": "Order {orderNumber}",
+      "topicLabel": "Topic:",
+      "reasonLabel": "Reason:",
+      "orderNumberLabel": "Order number:",
+      "nameLabel": "Name:",
+      "emailLabel": "Email:"
+    }
   }
 }

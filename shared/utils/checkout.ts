@@ -9,10 +9,15 @@ export interface AddressRequest {
     country: string
 }
 
-export const checkoutCountries = [
-    {code: 'NL', label: 'Netherlands'},
-    {code: 'BE', label: 'Belgium'}
-] as const
+export interface AddressRequestError {
+    name: keyof AddressRequest
+    /** A key into validation.* in the locale catalogs */
+    code: string
+    params?: Record<string, string | number>
+}
+
+/** Display labels come from common.countries.<code> in the locale catalogs. */
+export const checkoutCountries = [{code: 'NL'}, {code: 'BE'}] as const
 
 export const checkoutLimits = {
     email: 254,
@@ -51,33 +56,33 @@ export function normalizeAddressRequest(input?: Partial<Record<keyof AddressRequ
 }
 
 /**
- * Used by the form for instant feedback, and by the server before sending.
+ * Used by the form for instant feedback, and by the server before sending. Each error names a
+ * validation.* key rather than display text, so the caller can translate it into the site locale.
  * @param input Address to validate
  * @returns A list of field errors, empty when the address is valid
  */
-export function validateAddressRequest(input: AddressRequest) {
+export function validateAddressRequest(input: AddressRequest): AddressRequestError[] {
     const request = normalizeAddressRequest(input)
     const {email, firstName, lastName, street, houseNumber, postalCode, city, country} = request
-    const errors: {name: keyof AddressRequest; message: string}[] = []
+    const errors: AddressRequestError[] = []
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-        errors.push({name: 'email', message: 'Please enter a valid email address'})
-    if (!firstName) errors.push({name: 'firstName', message: 'Please enter your first name'})
-    if (!lastName) errors.push({name: 'lastName', message: 'Please enter your last name'})
-    if (!street) errors.push({name: 'street', message: 'Please enter your street'})
-    if (!houseNumber) errors.push({name: 'houseNumber', message: 'Please enter your house number'})
-    if (!city) errors.push({name: 'city', message: 'Please enter your city'})
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.push({name: 'email', code: 'invalidEmail'})
+    if (!firstName) errors.push({name: 'firstName', code: 'required'})
+    if (!lastName) errors.push({name: 'lastName', code: 'required'})
+    if (!street) errors.push({name: 'street', code: 'required'})
+    if (!houseNumber) errors.push({name: 'houseNumber', code: 'required'})
+    if (!city) errors.push({name: 'city', code: 'required'})
 
     const countryPattern = postalCodePatterns[country]
     if (!countryPattern) {
-        errors.push({name: 'country', message: 'Please choose a valid country'})
+        errors.push({name: 'country', code: 'invalidCountry'})
     } else if (!countryPattern.test(postalCode)) {
-        errors.push({name: 'postalCode', message: 'Please enter a valid postal code'})
+        errors.push({name: 'postalCode', code: 'invalidPostalCode'})
     }
 
     for (const field of ['firstName', 'lastName', 'street', 'houseNumber', 'city'] as const) {
         if (request[field].length > checkoutLimits[field]) {
-            errors.push({name: field, message: `Please use at most ${checkoutLimits[field]} characters`})
+            errors.push({name: field, code: 'tooLong', params: {limit: checkoutLimits[field]}})
         }
     }
 

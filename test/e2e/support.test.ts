@@ -1,6 +1,6 @@
 import {afterAll, beforeEach, describe, expect, it} from 'vitest'
 import {$fetch, fetch, setup} from '@nuxt/test-utils/e2e'
-import {startSmtpSink} from '../helpers/smtpSink'
+import {decodeMimeMessage, startSmtpSink} from '../helpers/smtpSink'
 
 const smtp = await startSmtpSink()
 
@@ -21,18 +21,22 @@ const validRequest = {
     name: 'Jan Jansen',
     email: 'jan@example.nl',
     orderNumber: '1001',
-    reason: 'I want to return an item',
+    reason: 'wantToReturn',
     message: 'Please help',
     website: ''
 }
 
 // Every call gets its own address by default, so tests never share a rate limit bucket unless a test wants that
 let nextIp = 0
-const postSupport = (body: unknown, ip = `198.51.100.${++nextIp}`) =>
+const postSupport = (body: unknown, ip = `198.51.100.${++nextIp}`, locale?: string) =>
     fetch('/api/support', {
         method: 'POST',
         body: JSON.stringify(body),
-        headers: {'content-type': 'application/json', 'x-forwarded-for': ip}
+        headers: {
+            'content-type': 'application/json',
+            'x-forwarded-for': ip,
+            ...(locale ? {'x-site-locale': locale} : {})
+        }
     })
 
 describe('support pages', () => {
@@ -44,8 +48,15 @@ describe('support pages', () => {
         }
     })
 
-    it('renders the form of a topic on the server', async () => {
+    it('renders the form of a topic on the server, in the default (Dutch) locale', async () => {
         const html = await $fetch<string>('/support/returns')
+
+        expect(html).toContain('Retourneren &amp; terugbetalen')
+        expect(html).toContain('Ik wil een artikel retourneren')
+    })
+
+    it('renders the form of a topic in English when prefixed with /en', async () => {
+        const html = await $fetch<string>('/en/support/returns')
 
         expect(html).toContain('Returns &amp; refunds')
         expect(html).toContain('I want to return an item')
@@ -59,31 +70,53 @@ describe('support pages', () => {
 })
 
 describe('POST /api/support', () => {
-    it('emails the request to the support address', async () => {
+    it.each([
+        ['nl', 'Retourneren & terugbetalen', 'Ik wil een artikel retourneren', 'Bestelnummer:'],
+        ['en', 'Returns & refunds', 'I want to return an item', 'Order number:'],
+        ['de', 'Rücksendungen & Rückerstattungen', 'Ich möchte einen Artikel zurücksenden', 'Bestellnummer:']
+    ] as const)(
+        'emails the request to the support address, composed in %s',
+        async (locale, topicTitle, reasonText, orderLabel) => {
+            const response = await postSupport(validRequest, undefined, locale)
+
+            expect(response.status).toBe(200)
+            expect(smtp.messages).toHaveLength(1)
+
+            const mail = decodeMimeMessage(smtp.messages[0]!.raw)
+            expect(mail).toContain('From: info@animenl.nl')
+            expect(mail).toContain('To: info@animenl.nl')
+            expect(mail).toContain('Reply-To: Jan Jansen <jan@example.nl>')
+            expect(mail).toContain(`Subject: [${topicTitle}]`)
+            expect(mail).toContain(reasonText)
+            expect(mail).toContain(orderLabel)
+            expect(mail).toContain('Please help')
+        }
+    )
+
+    it('defaults to Dutch when no locale header is sent', async () => {
         const response = await postSupport(validRequest)
 
         expect(response.status).toBe(200)
-        expect(smtp.messages).toHaveLength(1)
+        expect(smtp.messages[0]!.raw).toContain('Subject: [Retourneren & terugbetalen]')
+    })
 
-        const mail = smtp.messages[0]!.raw
-        expect(mail).toContain('From: info@animenl.nl')
-        expect(mail).toContain('To: info@animenl.nl')
-        expect(mail).toContain('Reply-To: Jan Jansen <jan@example.nl>')
-        expect(mail).toContain('Subject: [Returns & refunds] Order 1001 - I want to return an item')
-        expect(mail).toContain('Order number: 1001')
-        expect(mail).toContain('Please help')
+    it('defaults to Dutch when the locale header is not a supported locale', async () => {
+        const response = await postSupport(validRequest, undefined, 'fr')
+
+        expect(response.status).toBe(200)
+        expect(smtp.messages[0]!.raw).toContain('Subject: [Retourneren & terugbetalen]')
     })
 
     it('accepts a payments request without an order number', async () => {
         const response = await postSupport({
             ...validRequest,
             topic: 'payments',
-            reason: 'My payment failed',
+            reason: 'paymentFailed',
             orderNumber: ''
         })
 
         expect(response.status).toBe(200)
-        expect(smtp.messages[0]!.raw).toContain('Subject: [Payments] My payment failed')
+        expect(smtp.messages[0]!.raw).toContain('Subject: [Betalingen] Mijn betaling is mislukt')
     })
 
     it('rejects an invalid request with the failing fields', async () => {

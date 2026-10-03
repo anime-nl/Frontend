@@ -9,24 +9,31 @@ describe('support overview page', () => {
 
         await vi.waitFor(() => expect(document.title).toBe('Support | AnimeNL'))
         expect(document.querySelector('meta[name="description"]')?.getAttribute('content')).toContain(
-            'orders, shipping, returns and products'
+            'bestellingen, verzending, retourneren en producten'
         )
     })
 
     it('links to a form for every topic', async () => {
         const wrapper = await mountSuspended(SupportIndex)
 
+        const expectedTitles: Record<string, string> = {
+            orders: 'Bestellingen',
+            shipping: 'Verzending',
+            returns: 'Retourneren & terugbetalen',
+            payments: 'Betalingen'
+        }
+
         for (const topic of supportTopics) {
             expect(wrapper.find(`a[href="/support/${topic.slug}"]`).exists(), topic.slug).toBe(true)
-            expect(wrapper.text()).toContain(topic.title)
+            expect(wrapper.text()).toContain(expectedTitles[topic.slug])
         }
     })
 
     it('shows the frequently asked questions', async () => {
         const wrapper = await mountSuspended(SupportIndex)
 
-        expect(wrapper.text()).toContain('How long does shipping take?')
-        expect(wrapper.text()).toContain('What is your return policy?')
+        expect(wrapper.text()).toContain('Hoe lang duurt de verzending?')
+        expect(wrapper.text()).toContain('Wat is jullie retourbeleid?')
     })
 
     it('offers to email the support address', async () => {

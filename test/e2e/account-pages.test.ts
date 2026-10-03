@@ -8,10 +8,10 @@ const SESSION_COOKIE = 'medusa_session'
 await setup({server: true})
 
 describe('account pages', () => {
-    it('/account/login renders sign-in buttons', async () => {
+    it('/account/login renders sign-in buttons, in the default (Dutch) locale', async () => {
         const html = await $fetch<string>('/account/login')
 
-        expect(html).toContain('Continue with Google')
+        expect(html).toContain('Doorgaan met Google')
     })
 
     it('/account prompts a first-time visitor to sign in', async () => {
