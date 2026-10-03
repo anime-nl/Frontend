@@ -110,4 +110,15 @@ describe('medusaFetch', () => {
 
         expect(log).not.toHaveBeenCalled()
     })
+
+    // A 401 from an authenticated call is a missing or expired customer session, the normal state
+    // for most visitors on most page loads - not a system fault worth an error-level log line.
+    it('does not log a 401', async () => {
+        const log = vi.spyOn(console, 'error').mockImplementation(() => {})
+        fetchMock.mockRejectedValue({statusCode: 401})
+
+        await medusaFetch(event, 'customers/me', {token: 'tok_stale'}).catch(() => {})
+
+        expect(log).not.toHaveBeenCalled()
+    })
 })
