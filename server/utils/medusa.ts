@@ -35,8 +35,11 @@ export async function medusaFetch<T>(event: H3Event, path: string, init: MedusaF
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any)
     } catch (error) {
-        // A 404 is a normal answer for an unknown product, not a failure worth a log line
-        if ((error as {statusCode?: number}).statusCode !== 404) {
+        // A 404 is a normal answer for an unknown product, and a 401 just means the customer's
+        // session is missing or expired (the usual state for most visitors on most page loads) -
+        // neither is a system fault worth an error-level log line.
+        const statusCode = (error as {statusCode?: number}).statusCode
+        if (statusCode !== 404 && statusCode !== 401) {
             console.error(`Medusa request to ${base}/${path} failed:`, error, (error as {data?: unknown}).data)
         }
         throw error
