@@ -323,14 +323,14 @@ describe('checkout page', () => {
         wrapper = await mountCheckout()
         await reachReviewStep(wrapper)
 
-        expect(wrapper.text()).toContain('Price excl. VAT')
+        expect(wrapper.text()).toContain('Prijs excl. btw')
         expect(wrapper.text()).toContain(eur(18.0))
-        expect(wrapper.text()).toContain('VAT')
+        expect(wrapper.text()).toContain('Btw')
         expect(wrapper.text()).toContain(eur(3.8))
         // Subtotal is items-only (no shipping yet); Total adds the chosen Standard shipping (4.95).
-        expect(wrapper.text()).toContain('Subtotal')
+        expect(wrapper.text()).toContain('Subtotaal')
         expect(wrapper.text()).toContain(eur(21.8))
-        expect(wrapper.text()).toContain('Total')
+        expect(wrapper.text()).toContain('Totaal')
         expect(wrapper.text()).toContain(eur(26.75))
     })
 
@@ -349,8 +349,8 @@ describe('checkout page', () => {
         wrapper = await mountCheckout()
         await reachReviewStep(wrapper)
 
-        await wrapper.find('input[placeholder="Promo code"]').setValue('WELCOME10')
-        const applyButton = wrapper.findAllComponents({name: 'UButton'}).find((button) => button.text() === 'Apply')
+        await wrapper.find('input[placeholder="Promocode"]').setValue('WELCOME10')
+        const applyButton = wrapper.findAllComponents({name: 'UButton'}).find((button) => button.text() === 'Toepassen')
         await applyButton!.trigger('click')
 
         await vi.waitFor(() => expect(lastPromotionBody).toEqual({code: 'WELCOME10'}))

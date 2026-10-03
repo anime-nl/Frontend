@@ -8,6 +8,7 @@ type ProductCardProduct = {
 }
 
 const props = defineProps<{product: ProductCardProduct}>()
+const {t} = useI18n()
 
 const price = computed(() => {
   const calculated = props.product?.variants?.[0]?.calculated_price
@@ -43,7 +44,7 @@ const price = computed(() => {
           <hr class="border-gray-500 my-2" />
 
           <p v-if="price" class="font-medium text-[#3fa3ee]">{{ price.amount.toFixed(2) }} {{ price.currency }}</p>
-          <p v-else class="text-sm text-gray-400">Price unavailable</p>
+          <p v-else class="text-sm text-gray-400">{{ t('products.priceUnavailable') }}</p>
         </div>
       </div>
     </div>

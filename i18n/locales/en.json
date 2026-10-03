@@ -7,8 +7,43 @@
       "BE": "Belgium"
     }
   },
+  "cookieConsent": {
+    "title": "We use cookies to understand how visitors use this site.",
+    "accept": "Accept",
+    "decline": "Decline"
+  },
+  "products": {
+    "emptyCategory": "No products in this category yet.",
+    "priceUnavailable": "Price unavailable"
+  },
+  "search": {
+    "placeholder": "Search for TCG cards, figures, plushies and more...",
+    "button": "Search"
+  },
+  "home": {
+    "newProducts": "New Products",
+    "discover": "Discover",
+    "loadingMore": "Loading more products..."
+  },
+  "cart": {
+    "priceExclVat": "Price excl. VAT",
+    "vat": "VAT",
+    "discount": "Discount",
+    "subtotal": "Subtotal",
+    "total": "Total",
+    "promoCodePlaceholder": "Promo code",
+    "apply": "Apply",
+    "removePromoAriaLabel": "Remove {code}",
+    "promoInvalid": "That promo code is not valid.",
+    "promoRemoveFailed": "That promo code could not be removed. Please try again."
+  },
   "nav": {
     "home": "Home",
+    "cartAriaLabel": "Cart",
+    "accountFallback": "Account",
+    "logIn": "Log in",
+    "openMenuAriaLabel": "Open menu",
+    "menuTitle": "Menu",
     "main": {
       "home": {"label": "Home"},
       "tcg": {

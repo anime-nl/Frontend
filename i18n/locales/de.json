@@ -7,8 +7,43 @@
       "BE": "Belgien"
     }
   },
+  "cookieConsent": {
+    "title": "Wir verwenden Cookies, um zu verstehen, wie Besucher diese Website nutzen.",
+    "accept": "Akzeptieren",
+    "decline": "Ablehnen"
+  },
+  "products": {
+    "emptyCategory": "Noch keine Produkte in dieser Kategorie.",
+    "priceUnavailable": "Preis nicht verfügbar"
+  },
+  "search": {
+    "placeholder": "Suchen Sie nach TCG-Karten, Figuren, Plüschtieren und mehr...",
+    "button": "Suchen"
+  },
+  "home": {
+    "newProducts": "Neue Produkte",
+    "discover": "Entdecken",
+    "loadingMore": "Weitere Produkte werden geladen..."
+  },
+  "cart": {
+    "priceExclVat": "Preis exkl. MwSt.",
+    "vat": "MwSt.",
+    "discount": "Rabatt",
+    "subtotal": "Zwischensumme",
+    "total": "Gesamt",
+    "promoCodePlaceholder": "Gutscheincode",
+    "apply": "Anwenden",
+    "removePromoAriaLabel": "{code} entfernen",
+    "promoInvalid": "Dieser Gutscheincode ist ungültig.",
+    "promoRemoveFailed": "Dieser Gutscheincode konnte nicht entfernt werden. Bitte versuchen Sie es erneut."
+  },
   "nav": {
     "home": "Startseite",
+    "cartAriaLabel": "Warenkorb",
+    "accountFallback": "Konto",
+    "logIn": "Anmelden",
+    "openMenuAriaLabel": "Menü öffnen",
+    "menuTitle": "Menü",
     "main": {
       "home": {"label": "Startseite"},
       "tcg": {

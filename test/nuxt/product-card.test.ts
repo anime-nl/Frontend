@@ -35,13 +35,13 @@ describe('product card', () => {
         expect(wrapper.text()).toContain('10.90 EUR')
     })
 
-    it('shows "Price unavailable" when there is no calculated price', async () => {
+    it('shows a price-unavailable message when there is no calculated price, in the default (Dutch) locale', async () => {
         wrapper = await mountSuspended(ProductCard, {props: {product: {id: 'prod_1', title: 'Zhongli Keychain'}}})
 
-        expect(wrapper.text()).toContain('Price unavailable')
+        expect(wrapper.text()).toContain('Prijs niet beschikbaar')
     })
 
-    it('shows "Price unavailable" when the calculated price has no amount', async () => {
+    it('shows a price-unavailable message when the calculated price has no amount', async () => {
         wrapper = await mountSuspended(ProductCard, {
             props: {
                 product: {
@@ -52,7 +52,7 @@ describe('product card', () => {
             }
         })
 
-        expect(wrapper.text()).toContain('Price unavailable')
+        expect(wrapper.text()).toContain('Prijs niet beschikbaar')
     })
 
     it('shows the thumbnail image when there is one', async () => {

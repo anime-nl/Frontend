@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+const {t} = useI18n()
 const cart = useCart()
 
 const code = ref('')
@@ -16,7 +17,7 @@ async function onApplyCode() {
     await cart.applyPromoCode(trimmed)
     code.value = ''
   } catch (error) {
-    promoError.value = (error as {statusMessage?: string}).statusMessage ?? 'That promo code is not valid.'
+    promoError.value = (error as {statusMessage?: string}).statusMessage ?? t('cart.promoInvalid')
   } finally {
     applying.value = false
   }
@@ -28,7 +29,7 @@ async function onRemoveCode(promoCode: string) {
   try {
     await cart.removePromoCode(promoCode)
   } catch {
-    promoError.value = 'That promo code could not be removed. Please try again.'
+    promoError.value = t('cart.promoRemoveFailed')
   } finally {
     removing.value = null
   }
@@ -38,22 +39,27 @@ async function onRemoveCode(promoCode: string) {
 <template>
   <div class="flex flex-col gap-3">
     <div v-if="cart.subtotal.value" class="flex justify-between text-slate-300">
-      <span>Price excl. VAT</span>
+      <span>{{ t('cart.priceExclVat') }}</span>
       <span>{{ cart.subtotal.value }}</span>
     </div>
     <div v-if="cart.taxTotal.value" class="flex justify-between text-slate-300">
-      <span>VAT</span>
+      <span>{{ t('cart.vat') }}</span>
       <span>{{ cart.taxTotal.value }}</span>
     </div>
     <div v-if="cart.discountTotal.value" class="flex justify-between text-slate-300">
-      <span>Discount</span>
+      <span>{{ t('cart.discount') }}</span>
       <span>-{{ cart.discountTotal.value }}</span>
     </div>
 
     <div class="flex flex-col gap-2">
       <UFieldGroup>
-        <UInput v-model="code" placeholder="Promo code" class="flex-1" @keyup.enter="onApplyCode" />
-        <UButton label="Apply" :loading="applying" @click="onApplyCode" />
+        <UInput
+          v-model="code"
+          :placeholder="t('cart.promoCodePlaceholder')"
+          class="flex-1"
+          @keyup.enter="onApplyCode"
+        />
+        <UButton :label="t('cart.apply')" :loading="applying" @click="onApplyCode" />
       </UFieldGroup>
 
       <div v-for="promotion in cart.promotions.value" :key="promotion.id" class="flex items-center justify-between">
@@ -64,7 +70,7 @@ async function onRemoveCode(promoCode: string) {
           color="neutral"
           variant="ghost"
           size="xs"
-          :aria-label="`Remove ${promotion.code}`"
+          :aria-label="t('cart.removePromoAriaLabel', {code: promotion.code ?? ''})"
           :disabled="removing === promotion.code"
           @click="onRemoveCode(promotion.code ?? '')"
         />
@@ -74,11 +80,11 @@ async function onRemoveCode(promoCode: string) {
     </div>
 
     <div class="flex justify-between text-xl font-bold">
-      <span>Subtotal</span>
+      <span>{{ t('cart.subtotal') }}</span>
       <span>{{ cart.subtotalInclTax.value }}</span>
     </div>
     <div class="flex justify-between text-xl font-bold">
-      <span>Total</span>
+      <span>{{ t('cart.total') }}</span>
       <span>{{ cart.total.value }}</span>
     </div>
   </div>

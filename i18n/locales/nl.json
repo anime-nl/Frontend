@@ -7,8 +7,43 @@
       "BE": "België"
     }
   },
+  "cookieConsent": {
+    "title": "Wij gebruiken cookies om te begrijpen hoe bezoekers deze site gebruiken.",
+    "accept": "Accepteren",
+    "decline": "Weigeren"
+  },
+  "products": {
+    "emptyCategory": "Nog geen producten in deze categorie.",
+    "priceUnavailable": "Prijs niet beschikbaar"
+  },
+  "search": {
+    "placeholder": "Zoek naar TCG-kaarten, figuren, pluchen en meer...",
+    "button": "Zoeken"
+  },
+  "home": {
+    "newProducts": "Nieuwe producten",
+    "discover": "Ontdekken",
+    "loadingMore": "Meer producten laden..."
+  },
+  "cart": {
+    "priceExclVat": "Prijs excl. btw",
+    "vat": "Btw",
+    "discount": "Korting",
+    "subtotal": "Subtotaal",
+    "total": "Totaal",
+    "promoCodePlaceholder": "Promocode",
+    "apply": "Toepassen",
+    "removePromoAriaLabel": "{code} verwijderen",
+    "promoInvalid": "Deze promocode is niet geldig.",
+    "promoRemoveFailed": "Deze promocode kon niet worden verwijderd. Probeer het opnieuw."
+  },
   "nav": {
     "home": "Home",
+    "cartAriaLabel": "Winkelwagen",
+    "accountFallback": "Account",
+    "logIn": "Inloggen",
+    "openMenuAriaLabel": "Menu openen",
+    "menuTitle": "Menu",
     "main": {
       "home": {"label": "Home"},
       "tcg": {
