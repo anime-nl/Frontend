@@ -146,10 +146,10 @@ describe('product page', () => {
         await vi.waitFor(() => expect(addToCartButton()!.props('loading')).toBe(false))
     })
 
-    it('shows unlimited stock as in stock with no maximum quantity', async () => {
+    it('shows unlimited stock as in stock with no maximum quantity, in the default (Dutch) locale', async () => {
         wrapper = await mountProduct('prod_unlimited')
 
-        expect(wrapper.text()).toContain('In stock')
+        expect(wrapper.text()).toContain('Op voorraad')
         const quantityInput = wrapper.findComponent({name: 'UInputNumber'})
         expect(quantityInput.props('max')).toBeUndefined()
     })

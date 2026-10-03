@@ -12,6 +12,33 @@
     "accept": "Accepteren",
     "decline": "Weigeren"
   },
+  "product": {
+    "addToCart": "In winkelwagen",
+    "backorderNow": "Nu nabestellen",
+    "backorderAlertTitle": "Beschikbaar op nabestelling",
+    "backorderAlertDescription": "Dit artikel is momenteel niet op voorraad. Je bestelling wordt verzonden zodra het weer op voorraad is.",
+    "descriptionHeading": "Beschrijving",
+    "detailsHeading": "Details",
+    "categoriesLabel": "Categorieën:",
+    "addedToCartTitle": "Toegevoegd aan winkelwagen",
+    "addToCartErrorTitle": "Kon niet toevoegen aan winkelwagen",
+    "addToCartErrorDescription": "Probeer het zo opnieuw.",
+    "stock": {
+      "unavailable": "Niet beschikbaar",
+      "inStock": "Op voorraad",
+      "inStockCount": "{count} op voorraad",
+      "backorder": "Nabestelling",
+      "outOfStock": "Niet op voorraad"
+    },
+    "details": {
+      "sku": "SKU",
+      "type": "Type",
+      "material": "Materiaal",
+      "origin": "Herkomst",
+      "weight": "Gewicht",
+      "dimensions": "Afmetingen"
+    }
+  },
   "products": {
     "emptyCategory": "Nog geen producten in deze categorie.",
     "priceUnavailable": "Prijs niet beschikbaar",

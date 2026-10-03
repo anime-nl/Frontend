@@ -12,6 +12,33 @@
     "accept": "Akzeptieren",
     "decline": "Ablehnen"
   },
+  "product": {
+    "addToCart": "In den Warenkorb",
+    "backorderNow": "Jetzt nachbestellen",
+    "backorderAlertTitle": "Auf Nachbestellung verfügbar",
+    "backorderAlertDescription": "Dieser Artikel ist derzeit nicht vorrätig. Ihre Bestellung wird versandt, sobald er wieder vorrätig ist.",
+    "descriptionHeading": "Beschreibung",
+    "detailsHeading": "Details",
+    "categoriesLabel": "Kategorien:",
+    "addedToCartTitle": "Zum Warenkorb hinzugefügt",
+    "addToCartErrorTitle": "Konnte nicht zum Warenkorb hinzugefügt werden",
+    "addToCartErrorDescription": "Bitte versuchen Sie es gleich erneut.",
+    "stock": {
+      "unavailable": "Nicht verfügbar",
+      "inStock": "Auf Lager",
+      "inStockCount": "{count} auf Lager",
+      "backorder": "Nachbestellung",
+      "outOfStock": "Nicht auf Lager"
+    },
+    "details": {
+      "sku": "SKU",
+      "type": "Typ",
+      "material": "Material",
+      "origin": "Herkunft",
+      "weight": "Gewicht",
+      "dimensions": "Maße"
+    }
+  },
   "products": {
     "emptyCategory": "Noch keine Produkte in dieser Kategorie.",
     "priceUnavailable": "Preis nicht verfügbar",

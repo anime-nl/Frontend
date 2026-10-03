@@ -12,6 +12,33 @@
     "accept": "Accept",
     "decline": "Decline"
   },
+  "product": {
+    "addToCart": "Add to cart",
+    "backorderNow": "Backorder now",
+    "backorderAlertTitle": "Available on backorder",
+    "backorderAlertDescription": "This item is currently out of stock. Your order will be shipped as soon as it is back in stock.",
+    "descriptionHeading": "Description",
+    "detailsHeading": "Details",
+    "categoriesLabel": "Categories:",
+    "addedToCartTitle": "Added to cart",
+    "addToCartErrorTitle": "Could not add to cart",
+    "addToCartErrorDescription": "Please try again in a moment.",
+    "stock": {
+      "unavailable": "Unavailable",
+      "inStock": "In stock",
+      "inStockCount": "{count} in stock",
+      "backorder": "Backorder",
+      "outOfStock": "Out of stock"
+    },
+    "details": {
+      "sku": "SKU",
+      "type": "Type",
+      "material": "Material",
+      "origin": "Origin",
+      "weight": "Weight",
+      "dimensions": "Dimensions"
+    }
+  },
   "products": {
     "emptyCategory": "No products in this category yet.",
     "priceUnavailable": "Price unavailable",
