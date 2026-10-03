@@ -6,6 +6,7 @@ const route = useRoute()
 const toast = useToast()
 const requestUrl = useRequestURL()
 const cart = useCart()
+const {localeProperties} = useI18n()
 
 const {data, error} = await useFetch<{product: StoreProduct; region_id?: string; sales_channel_id?: string}>(
   () => `/api/products/${route.params.id}`,
@@ -56,8 +57,11 @@ const price = computed(() => {
   const currency = calculated.currency_code!
   const original = calculated.original_amount ?? calculated.calculated_amount
   return {
-    current: formatCurrency(calculated.calculated_amount, currency),
-    original: original > calculated.calculated_amount ? formatCurrency(original, currency) : null
+    current: formatCurrency(calculated.calculated_amount, currency, localeProperties.value.language!),
+    original:
+      original > calculated.calculated_amount
+        ? formatCurrency(original, currency, localeProperties.value.language!)
+        : null
   }
 })
 

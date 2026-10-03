@@ -4,7 +4,7 @@ import {checkoutCountries, splitStreetAndHouseNumber, validateAddressRequest} fr
 import type {AddressRequest} from '#shared/utils/checkout'
 import {formatCurrency} from '#shared/utils/currency'
 
-const {t} = useI18n()
+const {t, localeProperties} = useI18n()
 
 // useFetch dedupes by key, so whichever call with a given key runs first is the one that actually
 // fires and must carry the cookie-forwarding hook - not useCart's/useCustomer's own internal call.
@@ -68,7 +68,7 @@ const shippingOptions = ref<StoreShippingOption[]>([])
 const shippingOptionItems = computed(() =>
   shippingOptions.value.map((option) => ({
     value: option.id,
-    label: `${option.name} — ${formatCurrency(option.amount, cart.cart.value?.currency_code ?? 'EUR')}`
+    label: `${option.name} — ${formatCurrency(option.amount, cart.cart.value?.currency_code ?? 'EUR', localeProperties.value.language!)}`
   }))
 )
 const selectedOptionId = ref('')

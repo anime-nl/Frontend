@@ -10,6 +10,7 @@ await useFetch('/api/account/me', {
   onResponse: ({response}) => forwardSetCookie(requestEvent, response)
 })
 const customer = useCustomer()
+const {localeProperties} = useI18n()
 
 const {data: ordersData} = await useFetch<{orders: StoreOrder[]}>('/api/account/orders', {
   key: 'account-orders',
@@ -49,7 +50,9 @@ async function logout() {
         >
           <span>Order #{{ order.display_id ?? order.id }}</span>
           <UBadge :label="order.status" color="neutral" variant="subtle" />
-          <span class="font-semibold">{{ formatCurrency(order.total, order.currency_code) }}</span>
+          <span class="font-semibold">{{
+            formatCurrency(order.total, order.currency_code, localeProperties.language!)
+          }}</span>
         </div>
       </div>
     </div>
