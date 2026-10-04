@@ -43,7 +43,13 @@ const filters = reactive<ProductFilters>({
 
 const loadMoreSentinel = useTemplateRef<HTMLElement>('loadMoreSentinel')
 const collectionSelect = useTemplateRef<HTMLSelectElement>('collectionSelect')
-let observer: IntersectionObserver | null = null
+const infiniteScroll = useInfiniteScroll(
+  loadMoreSentinel,
+  () => {
+    if (hasMore.value && !loading.value) fetchProducts()
+  },
+  {rootMargin: '200px'}
+)
 let filterTimeout: ReturnType<typeof setTimeout> | null = null
 let currentRequestId = 0
 
@@ -84,7 +90,7 @@ const fetchProducts = async (reset = false) => {
     if (requestId === currentRequestId) {
       loading.value = false
       await nextTick()
-      rearmObserver()
+      infiniteScroll.rearm()
     }
   }
 }
@@ -106,28 +112,6 @@ watch(
   {deep: true}
 )
 
-const rearmObserver = () => {
-  if (!observer || !loadMoreSentinel.value) return
-  observer.unobserve(loadMoreSentinel.value)
-  observer.observe(loadMoreSentinel.value)
-}
-
-const setupIntersectionObserver = () => {
-  if (!loadMoreSentinel.value) return
-
-  observer = new IntersectionObserver(
-    (entries) => {
-      const target = entries[0]
-      if (target?.isIntersecting && hasMore.value && !loading.value) {
-        fetchProducts()
-      }
-    },
-    {rootMargin: '200px'}
-  )
-
-  observer.observe(loadMoreSentinel.value)
-}
-
 onMounted(async () => {
   if (route.query.focus === 'collection') {
     collectionSelect.value?.focus()
@@ -137,12 +121,11 @@ onMounted(async () => {
 
   if (regionId.value) {
     await fetchProducts(true)
-    setupIntersectionObserver()
+    infiniteScroll.start()
   }
 })
 
 onUnmounted(() => {
-  if (observer) observer.disconnect()
   if (filterTimeout) clearTimeout(filterTimeout)
 })
 </script>

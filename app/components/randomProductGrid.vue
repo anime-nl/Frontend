@@ -16,7 +16,7 @@ const totalCount = ref(initial.value?.count ?? 0)
 const loading = ref(false)
 
 const loadMoreSentinel = useTemplateRef<HTMLElement>('loadMoreSentinel')
-let observer: IntersectionObserver | null = null
+const infiniteScroll = useInfiniteScroll(loadMoreSentinel, loadMore, {rootMargin: '400px'})
 
 /** A random offset for a batch, so repeated loads surface different products instead of always the same page. */
 function randomOffset() {
@@ -40,31 +40,11 @@ async function loadMore() {
   } finally {
     loading.value = false
     await nextTick()
-    rearmObserver()
+    infiniteScroll.rearm()
   }
 }
 
-function rearmObserver() {
-  if (!observer || !loadMoreSentinel.value) return
-  observer.unobserve(loadMoreSentinel.value)
-  observer.observe(loadMoreSentinel.value)
-}
-
-onMounted(() => {
-  if (!loadMoreSentinel.value) return
-
-  observer = new IntersectionObserver(
-    (entries) => {
-      if (entries[0]?.isIntersecting) loadMore()
-    },
-    {rootMargin: '400px'}
-  )
-  observer.observe(loadMoreSentinel.value)
-})
-
-onUnmounted(() => {
-  observer?.disconnect()
-})
+onMounted(() => infiniteScroll.start())
 </script>
 
 <template>
