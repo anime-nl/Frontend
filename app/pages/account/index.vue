@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type {StoreOrder} from '@medusajs/types'
 import {formatCurrency} from '#shared/utils/currency'
 
 // useFetch dedupes by key, so this call (not useCustomer's own) is the one that actually fires
@@ -10,16 +9,14 @@ await useFetch('/api/account/me', {
   onResponse: ({response}) => forwardSetCookie(requestEvent, response)
 })
 const customer = useCustomer()
+const auth = useAuth()
 const {t, localeProperties} = useI18n()
 
-const {data: ordersData} = await useFetch<{orders: StoreOrder[]}>('/api/account/orders', {
-  key: 'account-orders',
-  immediate: !!customer.customer.value
-})
+const {data: ordersData} = await useOrders(!!customer.customer.value)
 const orders = computed(() => ordersData.value?.orders ?? [])
 
 async function logout() {
-  await $fetch('/api/account/logout', {method: 'POST'})
+  await auth.logout()
   await customer.refresh()
 }
 </script>

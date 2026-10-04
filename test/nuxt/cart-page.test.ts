@@ -116,6 +116,14 @@ describe('cart page', () => {
         expect(wrapper.text()).toContain(eur(10.9))
     })
 
+    it('stacks a line item vertically on narrow screens instead of overflowing', async () => {
+        wrapper = await mountCart()
+
+        const row = wrapper.findComponent({name: 'UInputNumber'}).element.closest('[class*="flex-col"]')
+        expect(row?.className).toContain('flex-col')
+        expect(row?.className).toContain('sm:flex-row')
+    })
+
     it('shows the price excl. VAT, the VAT amount, the incl.-VAT subtotal and the total', async () => {
         wrapper = await mountCart()
 

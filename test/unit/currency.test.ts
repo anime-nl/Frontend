@@ -1,4 +1,4 @@
-import {describe, expect, it} from 'vitest'
+import {describe, expect, it, vi} from 'vitest'
 import {formatCurrency} from '../../shared/utils/currency'
 
 describe('formatCurrency', () => {
@@ -28,5 +28,15 @@ describe('formatCurrency', () => {
         // Locale affects number formatting (grouping/decimal separators), never the currency itself:
         // this shop only ever sells in EUR, per Medusa's single-region setup.
         expect(formatCurrency(10.9, 'eur', 'de-DE')).toContain('€')
+    })
+
+    it('reuses the same Intl.NumberFormat instance for repeated calls with the same locale and currency', () => {
+        const spy = vi.spyOn(Intl, 'NumberFormat')
+
+        formatCurrency(10, 'USD', 'en-US')
+        formatCurrency(20, 'USD', 'en-US')
+
+        expect(spy).toHaveBeenCalledTimes(1)
+        spy.mockRestore()
     })
 })

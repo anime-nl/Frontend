@@ -6,17 +6,17 @@ const BATCH_SIZE = 24
 const {t} = useI18n()
 const {data: regionId} = await useDefaultRegionId()
 
-const {data: initial} = await useFetch('/api/products', {
-  key: 'random-products-initial',
-  query: {limit: BATCH_SIZE, offset: 0, fields: 'title,thumbnail,*variants.calculated_price', region_id: regionId}
-})
+const {data: initial} = await useProductSearch(
+  {limit: BATCH_SIZE, offset: 0, fields: 'title,thumbnail,*variants.calculated_price', region_id: regionId},
+  'random-products-initial'
+)
 
 const products = ref<StoreProduct[]>(initial.value?.products ?? [])
 const totalCount = ref(initial.value?.count ?? 0)
 const loading = ref(false)
 
 const loadMoreSentinel = useTemplateRef<HTMLElement>('loadMoreSentinel')
-let observer: IntersectionObserver | null = null
+const infiniteScroll = useInfiniteScroll(loadMoreSentinel, loadMore, {rootMargin: '400px'})
 
 /** A random offset for a batch, so repeated loads surface different products instead of always the same page. */
 function randomOffset() {
@@ -30,43 +30,21 @@ async function loadMore() {
   loading.value = true
 
   try {
-    const response = await $fetch<{products: StoreProduct[]}>('/api/products', {
-      query: {
-        limit: Math.min(BATCH_SIZE, totalCount.value),
-        offset: randomOffset(),
-        fields: 'title,thumbnail,*variants.calculated_price',
-        region_id: regionId.value
-      }
+    const response = await fetchProductPage({
+      limit: Math.min(BATCH_SIZE, totalCount.value),
+      offset: randomOffset(),
+      fields: 'title,thumbnail,*variants.calculated_price',
+      region_id: regionId.value
     })
     products.value.push(...response.products)
   } finally {
     loading.value = false
     await nextTick()
-    rearmObserver()
+    infiniteScroll.rearm()
   }
 }
 
-function rearmObserver() {
-  if (!observer || !loadMoreSentinel.value) return
-  observer.unobserve(loadMoreSentinel.value)
-  observer.observe(loadMoreSentinel.value)
-}
-
-onMounted(() => {
-  if (!loadMoreSentinel.value) return
-
-  observer = new IntersectionObserver(
-    (entries) => {
-      if (entries[0]?.isIntersecting) loadMore()
-    },
-    {rootMargin: '400px'}
-  )
-  observer.observe(loadMoreSentinel.value)
-})
-
-onUnmounted(() => {
-  observer?.disconnect()
-})
+onMounted(() => infiniteScroll.start())
 </script>
 
 <template>

@@ -27,7 +27,7 @@ const price = computed(() => {
         <img
           v-if="product.thumbnail"
           :src="product.thumbnail"
-          alt="product-image"
+          :alt="product.title"
           class="object-cover absolute w-full h-full bottom-0 top-0 z-0"
         />
 
@@ -42,7 +42,7 @@ const price = computed(() => {
 
           <hr class="border-gray-500 my-2" />
 
-          <p v-if="price" class="font-medium text-[#3fa3ee]">{{ price }}</p>
+          <p v-if="price" class="font-medium text-primary">{{ price }}</p>
           <p v-else class="text-sm text-gray-400">{{ t('products.priceUnavailable') }}</p>
         </div>
       </div>

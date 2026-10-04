@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 const {t} = useI18n()
 const {data: regionId} = await useDefaultRegionId()
-const {data} = await useFetch('/api/products', {
-  key: 'showcase-products',
-  query: {fields: 'title,thumbnail', region_id: regionId, limit: 10, order: '-created_at'}
-})
+const {data} = await useProductSearch(
+  {fields: 'title,thumbnail', region_id: regionId, limit: 10, order: '-created_at'},
+  'showcase-products'
+)
 const products = computed(() => (data.value?.products ?? []).filter((product) => product.thumbnail))
 </script>
 

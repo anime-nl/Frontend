@@ -1,16 +1,19 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
 import type {H3Event} from 'h3'
+import {clearCache, withTtlCache} from '../../server/utils/cache'
 
 const medusaFetch = vi.fn()
 
 beforeEach(() => {
     vi.stubGlobal('defineEventHandler', (handler: unknown) => handler)
     vi.stubGlobal('medusaFetch', medusaFetch)
+    vi.stubGlobal('withTtlCache', withTtlCache)
 })
 
 afterEach(() => {
     vi.unstubAllGlobals()
     medusaFetch.mockReset()
+    clearCache()
 })
 
 async function callRoute() {
@@ -29,5 +32,23 @@ describe('GET /api/categories', () => {
         medusaFetch.mockRejectedValue(new Error('connect ECONNREFUSED'))
 
         await expect(callRoute()).resolves.toEqual({product_categories: []})
+    })
+
+    it('does not re-fetch from Medusa on a second call within the cache window', async () => {
+        medusaFetch.mockResolvedValue({product_categories: [{id: 'pcat_1', name: 'TCG'}]})
+
+        await callRoute()
+        await callRoute()
+
+        expect(medusaFetch).toHaveBeenCalledTimes(1)
+    })
+
+    it('does not cache a failure, so a later call still reaches Medusa once it recovers', async () => {
+        medusaFetch.mockRejectedValueOnce(new Error('connect ECONNREFUSED'))
+        medusaFetch.mockResolvedValueOnce({product_categories: [{id: 'pcat_1', name: 'TCG'}]})
+
+        await callRoute()
+
+        await expect(callRoute()).resolves.toEqual({product_categories: [{id: 'pcat_1', name: 'TCG'}]})
     })
 })

@@ -15,7 +15,6 @@ interface ProductFilters {
   collection: string
 }
 
-const currentRegionId = ref<string>('')
 const availableCollections = ref<Collection[]>([])
 const products = ref<StoreProduct[]>([])
 
@@ -30,7 +29,10 @@ const queryParam = (key: keyof ProductFilters) => {
   return (Array.isArray(value) ? value[0] : value) ?? ''
 }
 
-const {data: categoriesResponse} = await useFetch<{product_categories: SearchCategory[]}>('/api/categories')
+const [{data: categoriesResponse}, {data: regionId}] = await Promise.all([
+  useFetch<{product_categories: SearchCategory[]}>('/api/categories'),
+  useDefaultRegionId()
+])
 const availableCategories = computed(() => categoriesResponse.value?.product_categories ?? [])
 
 const filters = reactive<ProductFilters>({
@@ -41,7 +43,13 @@ const filters = reactive<ProductFilters>({
 
 const loadMoreSentinel = useTemplateRef<HTMLElement>('loadMoreSentinel')
 const collectionSelect = useTemplateRef<HTMLSelectElement>('collectionSelect')
-let observer: IntersectionObserver | null = null
+const infiniteScroll = useInfiniteScroll(
+  loadMoreSentinel,
+  () => {
+    if (hasMore.value && !loading.value) fetchProducts()
+  },
+  {rootMargin: '200px'}
+)
 let filterTimeout: ReturnType<typeof setTimeout> | null = null
 let currentRequestId = 0
 
@@ -62,16 +70,14 @@ const fetchProducts = async (reset = false) => {
       limit: LIMIT,
       offset: (page.value - 1) * LIMIT,
       fields: '+variants,*variants.calculated_price',
-      region_id: currentRegionId.value
+      region_id: regionId.value
     }
 
     if (filters.q.trim()) queryParams.q = filters.q.trim()
     if (filters.category) queryParams.category_id = [filters.category]
     if (filters.collection) queryParams.collection_id = [filters.collection]
 
-    const response = await $fetch<{products: StoreProduct[]; count: number}>('/api/products', {
-      query: queryParams
-    })
+    const response = await fetchProductPage(queryParams)
 
     if (requestId !== currentRequestId) return
 
@@ -84,7 +90,7 @@ const fetchProducts = async (reset = false) => {
     if (requestId === currentRequestId) {
       loading.value = false
       await nextTick()
-      rearmObserver()
+      infiniteScroll.rearm()
     }
   }
 }
@@ -106,106 +112,74 @@ watch(
   {deep: true}
 )
 
-const rearmObserver = () => {
-  if (!observer || !loadMoreSentinel.value) return
-  observer.unobserve(loadMoreSentinel.value)
-  observer.observe(loadMoreSentinel.value)
-}
-
-const setupIntersectionObserver = () => {
-  if (!loadMoreSentinel.value) return
-
-  observer = new IntersectionObserver(
-    (entries) => {
-      const target = entries[0]
-      if (target?.isIntersecting && hasMore.value && !loading.value) {
-        fetchProducts()
-      }
-    },
-    {rootMargin: '200px'}
-  )
-
-  observer.observe(loadMoreSentinel.value)
-}
-
 onMounted(async () => {
   if (route.query.focus === 'collection') {
     collectionSelect.value?.focus()
   }
 
-  const [collectionsRes, regionsRes] = await Promise.allSettled([
-    $fetch<{collections: Collection[]}>('/api/collections'),
-    $fetch<{regions: {id: string}[]}>('/api/regions')
-  ])
+  availableCollections.value = await fetchCollections().catch(() => [])
 
-  if (collectionsRes.status === 'fulfilled') {
-    availableCollections.value = collectionsRes.value.collections ?? []
-  }
-
-  const firstRegion = regionsRes.status === 'fulfilled' ? regionsRes.value.regions?.[0] : undefined
-  if (firstRegion) {
-    currentRegionId.value = firstRegion.id
+  if (regionId.value) {
     await fetchProducts(true)
-    setupIntersectionObserver()
+    infiniteScroll.start()
   }
 })
 
 onUnmounted(() => {
-  if (observer) observer.disconnect()
   if (filterTimeout) clearTimeout(filterTimeout)
 })
 </script>
 
 <template>
-  <div
-    class="max-w-screen-2xl mx-auto p-4 md:p-8 flex flex-col md:flex-row gap-8 bg-slate-900 min-h-screen text-slate-100"
-  >
+  <div class="max-w-screen-2xl mx-auto p-4 md:p-8 flex flex-col md:flex-row gap-8">
     <aside class="w-full md:w-72 shrink-0">
-      <div class="sticky top-8 space-y-6 p-6 rounded-2xl border border-sky-200/20 bg-slate-900">
-        <div>
-          <label for="search-input" class="block text-xl font-bold mb-3">{{ t('search.heading') }}</label>
-          <input
-            id="search-input"
-            v-model="filters.q"
-            type="text"
-            :placeholder="t('search.inputPlaceholder')"
-            class="w-full bg-slate-900 border border-sky-200/40 rounded-xl p-3 text-sm focus:ring-2 hover:ring-sky-400 hover:border-sky-400 outline-none placeholder-slate-400 transition-colors"
-          />
-        </div>
+      <UCard class="sticky top-8">
+        <div class="space-y-6">
+          <div>
+            <label for="search-input" class="block text-xl font-bold mb-3">{{ t('search.heading') }}</label>
+            <UInput
+              id="search-input"
+              v-model="filters.q"
+              type="text"
+              :placeholder="t('search.inputPlaceholder')"
+              class="w-full"
+            />
+          </div>
 
-        <div>
-          <label for="collection-select" class="block font-semibold mb-2 text-sky-200">{{
-            t('search.collectionLabel')
-          }}</label>
-          <select
-            id="collection-select"
-            ref="collectionSelect"
-            v-model="filters.collection"
-            class="w-full bg-slate-900 border border-sky-200/40 rounded-xl p-3 text-sm text-white focus:ring-2 hover:ring-sky-400 outline-none transition-colors"
-          >
-            <option value="">{{ t('search.allCollections') }}</option>
-            <option v-for="col in availableCollections" :key="col.id" :value="col.id">
-              {{ col.title }}
-            </option>
-          </select>
-        </div>
+          <div>
+            <label for="collection-select" class="block font-semibold mb-2 text-secondary">{{
+              t('search.collectionLabel')
+            }}</label>
+            <select
+              id="collection-select"
+              ref="collectionSelect"
+              v-model="filters.collection"
+              class="w-full bg-default border border-sky-200/40 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary hover:border-primary transition-colors"
+            >
+              <option value="">{{ t('search.allCollections') }}</option>
+              <option v-for="col in availableCollections" :key="col.id" :value="col.id">
+                {{ col.title }}
+              </option>
+            </select>
+          </div>
 
-        <div>
-          <label for="category-select" class="block font-semibold mb-2 text-sky-200">{{
-            t('search.categoryLabel')
-          }}</label>
-          <select
-            id="category-select"
-            v-model="filters.category"
-            class="w-full bg-slate-900 border border-sky-200/40 rounded-xl p-3 text-sm text-white focus:ring-2 hover:ring-sky-400 outline-none transition-colors"
-          >
-            <option value="">{{ t('search.allCategories') }}</option>
-            <option v-for="cat in availableCategories" :key="cat.id" :value="cat.id">
-              {{ cat.name }}
-            </option>
-          </select>
+          <div>
+            <label for="category-select" class="block font-semibold mb-2 text-secondary">{{
+              t('search.categoryLabel')
+            }}</label>
+            <select
+              id="category-select"
+              v-model="filters.category"
+              class="w-full bg-default border border-sky-200/40 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary hover:border-primary transition-colors"
+            >
+              <option value="">{{ t('search.allCategories') }}</option>
+              <option v-for="cat in availableCategories" :key="cat.id" :value="cat.id">
+                {{ cat.name }}
+              </option>
+            </select>
+          </div>
         </div>
-      </div>
+      </UCard>
     </aside>
 
     <main class="flex-1">
@@ -215,32 +189,15 @@ onUnmounted(() => {
 
       <div v-if="!loading && products.length === 0" class="text-center py-20 text-slate-400">
         <p class="text-lg">{{ t('search.noResults') }}</p>
-        <button
-          class="mt-4 text-sky-400 hover:text-sky-200 underline transition-colors focus:outline-none"
-          @click="resetFilters"
-        >
-          {{ t('search.clearFilters') }}
-        </button>
+        <UButton :label="t('search.clearFilters')" color="primary" variant="link" class="mt-4" @click="resetFilters" />
       </div>
 
       <div ref="loadMoreSentinel" class="w-full py-12 flex justify-center items-center">
         <div v-if="loading" class="flex flex-col items-center gap-3 text-slate-400">
-          <svg
-            class="animate-spin h-8 w-8 text-sky-400"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-            <path
-              class="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            />
-          </svg>
-          <span class="text-sm font-medium text-sky-200">{{ t('search.loadingMore') }}</span>
+          <UIcon name="i-lucide-loader-2" class="animate-spin text-primary size-8" />
+          <span class="text-sm font-medium text-secondary">{{ t('search.loadingMore') }}</span>
         </div>
-        <div v-else-if="!hasMore && products.length > 0" class="text-sky-200/60 text-sm">
+        <div v-else-if="!hasMore && products.length > 0" class="text-slate-400 text-sm">
           {{ t('search.endOfCatalog') }}
         </div>
       </div>
