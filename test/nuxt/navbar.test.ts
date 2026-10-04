@@ -145,4 +145,26 @@ describe('navbar', () => {
             expect(document.body.querySelectorAll('a[href="/account/login"]').length).toBeGreaterThan(1)
         })
     })
+
+    it('puts the cart icon first and the menu button last in the mobile top bar', async () => {
+        wrapper = await mountNavbar()
+
+        const cartItem = wrapper.find('a[href="/cart"]').element.closest('[class*="order-"]')
+        const menuButton = wrapper.find('button[aria-label="Menu openen"]')
+
+        expect(cartItem?.className).toContain('order-1')
+        expect(menuButton.classes()).toContain('order-2')
+    })
+
+    it('orders the desktop top bar as language switcher, nav menu, login, then cart', async () => {
+        wrapper = await mountNavbar()
+
+        const localeWrapper = wrapper.findComponent(LocaleSwitcher).element.closest('[class*="lg:order-"]')
+        const loginLink = wrapper.find('a[href="/account/login"]')
+        const cartItem = wrapper.find('a[href="/cart"]').element.closest('[class*="lg:order-"]')
+
+        expect(localeWrapper?.className).toContain('lg:order-1')
+        expect(loginLink.classes()).toContain('lg:order-3')
+        expect(cartItem?.className).toContain('lg:order-4')
+    })
 })
