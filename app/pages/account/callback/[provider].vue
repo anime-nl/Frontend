@@ -9,6 +9,7 @@ const localePath = useLocalePath()
 const cookieLocale = useCookieLocale()
 const route = useRoute()
 const customer = useCustomer()
+const auth = useAuth()
 const failed = ref(false)
 
 // This exchange must run in the browser: completing it during server rendering would set the
@@ -16,7 +17,7 @@ const failed = ref(false)
 // response, leaving the visitor looping back to a signed-out /account.
 onMounted(async () => {
   try {
-    await $fetch(`/api/auth/${route.params.provider}/callback`, {method: 'POST', body: route.query})
+    await auth.handleCallback(route.params.provider as string, route.query)
     await customer.refresh()
     await navigateTo(localePath('/account', isSupportedLocale(cookieLocale.value) ? cookieLocale.value : undefined))
   } catch {

@@ -5,12 +5,13 @@ const {t} = useI18n()
 
 const signingIn = ref<string | null>(null)
 const error = ref('')
+const auth = useAuth()
 
 async function signIn(providerId: string) {
   error.value = ''
   signingIn.value = providerId
   try {
-    const {location} = await $fetch<{location: string}>(`/api/auth/${providerId}/start`, {method: 'POST'})
+    const location = await auth.signInStart(providerId)
     await navigateTo(location, {external: true})
   } catch (e) {
     console.error('Failed to start sign-in:', e)

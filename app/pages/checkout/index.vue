@@ -7,21 +7,21 @@ import {formatCurrency} from '#shared/utils/currency'
 const {t, localeProperties} = useI18n()
 const localePath = useLocalePath()
 
-// useFetch dedupes by key, so whichever call with a given key runs first is the one that actually
-// fires and must carry the cookie-forwarding hook - not useCart's/useCustomer's own internal call.
-const requestEvent = useRequestEvent()
-await useFetch('/api/cart', {key: 'cart', onResponse: ({response}) => forwardSetCookie(requestEvent, response)})
+// Blocking so the redirect guard below and the address prefill see real data on first render, not
+// the transient empty state before useCart's/useCustomer's own fetch resolves. No onResponse here:
+// Navbar renders before this page and already calls useCart()/useCustomer(), whose own useFetch
+// carries the cookie-forwarding hook - this page's call is the dedup'd second one, not the one
+// Nuxt actually sends over the wire.
+await useFetch('/api/cart', {key: 'cart'})
 const cart = useCart()
 
 if (!cart.items.value.length) {
   await navigateTo(localePath('/cart'))
 }
 
-await useFetch('/api/account/me', {
-  key: 'current-customer',
-  onResponse: ({response}) => forwardSetCookie(requestEvent, response)
-})
+await useFetch('/api/account/me', {key: 'current-customer'})
 const customer = useCustomer()
+const checkout = useCheckout()
 
 type Step = 'address' | 'shipping' | 'review'
 const step = ref<Step>('address')
@@ -88,12 +88,11 @@ async function onAddressSubmit() {
   addressError.value = ''
 
   try {
-    await $fetch('/api/checkout/address', {method: 'POST', body: address})
+    await checkout.submitAddress(address)
     await cart.refresh()
 
-    const {shipping_options} = await $fetch<{shipping_options: StoreShippingOption[]}>('/api/checkout/shipping-options')
-    shippingOptions.value = shipping_options
-    selectedOptionId.value = shipping_options[0]?.id ?? ''
+    shippingOptions.value = await checkout.fetchShippingOptions()
+    selectedOptionId.value = shippingOptions.value[0]?.id ?? ''
 
     step.value = 'shipping'
   } catch {
@@ -111,7 +110,7 @@ async function onShippingContinue() {
   shippingError.value = ''
 
   try {
-    await $fetch('/api/checkout/shipping-method', {method: 'POST', body: {option_id: selectedOptionId.value}})
+    await checkout.selectShippingMethod(selectedOptionId.value)
     await cart.refresh()
     step.value = 'review'
   } catch {
@@ -129,8 +128,8 @@ async function onPay() {
   paymentError.value = ''
 
   try {
-    const {redirect_url} = await $fetch<{redirect_url: string}>('/api/checkout/payment-session', {method: 'POST'})
-    await navigateTo(redirect_url, {external: true})
+    const redirectUrl = await checkout.startPayment()
+    await navigateTo(redirectUrl, {external: true})
   } catch {
     paymentError.value = t('checkout.paymentError')
     submittingPayment.value = false

@@ -55,11 +55,7 @@ async function onSubmit() {
   submitError.value = ''
 
   try {
-    await $fetch('/api/support', {
-      method: 'POST',
-      body: state,
-      headers: {'x-site-locale': locale.value}
-    })
+    await submitSupportRequest(state, locale.value)
     sent.value = true
   } catch {
     submitError.value = t('support.sendError', {email: supportEmail})
