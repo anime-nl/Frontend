@@ -3,7 +3,10 @@
 useSeoMeta({robots: 'noindex'})
 
 const {t} = useI18n()
-const {data, pending, error} = await useFetch('/api/products')
+const {data, pending, error} = await useProductSearch(
+  {limit: 24, fields: 'title,thumbnail,*variants.calculated_price'},
+  'products-index'
+)
 </script>
 
 <template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {StoreProduct, StoreProductVariant} from '@medusajs/types'
+import type {StoreProductVariant} from '@medusajs/types'
 import {formatCurrency} from '#shared/utils/currency'
 
 const route = useRoute()
@@ -8,10 +8,7 @@ const requestUrl = useRequestURL()
 const cart = useCart()
 const {t, localeProperties} = useI18n()
 
-const {data, error} = await useFetch<{product: StoreProduct; region_id?: string; sales_channel_id?: string}>(
-  () => `/api/products/${route.params.id}`,
-  {key: `product-${route.params.id}`}
-)
+const {data, error} = await useProduct(() => route.params.id as string)
 
 if (error.value || !data.value?.product) {
   throw createError({

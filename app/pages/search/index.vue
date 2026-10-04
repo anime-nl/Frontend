@@ -15,7 +15,6 @@ interface ProductFilters {
   collection: string
 }
 
-const currentRegionId = ref<string>('')
 const availableCollections = ref<Collection[]>([])
 const products = ref<StoreProduct[]>([])
 
@@ -30,7 +29,10 @@ const queryParam = (key: keyof ProductFilters) => {
   return (Array.isArray(value) ? value[0] : value) ?? ''
 }
 
-const {data: categoriesResponse} = await useFetch<{product_categories: SearchCategory[]}>('/api/categories')
+const [{data: categoriesResponse}, {data: regionId}] = await Promise.all([
+  useFetch<{product_categories: SearchCategory[]}>('/api/categories'),
+  useDefaultRegionId()
+])
 const availableCategories = computed(() => categoriesResponse.value?.product_categories ?? [])
 
 const filters = reactive<ProductFilters>({
@@ -62,16 +64,14 @@ const fetchProducts = async (reset = false) => {
       limit: LIMIT,
       offset: (page.value - 1) * LIMIT,
       fields: '+variants,*variants.calculated_price',
-      region_id: currentRegionId.value
+      region_id: regionId.value
     }
 
     if (filters.q.trim()) queryParams.q = filters.q.trim()
     if (filters.category) queryParams.category_id = [filters.category]
     if (filters.collection) queryParams.collection_id = [filters.collection]
 
-    const response = await $fetch<{products: StoreProduct[]; count: number}>('/api/products', {
-      query: queryParams
-    })
+    const response = await fetchProductPage(queryParams)
 
     if (requestId !== currentRequestId) return
 
@@ -133,18 +133,9 @@ onMounted(async () => {
     collectionSelect.value?.focus()
   }
 
-  const [collectionsRes, regionsRes] = await Promise.allSettled([
-    $fetch<{collections: Collection[]}>('/api/collections'),
-    $fetch<{regions: {id: string}[]}>('/api/regions')
-  ])
+  availableCollections.value = await fetchCollections().catch(() => [])
 
-  if (collectionsRes.status === 'fulfilled') {
-    availableCollections.value = collectionsRes.value.collections ?? []
-  }
-
-  const firstRegion = regionsRes.status === 'fulfilled' ? regionsRes.value.regions?.[0] : undefined
-  if (firstRegion) {
-    currentRegionId.value = firstRegion.id
+  if (regionId.value) {
     await fetchProducts(true)
     setupIntersectionObserver()
   }

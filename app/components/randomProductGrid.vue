@@ -6,10 +6,10 @@ const BATCH_SIZE = 24
 const {t} = useI18n()
 const {data: regionId} = await useDefaultRegionId()
 
-const {data: initial} = await useFetch('/api/products', {
-  key: 'random-products-initial',
-  query: {limit: BATCH_SIZE, offset: 0, fields: 'title,thumbnail,*variants.calculated_price', region_id: regionId}
-})
+const {data: initial} = await useProductSearch(
+  {limit: BATCH_SIZE, offset: 0, fields: 'title,thumbnail,*variants.calculated_price', region_id: regionId},
+  'random-products-initial'
+)
 
 const products = ref<StoreProduct[]>(initial.value?.products ?? [])
 const totalCount = ref(initial.value?.count ?? 0)
@@ -30,13 +30,11 @@ async function loadMore() {
   loading.value = true
 
   try {
-    const response = await $fetch<{products: StoreProduct[]}>('/api/products', {
-      query: {
-        limit: Math.min(BATCH_SIZE, totalCount.value),
-        offset: randomOffset(),
-        fields: 'title,thumbnail,*variants.calculated_price',
-        region_id: regionId.value
-      }
+    const response = await fetchProductPage({
+      limit: Math.min(BATCH_SIZE, totalCount.value),
+      offset: randomOffset(),
+      fields: 'title,thumbnail,*variants.calculated_price',
+      region_id: regionId.value
     })
     products.value.push(...response.products)
   } finally {
