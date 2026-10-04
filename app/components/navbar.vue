@@ -35,7 +35,9 @@ watch(
         />
       </UChip>
 
-      <LocaleSwitcher />
+      <div class="hidden lg:flex">
+        <LocaleSwitcher />
+      </div>
 
       <UButton
         v-if="customer.customer.value"
@@ -43,8 +45,16 @@ watch(
         to="/account"
         color="neutral"
         variant="link"
+        class="hidden lg:flex"
       />
-      <UButton v-else :label="t('nav.logIn')" to="/account/login" color="neutral" variant="link" />
+      <UButton
+        v-else
+        :label="t('nav.logIn')"
+        to="/account/login"
+        color="neutral"
+        variant="link"
+        class="hidden lg:flex"
+      />
 
       <UButton
         class="lg:hidden"
@@ -61,7 +71,19 @@ watch(
   <USlideover v-model:open="mobileMenuOpen" :title="t('nav.menuTitle')">
     <template #body>
       <UNavigationMenu :items="items" orientation="vertical" />
-      <LocaleSwitcher class="mt-4" />
+      <USeparator class="my-4" />
+      <div class="flex flex-col gap-3">
+        <UButton
+          v-if="customer.customer.value"
+          :label="customer.customer.value.first_name || t('nav.accountFallback')"
+          to="/account"
+          color="neutral"
+          variant="outline"
+          block
+        />
+        <UButton v-else :label="t('nav.logIn')" to="/account/login" color="neutral" variant="outline" block />
+        <LocaleSwitcher />
+      </div>
     </template>
   </USlideover>
 </template>

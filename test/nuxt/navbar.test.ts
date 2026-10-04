@@ -2,6 +2,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
 import {mountSuspended, registerEndpoint} from '@nuxt/test-utils/runtime'
 import {createError} from 'h3'
 import Navbar from '~/components/navbar.vue'
+import LocaleSwitcher from '~/components/localeSwitcher.vue'
 
 let cart: {items: {quantity: number}[]} | null = null
 registerEndpoint('/api/cart', () => ({cart}))
@@ -117,5 +118,31 @@ describe('navbar', () => {
             .find((button) => button.attributes('aria-label') === 'Menu openen')
 
         expect(menuButton!.props('variant')).toBe('ghost')
+    })
+
+    it('hides the language switcher from the top bar on narrow screens, keeping only cart and menu', async () => {
+        wrapper = await mountNavbar()
+
+        const wrapperEl = wrapper.findComponent(LocaleSwitcher).element.closest('.hidden')
+        expect(wrapperEl?.className).toContain('hidden')
+        expect(wrapperEl?.className).toContain('lg:flex')
+    })
+
+    it('hides the login link from the top bar on narrow screens', async () => {
+        wrapper = await mountNavbar()
+
+        const loginLink = wrapper.find('a[href="/account/login"]')
+        expect(loginLink.classes()).toContain('hidden')
+        expect(loginLink.classes()).toContain('lg:flex')
+    })
+
+    it('offers a login link inside the mobile menu instead', async () => {
+        wrapper = await mountNavbar()
+
+        await wrapper.find('button[aria-label="Menu openen"]').trigger('click')
+
+        await vi.waitFor(() => {
+            expect(document.body.querySelectorAll('a[href="/account/login"]').length).toBeGreaterThan(1)
+        })
     })
 })
