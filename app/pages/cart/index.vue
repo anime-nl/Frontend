@@ -1,8 +1,11 @@
 <script setup lang="ts">
-// Blocks on the shared 'cart' key so this page's first render already has the cart, instead of
-// flashing the empty state until useCart's own fetch resolves. useFetch dedupes by key, so this
-// call (not useCart's own) is the one that actually fires and must carry the cookie-forwarding hook.
 const {t} = useI18n()
+// Two things depend on this call, not just useCart's own: (1) a Suspense boundary - this page's
+// own mountSuspended test, and a client-side navigation - only waits for an awaited expression in
+// THIS component's setup, not for a composable's internal fetch on its own; (2) useFetch dedupes
+// by key, and whichever call for a given key is registered first is the one whose options
+// (including onResponse) actually apply - when nothing upstream (e.g. Navbar) has already
+// requested 'cart', this is that first call, so it must carry the cookie-forwarding hook itself.
 const requestEvent = useRequestEvent()
 await useFetch('/api/cart', {key: 'cart', onResponse: ({response}) => forwardSetCookie(requestEvent, response)})
 const cart = useCart()

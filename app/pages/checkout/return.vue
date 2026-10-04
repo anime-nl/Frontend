@@ -31,10 +31,6 @@ if (status.value === 'completed') {
   await cart.refresh()
 }
 
-await useFetch('/api/account/me', {
-  key: 'current-customer',
-  onResponse: ({response}) => forwardSetCookie(requestEvent, response)
-})
 const customer = useCustomer()
 </script>
 
