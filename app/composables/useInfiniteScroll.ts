@@ -16,6 +16,9 @@ export function useInfiniteScroll(
 ) {
     let observer: IntersectionObserver | null = null
 
+    /**
+     * Begins observing the sentinel, firing onIntersect whenever it becomes visible.
+     */
     function start() {
         if (!sentinel.value) return
 
@@ -28,6 +31,10 @@ export function useInfiniteScroll(
         observer.observe(sentinel.value)
     }
 
+    /**
+     * Re-observes the sentinel after a load finishes, so a sentinel that never left the viewport
+     * (a short results list, or one that only shrank back into view) is noticed again.
+     */
     function rearm() {
         if (!observer || !sentinel.value) return
         observer.unobserve(sentinel.value)

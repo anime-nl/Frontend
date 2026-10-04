@@ -9,6 +9,6 @@ const CACHE_TTL_MS = 5 * 60 * 1000
  */
 export default defineEventHandler((event) =>
     withTtlCache('collections', CACHE_TTL_MS, () =>
-        medusaFetch<StoreCollectionListResponse>(event, 'collections').catch(() => ({collections: []}))
-    )
+        medusaFetch<StoreCollectionListResponse>(event, 'collections')
+    ).catch(() => ({collections: []}))
 )

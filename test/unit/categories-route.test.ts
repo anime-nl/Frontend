@@ -42,4 +42,13 @@ describe('GET /api/categories', () => {
 
         expect(medusaFetch).toHaveBeenCalledTimes(1)
     })
+
+    it('does not cache a failure, so a later call still reaches Medusa once it recovers', async () => {
+        medusaFetch.mockRejectedValueOnce(new Error('connect ECONNREFUSED'))
+        medusaFetch.mockResolvedValueOnce({product_categories: [{id: 'pcat_1', name: 'TCG'}]})
+
+        await callRoute()
+
+        await expect(callRoute()).resolves.toEqual({product_categories: [{id: 'pcat_1', name: 'TCG'}]})
+    })
 })

@@ -96,6 +96,16 @@ describe('search page', () => {
         expect(selectValue('category-select')).toBe('')
     })
 
+    it('gives the category and collection selects a solid background, so their options stay readable regardless of OS color scheme', async () => {
+        wrapper = await mountSearch('')
+
+        for (const id of ['category-select', 'collection-select']) {
+            const classes = document.getElementById(id)?.className.split(' ') ?? []
+            expect(classes).toContain('bg-default')
+            expect(classes).not.toContain('bg-transparent')
+        }
+    })
+
     it('searches products with the id of the selected category', async () => {
         wrapper = await mountSearch('category=tcg')
 

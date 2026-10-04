@@ -154,7 +154,7 @@ onUnmounted(() => {
               id="collection-select"
               ref="collectionSelect"
               v-model="filters.collection"
-              class="w-full bg-transparent border border-sky-200/40 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary hover:border-primary transition-colors"
+              class="w-full bg-default border border-sky-200/40 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary hover:border-primary transition-colors"
             >
               <option value="">{{ t('search.allCollections') }}</option>
               <option v-for="col in availableCollections" :key="col.id" :value="col.id">
@@ -170,7 +170,7 @@ onUnmounted(() => {
             <select
               id="category-select"
               v-model="filters.category"
-              class="w-full bg-transparent border border-sky-200/40 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary hover:border-primary transition-colors"
+              class="w-full bg-default border border-sky-200/40 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary hover:border-primary transition-colors"
             >
               <option value="">{{ t('search.allCategories') }}</option>
               <option v-for="cat in availableCategories" :key="cat.id" :value="cat.id">

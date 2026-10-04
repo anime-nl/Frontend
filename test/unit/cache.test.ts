@@ -40,6 +40,14 @@ describe('withTtlCache', () => {
         expect(compute).toHaveBeenCalledTimes(2)
     })
 
+    it('does not cache a rejected compute, so the next call tries again', async () => {
+        const compute = vi.fn().mockRejectedValueOnce(new Error('down')).mockResolvedValueOnce('fresh')
+
+        await expect(withTtlCache('key', 1000, compute, 0)).rejects.toThrow('down')
+        await expect(withTtlCache('key', 1000, compute, 1)).resolves.toBe('fresh')
+        expect(compute).toHaveBeenCalledTimes(2)
+    })
+
     it('clearCache forces the next call to recompute', async () => {
         const compute = vi.fn().mockResolvedValue('fresh')
 
