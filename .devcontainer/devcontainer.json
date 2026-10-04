@@ -17,6 +17,7 @@
     }
   },
   "postCreateCommand": "bun install",
+  "postStartCommand": "nohup bash .devcontainer/kill-oxide-helpers.sh >/tmp/kill-oxide-helpers-stdout.log 2>&1 & disown",
   "remoteUser": "node",
   "mounts": ["source=claude-code-config,target=/home/node/.claude,type=volume"],
   "containerEnv": {
