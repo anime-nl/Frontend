@@ -2,7 +2,7 @@ import type {StoreProduct, StoreProductCategory} from '@medusajs/types'
 
 /**
  * Returns products in a given category, including the price
- * @param handle Category ID
+ * @param handle Category handle (slug)
  * @returns List of products in the given category
  */
 export function useCategoryProducts(handle: string) {

@@ -95,11 +95,13 @@ describe('product page', () => {
         expect(wrapper.find('h1').text()).toBe(product.product.title)
     })
 
-    it('shows the product image scaled to fit and centered in a fixed-size box', async () => {
+    it('shows the product image scaled to fit, centered, and sized down on narrow screens', async () => {
         wrapper = await mountProduct()
 
         const img = wrapper.find('img')
-        expect(img.classes()).toContain('h-160')
+        expect(img.classes()).toContain('h-80')
+        expect(img.classes()).toContain('sm:h-120')
+        expect(img.classes()).toContain('lg:h-160')
         expect(img.classes()).toContain('object-contain')
         expect(img.classes()).toContain('object-center')
     })

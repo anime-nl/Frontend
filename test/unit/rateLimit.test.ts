@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest'
-import {isRateLimited} from '../../server/utils/rateLimit'
+import {isCallerTracked, isRateLimited} from '../../server/utils/rateLimit'
 
 describe('isRateLimited', () => {
     it('allows requests up to the limit', () => {
@@ -34,5 +34,14 @@ describe('isRateLimited', () => {
 
     it('defaults to the current time when none is given', () => {
         expect(isRateLimited('defaults-to-now', {limit: 1, windowMs: 1000})).toBe(false)
+    })
+
+    it('stops tracking a caller once its requests have all fallen outside the window', () => {
+        isRateLimited('one-off-caller', {limit: 5, windowMs: 1000, now: 0})
+        expect(isCallerTracked('one-off-caller')).toBe(true)
+
+        isRateLimited('a-later-caller', {limit: 5, windowMs: 1000, now: 5000})
+
+        expect(isCallerTracked('one-off-caller')).toBe(false)
     })
 })

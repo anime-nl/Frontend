@@ -111,6 +111,16 @@ describe('POST /api/cart/items', () => {
         await expect(callRoute()).rejects.toMatchObject({statusCode: 500})
     })
 
+    it('surfaces a Medusa validation error on an existing cart as a 400 with its message', async () => {
+        getCookie.mockReturnValue('cart_1')
+        medusaFetch.mockRejectedValue({statusCode: 400, data: {message: 'Not enough stock for this variant'}})
+
+        await expect(callRoute()).rejects.toMatchObject({
+            statusCode: 400,
+            statusMessage: 'Not enough stock for this variant'
+        })
+    })
+
     it('creates a new cart when the cookie points at a cart Medusa no longer has', async () => {
         getCookie.mockReturnValue('cart_1')
         const cartNotFound = Object.assign(new Error('Cart id not found'), {statusCode: 404})

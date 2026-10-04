@@ -1,3 +1,5 @@
+import {isValidEmail} from './validation'
+
 export interface AddressRequest {
     email: string
     firstName: string
@@ -66,7 +68,7 @@ export function validateAddressRequest(input: AddressRequest): AddressRequestErr
     const {email, firstName, lastName, street, houseNumber, postalCode, city, country} = request
     const errors: AddressRequestError[] = []
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.push({name: 'email', code: 'invalidEmail'})
+    if (!isValidEmail(email)) errors.push({name: 'email', code: 'invalidEmail'})
     if (!firstName) errors.push({name: 'firstName', code: 'required'})
     if (!lastName) errors.push({name: 'lastName', code: 'required'})
     if (!street) errors.push({name: 'street', code: 'required'})

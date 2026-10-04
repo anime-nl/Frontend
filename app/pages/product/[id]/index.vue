@@ -231,7 +231,7 @@ useHead({
             <img
               :src="item"
               :alt="product.title"
-              class="rounded-4xl w-full h-160 object-contain object-center"
+              class="rounded-4xl w-full h-80 sm:h-120 lg:h-160 object-contain object-center"
               loading="lazy"
             />
           </UCarousel>
@@ -239,20 +239,20 @@ useHead({
             v-else-if="images.length === 1"
             :src="images[0]"
             :alt="product.title"
-            class="rounded-4xl w-full h-160 object-contain object-center"
+            class="rounded-4xl w-full h-80 sm:h-120 lg:h-160 object-contain object-center"
           />
           <template #fallback>
             <img
               v-if="images[0]"
               :src="images[0]"
               :alt="product.title"
-              class="rounded-4xl w-full h-160 object-contain object-center"
+              class="rounded-4xl w-full h-80 sm:h-120 lg:h-160 object-contain object-center"
             />
           </template>
         </ClientOnly>
         <div
           v-if="!images.length"
-          class="flex items-center justify-center h-160 rounded-4xl bg-gray-900 text-slate-400"
+          class="flex items-center justify-center h-80 sm:h-120 lg:h-160 rounded-4xl bg-gray-900 text-slate-400"
         >
           <UIcon name="i-lucide-image-off" class="text-6xl" />
         </div>

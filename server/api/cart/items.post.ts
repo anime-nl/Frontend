@@ -69,7 +69,11 @@ export default defineEventHandler(async (event) => {
 
         const cartId = await createCart(event)
         return {cart: await addLineItem(event, cartId, body)}
-    } catch {
+    } catch (error) {
+        const {statusCode, data} = error as {statusCode?: number; data?: {message?: string}}
+        if (statusCode === 400 && data?.message) {
+            throw createError({statusCode: 400, statusMessage: data.message})
+        }
         throw createError({statusCode: 500, statusMessage: 'Could not add item to cart'})
     }
 })

@@ -1,3 +1,5 @@
+import {isValidEmail} from './validation'
+
 export interface SupportTopic {
     slug: string
     icon: string
@@ -95,7 +97,7 @@ export function validateSupportRequest(input: SupportRequest): SupportRequestErr
 
     if (!topic) errors.push({name: 'topic', code: 'unknownTopic'})
     if (!name) errors.push({name: 'name', code: 'required'})
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.push({name: 'email', code: 'invalidEmail'})
+    if (!isValidEmail(email)) errors.push({name: 'email', code: 'invalidEmail'})
     if (!orderNumber && topic?.orderNumberRequired) errors.push({name: 'orderNumber', code: 'required'})
     if (topic && !topic.reasons.includes(reason)) errors.push({name: 'reason', code: 'invalidReason'})
     if (!message) errors.push({name: 'message', code: 'required'})
