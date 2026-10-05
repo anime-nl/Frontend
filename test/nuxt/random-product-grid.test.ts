@@ -1,5 +1,6 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
 import {mountSuspended, registerEndpoint} from '@nuxt/test-utils/runtime'
+import {flushPromises} from '@vue/test-utils'
 import {getQuery} from 'h3'
 import RandomProductGrid from '~/components/randomProductGrid.vue'
 
@@ -32,6 +33,7 @@ class FakeIntersectionObserver {
 
 const productRequests: Record<string, unknown>[] = []
 let productCount = 5
+const catalog = Array.from({length: 100}, (_, i) => ({id: `prod_${i + 1}`, title: `Product ${i + 1}`, thumbnail: null}))
 
 registerEndpoint('/api/regions', () => ({regions: [{id: 'reg_nl'}]}))
 registerEndpoint('/api/products', (event) => {
@@ -40,10 +42,10 @@ registerEndpoint('/api/products', (event) => {
         products:
             productCount === 0
                 ? []
-                : [
-                      {id: 'prod_1', title: 'Zhongli Keychain', thumbnail: null},
-                      {id: 'prod_2', title: 'Nijika Keychain', thumbnail: null}
-                  ],
+                : catalog.slice(
+                      Number(getQuery(event).offset),
+                      Number(getQuery(event).offset) + Number(getQuery(event).limit)
+                  ),
         count: productCount
     }
 })
@@ -68,8 +70,7 @@ describe('random product grid', () => {
     it('shows the first batch of products', async () => {
         wrapper = await mountGrid()
 
-        expect(wrapper.text()).toContain('Zhongli Keychain')
-        expect(wrapper.text()).toContain('Nijika Keychain')
+        expect(wrapper.findAll('a')).toHaveLength(24)
     })
 
     it('does not render when there are no products', async () => {
@@ -88,14 +89,43 @@ describe('random product grid', () => {
     })
 
     it('loads another batch of products once the sentinel scrolls into view', async () => {
+        productCount = 100
         wrapper = await mountGrid()
+        const before = wrapper.findAll('a').length
 
         FakeIntersectionObserver.instances[0]?.intersect()
 
-        await vi.waitFor(() => {
-            const links = wrapper?.findAll('a').map((link) => link.attributes('href'))
-            expect(links).toEqual(['/product/prod_1', '/product/prod_2', '/product/prod_1', '/product/prod_2'])
+        await vi.waitFor(() => expect(wrapper?.findAll('a').length).toBeGreaterThan(before))
+    })
+
+    it('never shows a product again within 30 other products', async () => {
+        productCount = 100
+        wrapper = await mountGrid()
+
+        for (let i = 0; i < 3; i++) {
+            const shown = wrapper.findAll('a').length
+            FakeIntersectionObserver.instances.forEach((observer) => observer.intersect())
+            await vi.waitFor(() => expect(wrapper?.findAll('a').length).toBeGreaterThan(shown))
+            await flushPromises()
+        }
+
+        const links = wrapper.findAll('a').map((link) => link.attributes('href'))
+        links.forEach((link, index) => {
+            expect(links.slice(Math.max(index - 30, 0), index)).not.toContain(link)
         })
+    })
+
+    it('does not refetch products it already has when the catalog is small', async () => {
+        productCount = 5
+        wrapper = await mountGrid()
+        const requestsAfterMount = productRequests.length
+
+        for (let i = 0; i < 3; i++) {
+            FakeIntersectionObserver.instances.forEach((observer) => observer.intersect())
+            await flushPromises()
+        }
+
+        expect(productRequests).toHaveLength(requestsAfterMount)
     })
 
     it('requests an offset within the range that still fits a full batch', async () => {
