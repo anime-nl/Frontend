@@ -16,7 +16,7 @@
       "onAutoForward": "notify"
     }
   },
-  "postCreateCommand": "bun install",
+  "postCreateCommand": "sudo chown -R node:node /home/node/.claude && bun install",
   "remoteUser": "node",
   "mounts": ["source=claude-code-config,target=/home/node/.claude,type=volume"],
   "containerEnv": {
