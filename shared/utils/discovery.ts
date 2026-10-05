@@ -55,3 +55,30 @@ export function rememberShown(recentIds: readonly string[], shown: readonly Stor
     if (window <= 0) return []
     return [...recentIds, ...shown.map((product) => product.id)].slice(-window)
 }
+
+/**
+ * Builds a batch one product at a time, so a product picked early in the batch also counts as
+ * recently shown for the picks after it. Stops early when no eligible product is left.
+ * @param pool Every product known so far
+ * @param recentIds Ids of the most recently shown products, oldest first
+ * @param window How many shown products are remembered
+ * @param size The batch size to aim for
+ * @returns The picked products and the updated memory
+ */
+export function takeBatch(
+    pool: readonly StoreProduct[],
+    recentIds: readonly string[],
+    window: number,
+    size: number
+): {batch: StoreProduct[]; recentIds: string[]} {
+    const batch: StoreProduct[] = []
+    let memory = [...recentIds]
+
+    while (batch.length < size) {
+        const [next] = pickUnseenProducts(pool, memory)
+        if (!next) break
+        batch.push(next)
+        memory = rememberShown(memory, [next], window)
+    }
+    return {batch, recentIds: memory}
+}

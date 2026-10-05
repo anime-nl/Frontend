@@ -5,6 +5,7 @@ import {
     discoveryWindow,
     pickUnseenProducts,
     rememberShown,
+    takeBatch,
     shuffle
 } from '../../shared/utils/discovery'
 
@@ -53,5 +54,28 @@ describe('rememberShown', () => {
 
     it('remembers nothing with an empty window', () => {
         expect(rememberShown(['a'], [product('b')], 0)).toEqual([])
+    })
+})
+
+describe('takeBatch', () => {
+    const pool = ['a', 'b', 'c', 'd', 'e'].map(product)
+
+    it('counts products picked earlier in the batch as recently shown', () => {
+        const ids = takeBatch(pool, [], 4, 12).batch.map((p) => p.id)
+
+        ids.forEach((id, index) => {
+            expect(ids.slice(Math.max(index - 4, 0), index)).not.toContain(id)
+        })
+    })
+
+    it('fills the whole batch when products become eligible again', () => {
+        expect(takeBatch(pool, [], 4, 12).batch).toHaveLength(12)
+    })
+
+    it('stops when no eligible product is left', () => {
+        const {batch, recentIds} = takeBatch(pool, ['a', 'b', 'c', 'd', 'e'], 5, 3)
+
+        expect(batch).toEqual([])
+        expect(recentIds).toEqual(['a', 'b', 'c', 'd', 'e'])
     })
 })

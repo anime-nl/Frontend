@@ -70,7 +70,7 @@ describe('random product grid', () => {
     it('shows the first batch of products', async () => {
         wrapper = await mountGrid()
 
-        expect(wrapper.findAll('a')).toHaveLength(5)
+        expect(wrapper.findAll('a')).toHaveLength(24)
     })
 
     it('does not render when there are no products', async () => {
@@ -113,6 +113,19 @@ describe('random product grid', () => {
         links.forEach((link, index) => {
             expect(links.slice(Math.max(index - 30, 0), index)).not.toContain(link)
         })
+    })
+
+    it('does not refetch products it already has when the catalog is small', async () => {
+        productCount = 5
+        wrapper = await mountGrid()
+        const requestsAfterMount = productRequests.length
+
+        for (let i = 0; i < 3; i++) {
+            FakeIntersectionObserver.instances.forEach((observer) => observer.intersect())
+            await flushPromises()
+        }
+
+        expect(productRequests).toHaveLength(requestsAfterMount)
     })
 
     it('requests an offset within the range that still fits a full batch', async () => {

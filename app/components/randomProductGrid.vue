@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import type {StoreProduct} from '@medusajs/types'
-import {discoveryWindow, pickUnseenProducts, rememberShown, shuffle} from '#shared/utils/discovery'
+import {discoveryWindow, takeBatch} from '#shared/utils/discovery'
 
 const BATCH_SIZE = 24
-const MAX_ATTEMPTS = 5
+const MAX_FETCHES = 5
 const FIELDS = 'title,thumbnail,*variants.calculated_price'
 
 const {t} = useI18n()
@@ -26,16 +26,32 @@ async function fetchRandomPage(totalCount?: number) {
 
 const {data: initial} = await useAsyncData('random-products-initial', async () => {
   const page = await fetchRandomPage()
-  return {products: shuffle(page.products), count: page.count}
+  return {products: page.products, count: page.count}
 })
 
-const products = ref<StoreProduct[]>(initial.value?.products ?? [])
 const totalCount = ref(initial.value?.count ?? 0)
-const recentIds = ref<string[]>(rememberShown([], products.value, discoveryWindow(totalCount.value)))
+const pool = new Map((initial.value?.products ?? []).map((product) => [product.id, product]))
+const firstBatch = takeBatch([...pool.values()], [], discoveryWindow(totalCount.value), BATCH_SIZE)
+const products = ref<StoreProduct[]>(firstBatch.batch)
+const recentIds = ref<string[]>(firstBatch.recentIds)
 const loading = ref(false)
 
 const loadMoreSentinel = useTemplateRef<HTMLElement>('loadMoreSentinel')
 const infiniteScroll = useInfiniteScroll(loadMoreSentinel, loadMore, {rootMargin: '400px'})
+
+/**
+ * Fetches random pages into the pool until enough products are eligible for a full batch.
+ * Stops when the whole catalog is known, or after MAX_FETCHES, since random pages can overlap.
+ */
+async function fillPool() {
+  const window = discoveryWindow(totalCount.value)
+  for (let fetches = 0; fetches < MAX_FETCHES && pool.size < totalCount.value; fetches++) {
+    if (takeBatch([...pool.values()], recentIds.value, window, BATCH_SIZE).batch.length === BATCH_SIZE) return
+
+    const page = await fetchRandomPage(totalCount.value)
+    page.products.forEach((product) => pool.set(product.id, product))
+  }
+}
 
 /** Loads a batch of products that were not shown within the last DISCOVERY_MEMORY products. */
 async function loadMore() {
@@ -43,15 +59,10 @@ async function loadMore() {
   loading.value = true
 
   try {
-    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-      const page = await fetchRandomPage(totalCount.value)
-      const fresh = pickUnseenProducts(page.products, recentIds.value)
-      if (fresh.length === 0) continue
-
-      products.value.push(...fresh)
-      recentIds.value = rememberShown(recentIds.value, fresh, discoveryWindow(totalCount.value))
-      break
-    }
+    await fillPool()
+    const next = takeBatch([...pool.values()], recentIds.value, discoveryWindow(totalCount.value), BATCH_SIZE)
+    products.value.push(...next.batch)
+    recentIds.value = next.recentIds
   } finally {
     loading.value = false
     await nextTick()
