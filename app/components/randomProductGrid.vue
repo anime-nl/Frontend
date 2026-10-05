@@ -1,42 +1,57 @@
 <script lang="ts" setup>
 import type {StoreProduct} from '@medusajs/types'
+import {discoveryWindow, pickUnseenProducts, rememberShown, shuffle} from '#shared/utils/discovery'
 
 const BATCH_SIZE = 24
+const MAX_ATTEMPTS = 5
+const FIELDS = 'title,thumbnail,*variants.calculated_price'
 
 const {t} = useI18n()
 const {data: regionId} = await useDefaultRegionId()
 
-const {data: initial} = await useProductSearch(
-  {limit: BATCH_SIZE, offset: 0, fields: 'title,thumbnail,*variants.calculated_price', region_id: regionId},
-  'random-products-initial'
-)
+/**
+ * Fetches a page of products at a random offset, so each batch comes from a different part of the catalog.
+ * @param totalCount The number of products in the catalog, when already known
+ * @returns The fetched products and the catalog's total count
+ */
+async function fetchRandomPage(totalCount?: number) {
+  const count = totalCount ?? (await fetchProductPage({limit: 1, offset: 0, region_id: regionId.value})).count
+  if (count === 0) return {products: [], count}
+
+  const limit = Math.min(BATCH_SIZE, count)
+  const offset = Math.floor(Math.random() * (count - limit + 1))
+  const response = await fetchProductPage({limit, offset, fields: FIELDS, region_id: regionId.value})
+  return {products: response.products, count: response.count}
+}
+
+const {data: initial} = await useAsyncData('random-products-initial', async () => {
+  const page = await fetchRandomPage()
+  return {products: shuffle(page.products), count: page.count}
+})
 
 const products = ref<StoreProduct[]>(initial.value?.products ?? [])
 const totalCount = ref(initial.value?.count ?? 0)
+const recentIds = ref<string[]>(rememberShown([], products.value, discoveryWindow(totalCount.value)))
 const loading = ref(false)
 
 const loadMoreSentinel = useTemplateRef<HTMLElement>('loadMoreSentinel')
 const infiniteScroll = useInfiniteScroll(loadMoreSentinel, loadMore, {rootMargin: '400px'})
 
-/** A random offset for a batch, so repeated loads surface different products instead of always the same page. */
-function randomOffset() {
-  const limit = Math.min(BATCH_SIZE, totalCount.value)
-  const maxOffset = Math.max(totalCount.value - limit, 0)
-  return Math.floor(Math.random() * (maxOffset + 1))
-}
-
+/** Loads a batch of products that were not shown within the last DISCOVERY_MEMORY products. */
 async function loadMore() {
   if (loading.value || totalCount.value === 0) return
   loading.value = true
 
   try {
-    const response = await fetchProductPage({
-      limit: Math.min(BATCH_SIZE, totalCount.value),
-      offset: randomOffset(),
-      fields: 'title,thumbnail,*variants.calculated_price',
-      region_id: regionId.value
-    })
-    products.value.push(...response.products)
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+      const page = await fetchRandomPage(totalCount.value)
+      const fresh = pickUnseenProducts(page.products, recentIds.value)
+      if (fresh.length === 0) continue
+
+      products.value.push(...fresh)
+      recentIds.value = rememberShown(recentIds.value, fresh, discoveryWindow(totalCount.value))
+      break
+    }
   } finally {
     loading.value = false
     await nextTick()
