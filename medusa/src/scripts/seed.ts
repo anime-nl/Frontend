@@ -67,7 +67,7 @@ const keychain = (
   description: `Official ${material.toLowerCase()} keychain of ${name}, with a sturdy metal clasp.`,
   collection,
   category: 'Keychains',
-  subcategory: material === 'Metal' ? 'metal' : 'acrylic',
+  subcategory: material === 'Metal' ? 'metal-keychains' : 'acrylic-keychains',
   material,
   weight: 16,
   size: [90, 73, 7],
@@ -266,8 +266,8 @@ const SUBCATEGORIES: Record<string, {handle: string; name: string}[]> = {
     { handle: 'noodle-stoppers', name: 'Noodle Stoppers' },
   ],
   Keychains: [
-    { handle: 'acrylic', name: 'Acrylic keychains' },
-    { handle: 'metal', name: 'Metal keychains' },
+    { handle: 'acrylic-keychains', name: 'Acrylic keychains' },
+    { handle: 'metal-keychains', name: 'Metal keychains' },
   ],
 }
 const SALES_CHANNELS = ['Webshop', 'Physical', 'Bol.com']

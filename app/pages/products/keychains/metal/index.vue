@@ -7,7 +7,7 @@ useSeoMeta({title: t('products.categories.metal.seoTitle'), description: t('prod
   <CategoryPage
     :badge="t('products.badges.keychains')"
     :description="t('products.categories.metal.description')"
-    handle="metal"
+    handle="metal-keychains"
     :title="t('products.categories.metal.heading')"
   />
 </template>

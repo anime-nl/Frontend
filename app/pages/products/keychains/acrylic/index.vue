@@ -10,7 +10,7 @@ useSeoMeta({
   <CategoryPage
     :badge="t('products.badges.keychains')"
     :description="t('products.categories.acrylic.description')"
-    handle="acrylic"
+    handle="acrylic-keychains"
     :title="t('products.categories.acrylic.heading')"
   />
 </template>

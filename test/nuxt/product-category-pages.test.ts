@@ -28,8 +28,8 @@ registerEndpoint('/api/categories', () => ({
         {id: 'pcat_noodle', handle: 'noodle-stoppers', name: 'Noodle Stoppers'},
         {id: 'pcat_plush', handle: 'plush', name: 'Plush'},
         {id: 'pcat_keychains', handle: 'keychains', name: 'Keychains'},
-        {id: 'pcat_acrylic', handle: 'acrylic', name: 'Acrylic keychains'},
-        {id: 'pcat_metal', handle: 'metal', name: 'Metal keychains'}
+        {id: 'pcat_acrylic', handle: 'acrylic-keychains', name: 'Acrylic keychains'},
+        {id: 'pcat_metal', handle: 'metal-keychains', name: 'Metal keychains'}
     ]
 }))
 registerEndpoint('/api/product-types', () => ({
