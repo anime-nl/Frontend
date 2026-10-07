@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest'
-import {bySeriesLink, findCategoryId, withDescendantIds} from '../../app/utils/search'
+import {bySeriesLink, findCategoryId, productTypesAsCategories, withDescendantIds} from '../../app/utils/search'
 
 const categories = [
     {id: 'pcat_tcg', handle: 'tcg', name: 'TCG'},
@@ -41,5 +41,17 @@ describe('withDescendantIds', () => {
 
     it('returns only the category itself when it has no children', () => {
         expect(withDescendantIds(tree, 'pcat_plush')).toEqual(['pcat_plush'])
+    })
+})
+
+describe('productTypesAsCategories', () => {
+    it('uses the lowercased type value as handle', () => {
+        expect(productTypesAsCategories([{id: 'ptyp_1', value: 'Figures'}])).toEqual([
+            {id: 'ptyp_1', handle: 'figures', name: 'Figures'}
+        ])
+    })
+
+    it('maps production\'s "Plushies" to the navbar\'s "plush" handle', () => {
+        expect(productTypesAsCategories([{id: 'ptyp_2', value: 'Plushies'}])[0]?.handle).toBe('plush')
     })
 })

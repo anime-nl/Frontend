@@ -11,6 +11,12 @@ registerEndpoint('/api/categories', () => ({
         {id: 'pcat_singles', handle: 'singles', name: 'Singles', parent_category_id: 'pcat_tcg'}
     ]
 }))
+registerEndpoint('/api/product-types', () => ({
+    product_types: [
+        {id: 'ptyp_tcg', value: 'TCG'},
+        {id: 'ptyp_plushies', value: 'Plushies'}
+    ]
+}))
 registerEndpoint('/api/regions', () => ({regions: [{id: 'reg_nl'}]}))
 registerEndpoint('/api/products', (event) => {
     productRequests.push(getQuery(event))
@@ -42,10 +48,11 @@ describe('category page', () => {
         expect(productRequests[0]?.category_id).toBe('pcat_singles')
     })
 
-    it('includes the products of the subcategories', async () => {
-        wrapper = await mountSuspended(CategoryPage, {props: {handle: 'tcg', title: 'TCG'}})
+    it('shows the products of the product type with the same handle', async () => {
+        wrapper = await mountSuspended(CategoryPage, {props: {handle: 'plush', title: 'Plush'}})
 
-        expect(productRequests[0]?.category_id).toEqual(['pcat_tcg', 'pcat_singles'])
+        expect(productRequests[0]?.type_id).toBe('ptyp_plushies')
+        expect(productRequests[0]?.category_id).toBeUndefined()
     })
 
     it('requests the calculated price for a region', async () => {
