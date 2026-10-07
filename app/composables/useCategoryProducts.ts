@@ -17,7 +17,7 @@ export function useCategoryProducts(handle: string) {
 
         const {products} = await $fetch<{products: StoreProduct[]}>('/api/products', {
             query: {
-                category_id: [category.id],
+                category_id: withDescendantIds(categories, category.id),
                 region_id: regions[0]?.id,
                 fields: 'title,thumbnail,*variants.calculated_price'
             }

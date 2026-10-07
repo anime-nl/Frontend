@@ -30,6 +30,7 @@ let regionsShouldFail = false
 registerEndpoint('/api/categories', () => ({
     product_categories: [
         {id: 'pcat_tcg', handle: 'tcg', name: 'TCG'},
+        {id: 'pcat_singles', handle: 'singles', name: 'Singles', parent_category_id: 'pcat_tcg'},
         {id: 'pcat_figures', handle: 'figures', name: 'Figures'}
     ]
 }))
@@ -109,7 +110,19 @@ describe('search page', () => {
     it('searches products with the id of the selected category', async () => {
         wrapper = await mountSearch('category=tcg')
 
-        await vi.waitFor(() => expect(productRequests.map((request) => request.category_id)).toContain('pcat_tcg'))
+        await vi.waitFor(() =>
+            expect(productRequests.map((request) => request.category_id)).toContainEqual(['pcat_tcg', 'pcat_singles'])
+        )
+    })
+
+    it('applies the filters of a new search link while already on the search page', async () => {
+        wrapper = await mountSearch('category=tcg')
+        await vi.waitFor(() => expect(productRequests.length).toBeGreaterThan(0))
+
+        await navigateTo('/search?category=figures&q=goku')
+
+        await vi.waitFor(() => expect(selectValue('category-select')).toBe('pcat_figures'))
+        await vi.waitFor(() => expect(productRequests.at(-1)).toMatchObject({q: 'goku', category_id: 'pcat_figures'}))
     })
 
     it('requests the calculated price for a region, so product cards can show a price', async () => {

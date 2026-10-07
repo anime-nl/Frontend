@@ -74,7 +74,7 @@ const fetchProducts = async (reset = false) => {
     }
 
     if (filters.q.trim()) queryParams.q = filters.q.trim()
-    if (filters.category) queryParams.category_id = [filters.category]
+    if (filters.category) queryParams.category_id = withDescendantIds(availableCategories.value, filters.category)
     if (filters.collection) queryParams.collection_id = [filters.collection]
 
     const response = await fetchProductPage(queryParams)
@@ -95,6 +95,13 @@ const fetchProducts = async (reset = false) => {
   }
 }
 
+const applyRouteQuery = () => {
+  filters.q = queryParam('q')
+  filters.category = findCategoryId(availableCategories.value, queryParam('category'))
+  filters.collection = queryParam('collection')
+  if (route.query.focus === 'collection') collectionSelect.value?.focus()
+}
+
 const resetFilters = () => {
   filters.q = ''
   filters.category = ''
@@ -111,6 +118,9 @@ watch(
   },
   {deep: true}
 )
+
+// The navbar's search bar and "by series" links navigate to /search while already on it, which reuses this page.
+watch(() => route.query, applyRouteQuery)
 
 onMounted(async () => {
   if (route.query.focus === 'collection') {
