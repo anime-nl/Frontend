@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 const {t} = useI18n()
-const items = computed(() => buildNavigationItems(t))
+const localePath = useLocalePath()
+const items = computed(() => buildNavigationItems(t, localePath))
 const mobileMenuOpen = ref(false)
 const cart = useCart()
 const customer = useCustomer()

@@ -2,6 +2,7 @@ export interface SearchCategory {
     id: string
     handle: string
     name: string
+    parent_category_id?: string | null
 }
 
 /**
@@ -19,3 +20,27 @@ export const bySeriesLink = (categoryHandle: string) => `/search?category=${cate
  */
 export const findCategoryId = (categories: SearchCategory[], idOrHandle: string) =>
     categories.find((category) => category.id === idOrHandle || category.handle === idOrHandle)?.id ?? ''
+
+/**
+ * Medusa only returns a product for the categories it is directly assigned to, so filtering on a top-level
+ * category such as "tcg" would miss products that are only in one of its subcategories.
+ * @param categories All categories
+ * @param id Id of the category to expand
+ * @returns The category's id followed by the ids of all its descendants
+ */
+export function withDescendantIds(categories: SearchCategory[], id: string): string[] {
+    const children = categories.filter((category) => category.parent_category_id === id)
+    return [id, ...children.flatMap((child) => withDescendantIds(categories, child.id))]
+}
+
+/**
+ * The shop's top-level categories are Medusa product types, because production has no product categories.
+ * The navbar links to them by handle, so each type value is turned into one (production's "Plushies" is the nav's "plush").
+ * @param types Product types as returned by /api/product-types
+ * @returns The types shaped like categories, so they can be resolved with findCategoryId
+ */
+export const productTypesAsCategories = (types: {id: string; value: string}[]): SearchCategory[] =>
+    types.map((type) => {
+        const handle = type.value.toLowerCase()
+        return {id: type.id, handle: handle === 'plushies' ? 'plush' : handle, name: type.value}
+    })

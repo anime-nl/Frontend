@@ -3,7 +3,10 @@ import {describe, expect, it} from 'vitest'
 import {buildNavigationItems} from '../../app/utils/navigation'
 
 // This test only checks icon validity, so a translator that echoes the key back is enough.
-const navigationItems = buildNavigationItems((key) => key)
+const navigationItems = buildNavigationItems(
+    (key) => key,
+    (path) => path
+)
 
 const require = createRequire(import.meta.url)
 
@@ -53,5 +56,19 @@ describe('navbar icons', () => {
         const {icons: collectionIcons} = require(`@iconify-json/${collection}/icons.json`)
 
         expect(Object.keys(collectionIcons)).toContain(name)
+    })
+})
+
+describe('navigation links', () => {
+    it('are prefixed with the current locale', () => {
+        const items = buildNavigationItems(
+            (key) => key,
+            (path) => `/en${path}`
+        )
+        const links = items.flatMap((item) => [item, ...((item.children as typeof items) ?? [])]).map((item) => item.to)
+
+        for (const link of links.filter((to) => typeof to === 'string' && to.startsWith('/'))) {
+            expect(link).toMatch(/^\/en\//)
+        }
     })
 })

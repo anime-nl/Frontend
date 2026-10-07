@@ -8,7 +8,13 @@ const productRequests: Record<string, unknown>[] = []
 registerEndpoint('/api/categories', () => ({
     product_categories: [
         {id: 'pcat_tcg', handle: 'tcg', name: 'TCG'},
-        {id: 'pcat_singles', handle: 'singles', name: 'Singles'}
+        {id: 'pcat_singles', handle: 'singles', name: 'Singles', parent_category_id: 'pcat_tcg'}
+    ]
+}))
+registerEndpoint('/api/product-types', () => ({
+    product_types: [
+        {id: 'ptyp_tcg', value: 'TCG'},
+        {id: 'ptyp_plushies', value: 'Plushies'}
     ]
 }))
 registerEndpoint('/api/regions', () => ({regions: [{id: 'reg_nl'}]}))
@@ -40,6 +46,13 @@ describe('category page', () => {
 
         expect(wrapper.text()).toContain('Charizard ex')
         expect(productRequests[0]?.category_id).toBe('pcat_singles')
+    })
+
+    it('shows the products of the product type with the same handle', async () => {
+        wrapper = await mountSuspended(CategoryPage, {props: {handle: 'plush', title: 'Plush'}})
+
+        expect(productRequests[0]?.type_id).toBe('ptyp_plushies')
+        expect(productRequests[0]?.category_id).toBeUndefined()
     })
 
     it('requests the calculated price for a region', async () => {

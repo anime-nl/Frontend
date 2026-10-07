@@ -28,8 +28,16 @@ registerEndpoint('/api/categories', () => ({
         {id: 'pcat_noodle', handle: 'noodle-stoppers', name: 'Noodle Stoppers'},
         {id: 'pcat_plush', handle: 'plush', name: 'Plush'},
         {id: 'pcat_keychains', handle: 'keychains', name: 'Keychains'},
-        {id: 'pcat_acrylic', handle: 'acrylic', name: 'Acrylic keychains'},
-        {id: 'pcat_metal', handle: 'metal', name: 'Metal keychains'}
+        {id: 'pcat_acrylic', handle: 'acrylic-keychains', name: 'Acrylic keychains'},
+        {id: 'pcat_metal', handle: 'metal-keychains', name: 'Metal keychains'}
+    ]
+}))
+registerEndpoint('/api/product-types', () => ({
+    product_types: [
+        {id: 'ptyp_tcg', value: 'TCG'},
+        {id: 'ptyp_figures', value: 'Figures'},
+        {id: 'ptyp_plush', value: 'Plush'},
+        {id: 'ptyp_keychains', value: 'Keychains'}
     ]
 }))
 registerEndpoint('/api/regions', () => ({regions: [{id: 'reg_nl'}]}))
@@ -52,7 +60,7 @@ describe.each([
     {
         page: TcgPage,
         heading: 'Trading Card Game (TCG) Collectie',
-        categoryId: 'pcat_tcg',
+        categoryId: 'ptyp_tcg',
         title: 'TCG',
         description: 'Bekijk onze volledige catalogus met Trading Card Game-producten.'
     },
@@ -80,7 +88,7 @@ describe.each([
     {
         page: FiguresPage,
         heading: 'Figuren Collectie',
-        categoryId: 'pcat_figures',
+        categoryId: 'ptyp_figures',
         title: 'Figuren',
         description: 'Bekijk onze volledige catalogus met figuren.'
     },
@@ -108,14 +116,14 @@ describe.each([
     {
         page: PlushPage,
         heading: 'Knuffels Collectie',
-        categoryId: 'pcat_plush',
+        categoryId: 'ptyp_plush',
         title: 'Knuffels',
         description: 'Bekijk onze volledige catalogus met knuffels.'
     },
     {
         page: KeychainsPage,
         heading: 'Sleutelhangers Collectie',
-        categoryId: 'pcat_keychains',
+        categoryId: 'ptyp_keychains',
         title: 'Sleutelhangers',
         description: 'Bekijk onze volledige catalogus met sleutelhangers.'
     },
@@ -138,7 +146,7 @@ describe.each([
         wrapper = await mountSuspended(page)
 
         expect(wrapper.find('h1').text()).toBe(heading)
-        expect(categoryRequests[0]?.category_id).toBe(categoryId)
+        expect(categoryRequests[0]?.type_id ?? categoryRequests[0]?.category_id).toBe(categoryId)
     })
 
     it('sets a page title and meta description for search engines', async () => {

@@ -27,10 +27,10 @@ let productsShouldFail = false
 let collectionsShouldFail = false
 let regionsShouldFail = false
 
-registerEndpoint('/api/categories', () => ({
-    product_categories: [
-        {id: 'pcat_tcg', handle: 'tcg', name: 'TCG'},
-        {id: 'pcat_figures', handle: 'figures', name: 'Figures'}
+registerEndpoint('/api/product-types', () => ({
+    product_types: [
+        {id: 'ptyp_tcg', value: 'TCG'},
+        {id: 'ptyp_figures', value: 'Figures'}
     ]
 }))
 registerEndpoint('/api/collections', () => {
@@ -81,13 +81,13 @@ describe('search page', () => {
     it('selects the category from its handle', async () => {
         wrapper = await mountSearch('category=tcg')
 
-        expect(selectValue('category-select')).toBe('pcat_tcg')
+        expect(selectValue('category-select')).toBe('ptyp_tcg')
     })
 
     it('selects the category from its id', async () => {
-        wrapper = await mountSearch('category=pcat_figures')
+        wrapper = await mountSearch('category=ptyp_figures')
 
-        expect(selectValue('category-select')).toBe('pcat_figures')
+        expect(selectValue('category-select')).toBe('ptyp_figures')
     })
 
     it('leaves the category empty for an unknown category', async () => {
@@ -109,7 +109,17 @@ describe('search page', () => {
     it('searches products with the id of the selected category', async () => {
         wrapper = await mountSearch('category=tcg')
 
-        await vi.waitFor(() => expect(productRequests.map((request) => request.category_id)).toContain('pcat_tcg'))
+        await vi.waitFor(() => expect(productRequests.map((request) => request.type_id)).toContain('ptyp_tcg'))
+    })
+
+    it('applies the filters of a new search link while already on the search page', async () => {
+        wrapper = await mountSearch('category=tcg')
+        await vi.waitFor(() => expect(productRequests.length).toBeGreaterThan(0))
+
+        await navigateTo('/search?category=figures&q=goku')
+
+        await vi.waitFor(() => expect(selectValue('category-select')).toBe('ptyp_figures'))
+        await vi.waitFor(() => expect(productRequests.at(-1)).toMatchObject({q: 'goku', type_id: 'ptyp_figures'}))
     })
 
     it('requests the calculated price for a region, so product cards can show a price', async () => {
