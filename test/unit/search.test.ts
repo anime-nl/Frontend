@@ -102,7 +102,7 @@ describe('filtersToQuery', () => {
                     q: ' goku ',
                     category: 'pcat_tcg',
                     collection: 'pcol_1',
-                    minPrice: 5,
+                    minPrice: '5',
                     maxPrice: '20.5',
                     addedWithinDays: '30',
                     inStock: true,
@@ -125,7 +125,7 @@ describe('filtersToQuery', () => {
     })
 
     it('keeps a price of zero', () => {
-        expect(filtersToQuery({...EMPTY_FILTERS, minPrice: 0}, cats)).toEqual({min_price: '0'})
+        expect(filtersToQuery({...EMPTY_FILTERS, minPrice: '0'}, cats)).toEqual({min_price: '0'})
     })
 })
 

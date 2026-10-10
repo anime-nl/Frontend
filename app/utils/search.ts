@@ -80,8 +80,8 @@ export interface SearchFilters {
     q: string
     category: string
     collection: string
-    minPrice: string | number
-    maxPrice: string | number
+    minPrice: string
+    maxPrice: string
     addedWithinDays: string
     inStock: boolean
     onSale: boolean
@@ -155,8 +155,8 @@ export function filtersToQuery(filters: SearchFilters, categories: SearchCategor
         q: filters.q.trim(),
         category: category ?? '',
         collection: filters.collection,
-        min_price: String(filters.minPrice ?? ''),
-        max_price: String(filters.maxPrice ?? ''),
+        min_price: String(filters.minPrice),
+        max_price: String(filters.maxPrice),
         added: filters.addedWithinDays,
         in_stock: filters.inStock ? 'true' : '',
         on_sale: filters.onSale ? 'true' : '',
