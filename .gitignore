@@ -112,3 +112,4 @@ out
 .yarn/install-state.gz
 .pnp.*
 .superpowers/
+/.prod-medusa.env
