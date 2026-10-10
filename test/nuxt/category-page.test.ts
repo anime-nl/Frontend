@@ -98,7 +98,7 @@ describe('category page', () => {
         expect(productRequests).toHaveLength(0)
     })
 
-    it('gives each product card an explicit height, since UPageColumns never sizes its children', async () => {
+    it('gives each product card an explicit height, since the grid does not size the card contents', async () => {
         wrapper = await mountSuspended(CategoryPage, {props: {handle: 'singles', title: 'Singles'}})
 
         expect(wrapper.find('a').classes()).toContain('h-100')

@@ -38,9 +38,9 @@ onMounted(() => infiniteScroll.start())
 <template>
   <UContainer class="flex flex-col gap-8">
     <ProductPageHeader :badge="badge" :title="title" :description="description" />
-    <UPageColumns v-if="products.length">
+    <div v-if="products.length" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       <ProductCard v-for="product in products" :key="product.id" :product="product" class="h-100" />
-    </UPageColumns>
+    </div>
     <p v-else class="text-center text-slate-400 py-12">{{ t('products.emptyCategory') }}</p>
     <div ref="loadMoreSentinel" class="w-full py-12 flex justify-center">
       <span v-if="loading" class="text-slate-400 text-sm">{{ t('home.loadingMore') }}</span>

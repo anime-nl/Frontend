@@ -1,6 +1,6 @@
 import type {StoreProductCategory} from '@medusajs/types'
 
-export const CATEGORY_PAGE_SIZE = 24
+export const CATEGORY_PAGE_SIZE = 12
 
 export interface CategoryProducts extends ProductListResponse {
     query: Record<string, unknown>
