@@ -102,3 +102,11 @@ To enable it:
 4. Pay for a test order in Mollie's sandbox mode and confirm the order and payment appear in the Medusa admin.
 
 The plugin's `package.json` pins its `@medusajs/*` peer dependencies to `2.5.1`, well behind the `2.21.1` this repo runs — there is an [open upstream issue](https://github.com/variablevic/mollie-payments-medusa/issues/7) reporting a provider-not-found error on 2.7.0 because of it. Verified locally against a throwaway Medusa 2.21.1 instance that the provider still registers correctly and reaches Mollie's real API (see `docs/known-issues.md`), but re-check `GET /store/payment-providers?region_id=<id>` after any Medusa or plugin version bump.
+
+### Order confirmation and order page
+
+After paying, `/checkout/return` completes the cart (asking again every few seconds for about a minute while Mollie settles) and redirects to `/orders/[id]?token=...`, which shows the order and its placed → paid → fulfilled → shipped → delivered timeline. Guests can open it through the signed `token`; signed-in customers can open their own orders without one (linked from `/account`).
+
+- `ORDER_LINK_SECRET` (Nuxt, build time like the other variables) signs the token: HMAC-SHA256 hex of the order id. **Medusa must use the exact same value**, because its confirmation email contains the same link. Without it, only signed-in customers can open an order page.
+- The confirmation email is sent by Medusa, not Nuxt: `medusa/src/subscribers/order-placed.ts` reacts to `order.placed` and hands the email to the SMTP notification provider in `medusa/src/modules/smtp-notification/`. It only activates when Medusa has `SMTP_HOST` (plus optional `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`), and needs `STOREFRONT_URL` and `ORDER_LINK_SECRET` to put the order link in the email. Locally the dev container sets all of these and Mailpit (http://localhost:8025) catches the email.
+- Production Medusa is a separate repo (`anime-nl/medusa-backend`); the same files must be applied there, and a placed order only gets an email if Medusa's event bus and worker actually process subscribers (check `MEDUSA_WORKER_MODE` and the Redis event bus).
