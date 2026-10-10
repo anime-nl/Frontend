@@ -313,4 +313,64 @@ describe('search page', () => {
             expect(selectValue('category-select')).toBe('')
         })
     })
+
+    describe('url', () => {
+        const currentQuery = () => useRoute().query
+
+        it('shows the filters that are in the url', async () => {
+            wrapper = await mountSearch('q=goku&category=tcg&min_price=5&in_stock=true&sort=title&added=30')
+
+            expect((document.getElementById('search-input') as HTMLInputElement).value).toBe('goku')
+            expect(selectValue('category-select')).toBe('pcat_tcg')
+            expect((document.getElementById('min-price-input') as HTMLInputElement).value).toBe('5')
+            expect(selectValue('sort-select')).toBe('title')
+            expect(selectValue('added-select')).toBe('30')
+            await vi.waitFor(() => expect(productRequests.at(-1)).toMatchObject({in_stock: 'true'}))
+        })
+
+        it('puts a changed search in the url without reloading the page', async () => {
+            wrapper = await mountSearch('')
+            await wrapper.find('#search-input').setValue('zhongli')
+            await wrapper.find('#sort-select').setValue('price_desc')
+
+            await vi.waitFor(() => expect(currentQuery()).toMatchObject({q: 'zhongli', sort: 'price_desc'}), {
+                timeout: 1000
+            })
+            expect(wrapper.find('#search-input').exists()).toBe(true)
+        })
+
+        it('writes the category as its handle', async () => {
+            wrapper = await mountSearch('')
+            await wrapper.find('#category-select').setValue('pcat_figures')
+
+            await vi.waitFor(() => expect(currentQuery().category).toBe('figures'), {timeout: 1000})
+        })
+
+        it('removes a filter from the url when it is cleared', async () => {
+            wrapper = await mountSearch('q=goku&in_stock=true')
+            await wrapper.find('#search-input').setValue('')
+
+            await vi.waitFor(() => expect(currentQuery()).toEqual({in_stock: 'true'}), {timeout: 1000})
+        })
+
+        it('does not add a history entry for every change', async () => {
+            wrapper = await mountSearch('')
+            const historyLength = window.history.length
+            await wrapper.find('#search-input').setValue('a')
+            await vi.waitFor(() => expect(currentQuery().q).toBe('a'), {timeout: 1000})
+            await wrapper.find('#search-input').setValue('ab')
+            await vi.waitFor(() => expect(currentQuery().q).toBe('ab'), {timeout: 1000})
+
+            expect(window.history.length).toBe(historyLength)
+        })
+
+        it('does not search again because of its own url update', async () => {
+            wrapper = await mountSearch('')
+            await wrapper.find('#search-input').setValue('zhongli')
+            await vi.waitFor(() => expect(currentQuery().q).toBe('zhongli'), {timeout: 1000})
+            await new Promise((resolve) => setTimeout(resolve, 700))
+
+            expect(productRequests.filter((request) => request.q === 'zhongli')).toHaveLength(1)
+        })
+    })
 })

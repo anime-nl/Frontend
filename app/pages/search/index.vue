@@ -10,18 +10,6 @@ interface Collection {
   title: string
 }
 
-interface SearchFilters {
-  q: string
-  category: string
-  collection: string
-  minPrice: string
-  maxPrice: string
-  addedWithinDays: string
-  inStock: boolean
-  onSale: boolean
-  sort: ProductSort | ''
-}
-
 const ADDED_WITHIN_OPTIONS = [
   {days: '', label: 'search.addedAny'},
   {days: '7', label: 'search.added7'},
@@ -37,15 +25,6 @@ const SORT_OPTIONS: {value: ProductSort | ''; label: string}[] = [
 ]
 const SELECT_CLASSES =
   'w-full bg-default border border-sky-200/40 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary hover:border-primary transition-colors'
-const EMPTY_FILTERS: Omit<SearchFilters, 'q' | 'category' | 'collection'> = {
-  minPrice: '',
-  maxPrice: '',
-  addedWithinDays: '',
-  inStock: false,
-  onSale: false,
-  sort: ''
-}
-
 const availableCollections = ref<Collection[]>([])
 const products = ref<StoreProduct[]>([])
 
@@ -55,10 +34,7 @@ const page = ref(1)
 const LIMIT = 12
 
 const route = useRoute()
-const queryParam = (key: 'q' | 'category' | 'collection') => {
-  const value = route.query[key]
-  return (Array.isArray(value) ? value[0] : value) ?? ''
-}
+const router = useRouter()
 
 const [{data: categoriesResponse}, {data: regionId}] = await Promise.all([
   useFetch<{product_categories: StoreProductCategory[]}>('/api/categories'),
@@ -67,12 +43,10 @@ const [{data: categoriesResponse}, {data: regionId}] = await Promise.all([
 const availableCategories = computed(() => categoriesResponse.value?.product_categories ?? [])
 const categoryChoices = computed(() => categoryOptions(availableCategories.value))
 
-const filters = reactive<SearchFilters>({
-  q: queryParam('q'),
-  category: findCategoryId(availableCategories.value, queryParam('category')),
-  collection: queryParam('collection'),
-  ...EMPTY_FILTERS
-})
+const filters = reactive<SearchFilters>(queryToFilters(route.query, availableCategories.value))
+
+/** @returns The URL query that describes the current filters */
+const currentQuery = () => filtersToQuery(filters, availableCategories.value)
 
 const loadMoreSentinel = useTemplateRef<HTMLElement>('loadMoreSentinel')
 const collectionSelect = useTemplateRef<HTMLSelectElement>('collectionSelect')
@@ -134,15 +108,18 @@ const fetchProducts = async (reset = false) => {
   }
 }
 
+/** Shows the filters of a search link that was followed while already on this page. */
 const applyRouteQuery = () => {
-  filters.q = queryParam('q')
-  filters.category = findCategoryId(availableCategories.value, queryParam('category'))
-  filters.collection = queryParam('collection')
   if (route.query.focus === 'collection') collectionSelect.value?.focus()
+
+  const routeFilters = queryToFilters(route.query, availableCategories.value)
+  // Our own URL updates come back through here; applying them again would only churn the inputs
+  if (JSON.stringify(filtersToQuery(routeFilters, availableCategories.value)) === JSON.stringify(currentQuery())) return
+  Object.assign(filters, routeFilters)
 }
 
 const resetFilters = () => {
-  Object.assign(filters, {q: '', category: '', collection: '', ...EMPTY_FILTERS})
+  Object.assign(filters, EMPTY_FILTERS)
 }
 
 watch(
@@ -150,6 +127,8 @@ watch(
   () => {
     if (filterTimeout) clearTimeout(filterTimeout)
     filterTimeout = setTimeout(() => {
+      // replace, not push: every keystroke would otherwise add a history entry to click back through
+      router.replace({query: currentQuery()})
       fetchProducts(true)
     }, 400)
   },
