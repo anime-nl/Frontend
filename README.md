@@ -43,17 +43,18 @@ Only the Nuxt app is deployed (Nixpacks: `bun run build`, `bun run start`). The 
 
 `nuxt.config.ts` reads these variables at build time, so they must be available at build time (in Coolify: "Available at Buildtime") and changing one needs a redeploy:
 
-| Variable                                           | Value                                                                                   |
-| -------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| `MEDUSA_URL`                                       | Medusa URL for the Nuxt server, used when `MEDUSA_SERVER_URL` is not set                |
-| `MEDUSA_SERVER_URL`                                | Medusa URL for the Nuxt server (defaults to `MEDUSA_URL`)                               |
-| `MEDUSA_PUBLISHABLE_KEY`                           | Publishable API key from the Medusa admin                                               |
-| `MEDUSA_SALES_CHANNEL_ID`                          | Sales channel id, if used                                                               |
-| `MEDUSA_BRIEVENBUS_SHIPPING_PROFILE_ID`            | Id of the Brievenbus shipping profile in the Medusa admin                               |
-| `MEDUSA_PAKKET_SHIPPING_PROFILE_ID`                | Id of the Pakket shipping profile in the Medusa admin                                   |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` | SMTP server for the support forms, see below                                            |
-| `SITE_URL`                                         | Public URL of the site, used to build `/sitemap.xml` (defaults to `https://animenl.nl`) |
-| `GA_MEASUREMENT_ID`                                | Google Analytics measurement id (e.g. `G-XXXXXXXXXX`); leave unset to disable analytics |
+| Variable                                           | Value                                                                                              |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `MEDUSA_URL`                                       | Medusa URL for the Nuxt server, used when `MEDUSA_SERVER_URL` is not set                           |
+| `MEDUSA_SERVER_URL`                                | Medusa URL for the Nuxt server (defaults to `MEDUSA_URL`)                                          |
+| `MEDUSA_PUBLISHABLE_KEY`                           | Publishable API key from the Medusa admin                                                          |
+| `MEDUSA_SALES_CHANNEL_ID`                          | Sales channel id, if used                                                                          |
+| `MEDUSA_BRIEVENBUS_SHIPPING_PROFILE_ID`            | Id of the Brievenbus shipping profile in the Medusa admin                                          |
+| `MEDUSA_PAKKET_SHIPPING_PROFILE_ID`                | Id of the Pakket shipping profile in the Medusa admin                                              |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` | SMTP server for the support forms, see below                                                       |
+| `ORDER_LINK_SECRET`                                | Secret signing order page links for guests; set the same value on Medusa, see "Order confirmation" |
+| `SITE_URL`                                         | Public URL of the site, used to build `/sitemap.xml` (defaults to `https://animenl.nl`)            |
+| `GA_MEASUREMENT_ID`                                | Google Analytics measurement id (e.g. `G-XXXXXXXXXX`); leave unset to disable analytics            |
 
 Nuxt needs Node 22.19 or newer. If the build complains about the Node version, set `NIXPACKS_NODE_VERSION=24`.
 
@@ -101,3 +102,11 @@ To enable it:
 4. Pay for a test order in Mollie's sandbox mode and confirm the order and payment appear in the Medusa admin.
 
 The plugin's `package.json` pins its `@medusajs/*` peer dependencies to `2.5.1`, well behind the `2.21.1` this repo runs — there is an [open upstream issue](https://github.com/variablevic/mollie-payments-medusa/issues/7) reporting a provider-not-found error on 2.7.0 because of it. Verified locally against a throwaway Medusa 2.21.1 instance that the provider still registers correctly and reaches Mollie's real API (see `docs/known-issues.md`), but re-check `GET /store/payment-providers?region_id=<id>` after any Medusa or plugin version bump.
+
+### Order confirmation and order page
+
+After paying, `/checkout/return` completes the cart (asking again every few seconds for about a minute while Mollie settles) and redirects to `/orders/[id]?token=...`, which shows the order and its placed → paid → fulfilled → shipped → delivered timeline. Guests can open it through the signed `token`; signed-in customers can open their own orders without one (linked from `/account`).
+
+- `ORDER_LINK_SECRET` (Nuxt, build time like the other variables) signs the token: HMAC-SHA256 hex of the order id. **Medusa must use the exact same value**, because its confirmation email contains the same link. Without it, only signed-in customers can open an order page.
+- The confirmation email is sent by Medusa, not Nuxt: `medusa/src/subscribers/order-placed.ts` reacts to `order.placed` and hands the email to the SMTP notification provider in `medusa/src/modules/smtp-notification/`. It only activates when Medusa has `SMTP_HOST` (plus optional `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`), and needs `STOREFRONT_URL` and `ORDER_LINK_SECRET` to put the order link in the email. Locally the dev container sets all of these and Mailpit (http://localhost:8025) catches the email.
+- Production Medusa is a separate repo (`anime-nl/medusa-backend`); the same files must be applied there, and a placed order only gets an email if Medusa's event bus and worker actually process subscribers (check `MEDUSA_WORKER_MODE` and the Redis event bus).

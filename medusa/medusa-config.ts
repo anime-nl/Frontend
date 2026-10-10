@@ -7,6 +7,10 @@ loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 // register but lets the rest of Medusa start). So it is only added when a key is actually configured.
 const mollieConfigured = Boolean(process.env.MOLLIE_API_KEY)
 
+// Order confirmation emails need an SMTP server; without one the notification module stays unregistered
+// and the order.placed subscriber just logs a warning.
+const smtpConfigured = Boolean(process.env.SMTP_HOST)
+
 module.exports = defineConfig({
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
@@ -19,6 +23,29 @@ module.exports = defineConfig({
     },
   },
   modules: [
+    ...(smtpConfigured
+      ? [
+          {
+            resolve: '@medusajs/medusa/notification',
+            options: {
+              providers: [
+                {
+                  resolve: './src/modules/smtp-notification',
+                  id: 'smtp',
+                  options: {
+                    channels: ['email'],
+                    host: process.env.SMTP_HOST,
+                    port: Number(process.env.SMTP_PORT) || 587,
+                    user: process.env.SMTP_USER,
+                    pass: process.env.SMTP_PASS,
+                    from: process.env.SMTP_FROM || 'info@animenl.nl',
+                  },
+                },
+              ],
+            },
+          },
+        ]
+      : []),
     {
       resolve: '@medusajs/medusa/file',
       options: {

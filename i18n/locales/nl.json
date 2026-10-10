@@ -290,6 +290,7 @@
       "failedBody": "Er ging iets mis met je betaling. Probeer het opnieuw.",
       "backToCart": "Terug naar winkelwagen",
       "idleTitle": "Niets te bevestigen",
+      "pendingTimeoutBody": "Het duurt langer dan verwacht. Je hoeft niets te doen: zodra je betaling is verwerkt, ontvang je een bevestiging per e-mail.",
       "idleBody": "Er is geen lopende betaling voor deze browser."
     }
   },
@@ -417,5 +418,25 @@
       "nameLabel": "Naam:",
       "emailLabel": "E-mail:"
     }
+  },
+  "order": {
+    "title": "Bestelling #{number}",
+    "placedOn": "Geplaatst op {date}",
+    "timelineHeading": "Status van je bestelling",
+    "timeline": {
+      "placed": "Geplaatst",
+      "paid": "Betaald",
+      "fulfilled": "Verwerkt",
+      "shipped": "Verzonden",
+      "delivered": "Bezorgd"
+    },
+    "itemsHeading": "Artikelen",
+    "quantity": "{count}×",
+    "subtotal": "Subtotaal",
+    "shipping": "Verzending",
+    "total": "Totaal",
+    "shippingAddress": "Bezorgadres",
+    "notFoundTitle": "Bestelling niet gevonden",
+    "notFoundBody": "We konden deze bestelling niet vinden. Gebruik de link uit je bevestigingsmail of log in op je account."
   }
 }

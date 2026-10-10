@@ -24,6 +24,8 @@ services:
       # Emails are caught by mailpit instead of being sent
       SMTP_HOST: mailpit
       SMTP_PORT: '1025'
+      # Signs order page links; must match Medusa's ORDER_LINK_SECRET below. Dev-only value.
+      ORDER_LINK_SECRET: dev-order-link-secret
 
   # Catches the emails the site sends, inbox at http://localhost:8025
   mailpit:
@@ -68,6 +70,11 @@ services:
       MOLLIE_API_KEY: ${MOLLIE_API_KEY}
       MOLLIE_REDIRECT_URL: http://localhost:3000/checkout/return
       MEDUSA_URL: http://localhost:9000
+      # Order confirmation emails are caught by mailpit; links point at the local storefront
+      SMTP_HOST: mailpit
+      SMTP_PORT: '1025'
+      STOREFRONT_URL: http://localhost:3000
+      ORDER_LINK_SECRET: dev-order-link-secret
     depends_on:
       postgres:
         condition: service_healthy

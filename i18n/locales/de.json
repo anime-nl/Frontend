@@ -302,6 +302,7 @@
       "failedBody": "Bei Ihrer Zahlung ist etwas schiefgegangen. Bitte versuchen Sie es erneut.",
       "backToCart": "Zurück zum Warenkorb",
       "idleTitle": "Hier gibt es nichts zu bestätigen",
+      "pendingTimeoutBody": "Das dauert länger als erwartet. Sie müssen nichts tun: Sobald Ihre Zahlung verarbeitet wurde, erhalten Sie eine Bestätigung per E-Mail.",
       "idleBody": "Für diesen Browser ist keine Zahlung in Bearbeitung."
     }
   },
@@ -429,5 +430,25 @@
       "nameLabel": "Name:",
       "emailLabel": "E-Mail:"
     }
+  },
+  "order": {
+    "title": "Bestellung #{number}",
+    "placedOn": "Aufgegeben am {date}",
+    "timelineHeading": "Bestellstatus",
+    "timeline": {
+      "placed": "Aufgegeben",
+      "paid": "Bezahlt",
+      "fulfilled": "Bearbeitet",
+      "shipped": "Versendet",
+      "delivered": "Zugestellt"
+    },
+    "itemsHeading": "Artikel",
+    "quantity": "{count}×",
+    "subtotal": "Zwischensumme",
+    "shipping": "Versand",
+    "total": "Gesamt",
+    "shippingAddress": "Lieferadresse",
+    "notFoundTitle": "Bestellung nicht gefunden",
+    "notFoundBody": "Wir konnten diese Bestellung nicht finden. Nutzen Sie den Link aus Ihrer Bestätigungs-E-Mail oder melden Sie sich in Ihrem Konto an."
   }
 }

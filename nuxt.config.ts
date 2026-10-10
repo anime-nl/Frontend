@@ -102,6 +102,8 @@ export default defineNuxtConfig({
         smtpPort: Number(process.env.SMTP_PORT) || 587,
         smtpUser: process.env.SMTP_USER,
         smtpPass: process.env.SMTP_PASS,
+        // Secret that signs the order page links (/orders/[id]?token=...); the Medusa order confirmation email must use the same value
+        orderLinkSecret: process.env.ORDER_LINK_SECRET,
         public: {
             supportEmail: 'info@animenl.nl',
             // Lets the cookie consent banner know whether there is anything to ask consent for

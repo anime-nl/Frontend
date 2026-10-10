@@ -45,7 +45,9 @@ async function logout() {
           :key="order.id"
           class="flex items-center justify-between border-b border-sky-200/20 pb-2"
         >
-          <span>{{ t('account.orderNumber', {number: order.display_id ?? order.id}) }}</span>
+          <NuxtLink :to="`/orders/${order.id}`" class="hover:underline">{{
+            t('account.orderNumber', {number: order.display_id ?? order.id})
+          }}</NuxtLink>
           <UBadge :label="t(`account.orderStatus.${order.status}`)" color="neutral" variant="subtle" />
           <span class="font-semibold">{{
             formatCurrency(order.total, order.currency_code, localeProperties.language!)
