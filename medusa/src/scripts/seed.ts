@@ -21,6 +21,7 @@ import {
 const PUBLISHABLE_KEY = process.env.PUBLISHABLE_API_KEY
 const COUNTRIES = ['nl', 'be']
 
+type Group = 'Keychains' | 'Figures' | 'Plushies' | 'TCG' | 'Misc'
 type Stock = number | 'backorder' | 'unmanaged'
 
 interface VariantSeed {
@@ -36,10 +37,12 @@ interface ProductSeed {
   title: string
   subtitle: string
   description?: string
-  collection: string
+  /** The series or franchise, stored as a product tag like in production. */
+  series: string
+  /** Becomes both the product's collection and its type, like in production. See GROUPS. */
+  group: Group
+  /** Handle of the product's single category. See CATEGORIES. */
   category: string
-  /** Handle of a subcategory under `category`, if this product belongs to one. See SUBCATEGORIES. */
-  subcategory?: string
   material: string
   weight: number
   size: [number, number, number]
@@ -55,7 +58,7 @@ const single = (sku: string, price: number, stock: Stock, salePrice?: number): V
 
 const keychain = (
   name: string,
-  collection: string,
+  series: string,
   sku: string,
   stock: Stock,
   hue: number,
@@ -65,9 +68,9 @@ const keychain = (
   title: `${material} ${name} Keychain`,
   subtitle: '6 cm',
   description: `Official ${material.toLowerCase()} keychain of ${name}, with a sturdy metal clasp.`,
-  collection,
-  category: 'Keychains',
-  subcategory: material === 'Metal' ? 'metal-keychains' : 'acrylic-keychains',
+  series,
+  group: 'Keychains',
+  category: material === 'Metal' ? 'metal-keychains' : 'acrylic-keychains',
   material,
   weight: 16,
   size: [90, 73, 7],
@@ -94,9 +97,9 @@ const PRODUCTS: ProductSeed[] = [
     subtitle: '11 cm',
     description:
       'A detailed PVC statue of Hitori Gotoh in her iconic pink tracksuit.\n\nComes in a collector box with display base.',
-    collection: 'Bocchi the Rock!',
-    category: 'Figures',
-    subcategory: 'prize-figures',
+    series: 'Bocchi the Rock!',
+    group: 'Figures',
+    category: 'prize-figures',
     material: 'PVC',
     weight: 187,
     size: [120, 120, 150],
@@ -108,9 +111,9 @@ const PRODUCTS: ProductSeed[] = [
     title: 'Raiden Shogun 1/7 Scale Figure',
     subtitle: '26 cm',
     description: 'A premium 1/7 scale figure of the Raiden Shogun from Genshin Impact.',
-    collection: 'Genshin Impact',
-    category: 'Figures',
-    subcategory: 'scale-figures',
+    series: 'Genshin Impact',
+    group: 'Figures',
+    category: 'scale-figures',
     material: 'PVC',
     weight: 780,
     size: [180, 160, 260],
@@ -122,9 +125,9 @@ const PRODUCTS: ProductSeed[] = [
     title: 'Nendoroid Gawr Gura',
     subtitle: '10 cm',
     description: 'Poseable Nendoroid with three faceplates and a trident accessory.',
-    collection: 'Hololive',
-    category: 'Figures',
-    material: 'ABS',
+    series: 'Hololive',
+    group: 'Figures',
+    category: 'nendoroids',    material: 'ABS',
     weight: 210,
     size: [110, 110, 160],
     hue: 205,
@@ -135,9 +138,9 @@ const PRODUCTS: ProductSeed[] = [
     title: 'Hu Tao Nendoroid',
     subtitle: '10 cm',
     description: 'Poseable Nendoroid of Hu Tao with Boo Tao accessory.',
-    collection: 'Genshin Impact',
-    category: 'Figures',
-    material: 'ABS',
+    series: 'Genshin Impact',
+    group: 'Figures',
+    category: 'nendoroids',    material: 'ABS',
     weight: 205,
     size: [110, 110, 160],
     hue: 5,
@@ -148,9 +151,9 @@ const PRODUCTS: ProductSeed[] = [
     title: 'Hololive Gawr Gura Plush',
     subtitle: 'Sitting plush',
     description: 'A soft plush of Gawr Gura. Available in three sizes.',
-    collection: 'Hololive',
-    category: 'Plush',
-    material: 'Polyester',
+    series: 'Hololive',
+    group: 'Plushies',
+    category: 'plush-toys',    material: 'Polyester',
     weight: 250,
     size: [200, 150, 200],
     hue: 210,
@@ -166,9 +169,9 @@ const PRODUCTS: ProductSeed[] = [
     title: 'Pikachu Plush',
     subtitle: 'Pokémon Center original',
     description: 'A classic Pikachu plush in three sizes and two colours.',
-    collection: 'Pokémon TCG',
-    category: 'Plush',
-    material: 'Polyester',
+    series: 'Pokémon TCG',
+    group: 'Plushies',
+    category: 'plush-toys',    material: 'Polyester',
     weight: 300,
     size: [220, 160, 220],
     hue: 50,
@@ -184,9 +187,9 @@ const PRODUCTS: ProductSeed[] = [
   {
     title: 'Bocchi Plush Set',
     subtitle: 'Set of 4',
-    collection: 'Bocchi the Rock!',
-    category: 'Plush',
-    material: 'Polyester',
+    series: 'Bocchi the Rock!',
+    group: 'Plushies',
+    category: 'plush-toys',    material: 'Polyester',
     weight: 400,
     size: [250, 200, 120],
     hue: 320,
@@ -197,9 +200,9 @@ const PRODUCTS: ProductSeed[] = [
     title: 'Pokémon Scarlet & Violet Booster Pack',
     subtitle: '10 cards',
     description: 'A single booster pack from the Scarlet & Violet series.',
-    collection: 'Pokémon TCG',
-    category: 'TCG',
-    subcategory: 'packs',
+    series: 'Pokémon TCG',
+    group: 'TCG',
+    category: 'packs',
     material: 'Paper',
     weight: 25,
     size: [70, 5, 120],
@@ -211,9 +214,9 @@ const PRODUCTS: ProductSeed[] = [
     title: 'Pokémon Scarlet & Violet Booster Box',
     subtitle: '36 packs',
     description: 'A sealed display box with 36 booster packs.',
-    collection: 'Pokémon TCG',
-    category: 'TCG',
-    subcategory: 'boosters',
+    series: 'Pokémon TCG',
+    group: 'TCG',
+    category: 'boosters',
     material: 'Paper',
     weight: 900,
     size: [200, 130, 90],
@@ -224,9 +227,9 @@ const PRODUCTS: ProductSeed[] = [
   {
     title: 'Pokémon Charizard ex Single Card',
     subtitle: 'Ultra Rare',
-    collection: 'Pokémon TCG',
-    category: 'TCG',
-    subcategory: 'singles',
+    series: 'Pokémon TCG',
+    group: 'TCG',
+    category: 'singles',
     material: 'Paper',
     weight: 2,
     size: [63, 1, 88],
@@ -235,41 +238,46 @@ const PRODUCTS: ProductSeed[] = [
     variants: single('820650000099', 12.5, 2),
   },
   ...Array.from({ length: 6 }, (_, i): ProductSeed => ({
-    title: `Genshin Impact Sticker Sheet Vol. ${i + 1}`,
-    subtitle: 'A5 sticker sheet',
-    collection: 'Genshin Impact',
-    category: 'Keychains',
-    material: 'Vinyl',
-    weight: 8,
-    size: [148, 1, 210],
+    title: `Genshin Impact Mug Vol. ${i + 1}`,
+    subtitle: '350 ml',
+    series: 'Genshin Impact',
+    group: 'Misc',
+    category: 'mugs',
+    material: 'Ceramic',
+    weight: 350,
+    size: [120, 90, 95],
     hue: (i * 55 + 90) % 360,
     images: 1,
-    variants: single(`STICKER-GI-${i + 1}`, 3.95, 100),
+    variants: single(`MUG-GI-${i + 1}`, 12.95, 100),
   })),
 ]
 
-const COLLECTIONS = ['Genshin Impact', 'Bocchi the Rock!', 'Hololive', 'Pokémon TCG']
-const CATEGORIES = ['Keychains', 'Figures', 'Plush', 'TCG']
+// Production uses the same five groups as collections and as product types
+const GROUPS: Group[] = ['Keychains', 'Figures', 'Plushies', 'TCG', 'Misc']
 // Categories thin/small enough to ship in a Brievenbus (letterbox parcel); everything else ships as a Pakket.
-const BRIEVENBUS_CATEGORIES = ['Keychains', 'TCG']
+const BRIEVENBUS_GROUPS: Group[] = ['Keychains', 'TCG']
 
-// Subcategories per top-level category, keyed by the handle the Nuxt app links to (e.g. /products/tcg/singles)
-const SUBCATEGORIES: Record<string, {handle: string; name: string}[]> = {
-  TCG: [
-    { handle: 'singles', name: 'Singles' },
-    { handle: 'packs', name: 'Packs' },
-    { handle: 'boosters', name: 'Booster Boxes' },
-  ],
-  Figures: [
-    { handle: 'prize-figures', name: 'Prize Figures' },
-    { handle: 'scale-figures', name: 'Scale Figures' },
-    { handle: 'noodle-stoppers', name: 'Noodle Stoppers' },
-  ],
-  Keychains: [
-    { handle: 'acrylic-keychains', name: 'Acrylic keychains' },
-    { handle: 'metal-keychains', name: 'Metal keychains' },
-  ],
-}
+// Production's categories: one flat list, every product in exactly one. The handles are what the Nuxt app links to (e.g. /products/tcg/singles)
+const CATEGORIES = [
+  { handle: 'singles', name: 'Singles' },
+  { handle: 'packs', name: 'Packs' },
+  { handle: 'boosters', name: 'Booster Boxes' },
+  { handle: 'prize-figures', name: 'Prize Figures' },
+  { handle: 'scale-figures', name: 'Scale figures' },
+  { handle: 'noodle-stoppers', name: 'Noodle Stoppers' },
+  { handle: 'acrylic-keychains', name: 'Acrylic Keychains' },
+  { handle: 'metal-keychains', name: 'Metal Keychains' },
+  { handle: 'plush-toys', name: 'Plush Toys' },
+  { handle: 'pop-up-parade', name: 'Pop Up Parade Figures' },
+  { handle: 'chibi-figures', name: 'Chibi Figures' },
+  { handle: 'action-figures', name: 'Action Figures' },
+  { handle: '2d-plush', name: '2D Plush' },
+  { handle: 'nendoroids', name: 'Nendoroids' },
+  { handle: 'pocket-plush', name: 'Pocket Plush' },
+  { handle: 'mascot-keychains', name: 'Mascot Keychains' },
+  { handle: 'acrylic-stands', name: 'Acrylic Stands' },
+  { handle: 'mugs', name: 'Mugs' },
+]
 const SALES_CHANNELS = ['Webshop', 'Physical', 'Bol.com']
 
 const escapeXml = (value: string) =>
@@ -468,24 +476,15 @@ export default async function seed({ container }: ExecArgs) {
 
   logger.info('Seeding catalog...')
   const collections = await productModule.createProductCollections(
-    COLLECTIONS.map((title) => ({ title, handle: title.toLowerCase().replace(/[^a-z0-9]+/g, '-') })),
+    GROUPS.map((title) => ({ title, handle: title.toLowerCase() })),
   )
   const { result: categories } = await createProductCategoriesWorkflow(container).run({
-    input: { product_categories: CATEGORIES.map((name) => ({ name, is_active: true })) },
+    input: { product_categories: CATEGORIES.map((category) => ({ ...category, is_active: true })) },
   })
-  const { result: subcategories } = await createProductCategoriesWorkflow(container).run({
-    input: {
-      product_categories: Object.entries(SUBCATEGORIES).flatMap(([parentName, subs]) =>
-        subs.map((sub) => ({
-          name: sub.name,
-          handle: sub.handle,
-          is_active: true,
-          parent_category_id: categories.find((category) => category.name === parentName)!.id,
-        })),
-      ),
-    },
-  })
-  const types = await productModule.createProductTypes(CATEGORIES.map((value) => ({ value })))
+  const types = await productModule.createProductTypes(GROUPS.map((value) => ({ value })))
+  const tags = await productModule.createProductTags(
+    [...new Set(PRODUCTS.map((product) => product.series))].map((value) => ({ value })),
+  )
 
   logger.info('Uploading product images...')
   const uploads = PRODUCTS.map((product) =>
@@ -519,15 +518,11 @@ export default async function seed({ container }: ExecArgs) {
           length: product.size[0],
           width: product.size[1],
           height: product.size[2],
-          collection_id: collections.find((collection) => collection.title === product.collection)!.id,
-          category_ids: [
-            categories.find((category) => category.name === product.category)!.id,
-            ...(product.subcategory
-              ? [subcategories.find((subcategory) => subcategory.handle === product.subcategory)!.id]
-              : []),
-          ],
-          type_id: types.find((type) => type.value === product.category)!.id,
-          shipping_profile_id: BRIEVENBUS_CATEGORIES.includes(product.category)
+          collection_id: collections.find((collection) => collection.title === product.group)!.id,
+          category_ids: [categories.find((category) => category.handle === product.category)!.id],
+          type_id: types.find((type) => type.value === product.group)!.id,
+          tags: [{ id: tags.find((tag) => tag.value === product.series)!.id }],
+          shipping_profile_id: BRIEVENBUS_GROUPS.includes(product.group)
             ? brievenbusProfile.id
             : pakketProfile.id,
           thumbnail: imageUrls[index][0],
