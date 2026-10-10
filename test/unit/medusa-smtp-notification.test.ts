@@ -1,8 +1,23 @@
 import {afterEach, beforeAll, describe, expect, it, vi} from 'vitest'
 import {decodeMimeMessage, startSmtpSink} from '../helpers/smtpSink'
+
 import {SmtpNotificationProviderService} from '../../medusa/src/modules/smtp-notification/service'
 import orderPlacedHandler from '../../medusa/src/subscribers/order-placed'
 import {isValidOrderToken} from '../../server/utils/orderToken'
+
+// CI does not install medusa/node_modules, so the Medusa framework is replaced by the few pieces the code under test touches.
+vi.mock('@medusajs/framework/utils', () => ({
+    // eslint-disable-next-line @typescript-eslint/no-extraneous-class
+    AbstractNotificationProviderService: class {},
+    MedusaError: class extends Error {
+        static Types = {INVALID_DATA: 'invalid_data'}
+        constructor(_type: string, message: string) {
+            super(message)
+        }
+    },
+    ContainerRegistrationKeys: {LOGGER: 'logger', QUERY: 'query'},
+    Modules: {NOTIFICATION: 'notification'}
+}))
 
 let smtp: Awaited<ReturnType<typeof startSmtpSink>>
 
