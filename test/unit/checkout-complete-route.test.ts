@@ -1,5 +1,6 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
 import type {H3Event} from 'h3'
+import {signOrderId} from '../../server/utils/orderToken'
 
 const medusaFetch = vi.fn()
 const getCookie = vi.fn()
@@ -7,6 +8,7 @@ const deleteCookie = vi.fn()
 const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
 
 beforeEach(() => {
+    vi.stubGlobal('useRuntimeConfig', () => ({orderLinkSecret: 'test-secret'}))
     vi.stubGlobal('defineEventHandler', (handler: unknown) => handler)
     vi.stubGlobal('createError', (input: object) => Object.assign(new Error(), input))
     vi.stubGlobal('medusaFetch', medusaFetch)
@@ -21,6 +23,14 @@ afterEach(() => {
     deleteCookie.mockReset()
     consoleError.mockClear()
 })
+
+/** The error Medusa returns while the Mollie plugin's authorizePayment rejects an unpaid payment. */
+function mollieError(status: string) {
+    return Object.assign(new Error('400 Bad Request'), {
+        statusCode: 400,
+        data: {type: 'invalid_data', message: `Payment is not authorized: current status is ${status}`}
+    })
+}
 
 async function callRoute() {
     const {default: handler} = await import('../../server/api/checkout/complete.post')
@@ -39,7 +49,11 @@ describe('POST /api/checkout/complete', () => {
         getCookie.mockImplementation((_event: unknown, name: string) => (name === 'cart_id' ? 'cart_1' : undefined))
         medusaFetch.mockResolvedValue({type: 'order', order: {id: 'order_1', display_id: 42}})
 
-        await expect(callRoute()).resolves.toEqual({status: 'completed', order: {id: 'order_1', display_id: 42}})
+        await expect(callRoute()).resolves.toEqual({
+            status: 'completed',
+            order: {id: 'order_1', display_id: 42},
+            token: signOrderId('order_1', 'test-secret')
+        })
         expect(medusaFetch).toHaveBeenCalledWith(expect.anything(), 'carts/cart_1/complete', {method: 'POST'})
         expect(deleteCookie).toHaveBeenCalledWith(expect.anything(), 'cart_id', {path: '/'})
     })
@@ -82,7 +96,42 @@ describe('POST /api/checkout/complete', () => {
         })
     })
 
-    it('fails with 502 when Medusa errors completing the cart', async () => {
+    it('omits the order link token when no secret is configured', async () => {
+        vi.stubGlobal('useRuntimeConfig', () => ({}))
+        getCookie.mockImplementation((_event: unknown, name: string) => (name === 'cart_id' ? 'cart_1' : undefined))
+        medusaFetch.mockResolvedValue({type: 'order', order: {id: 'order_1'}})
+
+        await expect(callRoute()).resolves.toEqual({status: 'completed', order: {id: 'order_1'}})
+    })
+
+    it.each(['open', 'pending'])('reports pending while Mollie says the payment is %s', async (mollieStatus) => {
+        getCookie.mockImplementation((_event: unknown, name: string) => (name === 'cart_id' ? 'cart_1' : undefined))
+        medusaFetch.mockRejectedValue(mollieError(mollieStatus))
+
+        await expect(callRoute()).resolves.toEqual({status: 'pending'})
+        expect(deleteCookie).not.toHaveBeenCalled()
+    })
+
+    it.each(['failed', 'canceled', 'expired'])(
+        'reports failed when Mollie says the payment is %s',
+        async (mollieStatus) => {
+            getCookie.mockImplementation((_event: unknown, name: string) => (name === 'cart_id' ? 'cart_1' : undefined))
+            medusaFetch.mockRejectedValue(mollieError(mollieStatus))
+
+            await expect(callRoute()).resolves.toEqual({status: 'failed'})
+            expect(deleteCookie).not.toHaveBeenCalled()
+        }
+    )
+
+    it('reports pending for a Medusa error it cannot interpret instead of telling the customer they failed', async () => {
+        getCookie.mockImplementation((_event: unknown, name: string) => (name === 'cart_id' ? 'cart_1' : undefined))
+        medusaFetch.mockRejectedValue(Object.assign(new Error('boom'), {statusCode: 500, data: {message: 'oops'}}))
+
+        await expect(callRoute()).resolves.toEqual({status: 'pending'})
+        expect(consoleError).toHaveBeenCalled()
+    })
+
+    it('fails with 502 when Medusa cannot be reached at all', async () => {
         getCookie.mockImplementation((_event: unknown, name: string) => (name === 'cart_id' ? 'cart_1' : undefined))
         medusaFetch.mockRejectedValue(new Error('medusa unreachable'))
 

@@ -43,17 +43,18 @@ Only the Nuxt app is deployed (Nixpacks: `bun run build`, `bun run start`). The 
 
 `nuxt.config.ts` reads these variables at build time, so they must be available at build time (in Coolify: "Available at Buildtime") and changing one needs a redeploy:
 
-| Variable                                           | Value                                                                                   |
-| -------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| `MEDUSA_URL`                                       | Medusa URL for the Nuxt server, used when `MEDUSA_SERVER_URL` is not set                |
-| `MEDUSA_SERVER_URL`                                | Medusa URL for the Nuxt server (defaults to `MEDUSA_URL`)                               |
-| `MEDUSA_PUBLISHABLE_KEY`                           | Publishable API key from the Medusa admin                                               |
-| `MEDUSA_SALES_CHANNEL_ID`                          | Sales channel id, if used                                                               |
-| `MEDUSA_BRIEVENBUS_SHIPPING_PROFILE_ID`            | Id of the Brievenbus shipping profile in the Medusa admin                               |
-| `MEDUSA_PAKKET_SHIPPING_PROFILE_ID`                | Id of the Pakket shipping profile in the Medusa admin                                   |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` | SMTP server for the support forms, see below                                            |
-| `SITE_URL`                                         | Public URL of the site, used to build `/sitemap.xml` (defaults to `https://animenl.nl`) |
-| `GA_MEASUREMENT_ID`                                | Google Analytics measurement id (e.g. `G-XXXXXXXXXX`); leave unset to disable analytics |
+| Variable                                           | Value                                                                                              |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `MEDUSA_URL`                                       | Medusa URL for the Nuxt server, used when `MEDUSA_SERVER_URL` is not set                           |
+| `MEDUSA_SERVER_URL`                                | Medusa URL for the Nuxt server (defaults to `MEDUSA_URL`)                                          |
+| `MEDUSA_PUBLISHABLE_KEY`                           | Publishable API key from the Medusa admin                                                          |
+| `MEDUSA_SALES_CHANNEL_ID`                          | Sales channel id, if used                                                                          |
+| `MEDUSA_BRIEVENBUS_SHIPPING_PROFILE_ID`            | Id of the Brievenbus shipping profile in the Medusa admin                                          |
+| `MEDUSA_PAKKET_SHIPPING_PROFILE_ID`                | Id of the Pakket shipping profile in the Medusa admin                                              |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` | SMTP server for the support forms, see below                                                       |
+| `ORDER_LINK_SECRET`                                | Secret signing order page links for guests; set the same value on Medusa, see "Order confirmation" |
+| `SITE_URL`                                         | Public URL of the site, used to build `/sitemap.xml` (defaults to `https://animenl.nl`)            |
+| `GA_MEASUREMENT_ID`                                | Google Analytics measurement id (e.g. `G-XXXXXXXXXX`); leave unset to disable analytics            |
 
 Nuxt needs Node 22.19 or newer. If the build complains about the Node version, set `NIXPACKS_NODE_VERSION=24`.
 

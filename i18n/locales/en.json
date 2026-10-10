@@ -270,6 +270,7 @@
       "failedBody": "Something went wrong with your payment. Please try again.",
       "backToCart": "Back to cart",
       "idleTitle": "Nothing to confirm here",
+      "pendingTimeoutBody": "This is taking longer than expected. You don't need to do anything: once your payment is processed, you'll receive a confirmation by email.",
       "idleBody": "There is no payment in progress for this browser."
     }
   },
@@ -397,5 +398,25 @@
       "nameLabel": "Name:",
       "emailLabel": "Email:"
     }
+  },
+  "order": {
+    "title": "Order #{number}",
+    "placedOn": "Placed on {date}",
+    "timelineHeading": "Order status",
+    "timeline": {
+      "placed": "Placed",
+      "paid": "Paid",
+      "fulfilled": "Fulfilled",
+      "shipped": "Shipped",
+      "delivered": "Delivered"
+    },
+    "itemsHeading": "Items",
+    "quantity": "{count}×",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "total": "Total",
+    "shippingAddress": "Shipping address",
+    "notFoundTitle": "Order not found",
+    "notFoundBody": "We couldn't find this order. Use the link from your confirmation email or sign in to your account."
   }
 }

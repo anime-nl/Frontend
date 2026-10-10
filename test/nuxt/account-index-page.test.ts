@@ -88,6 +88,13 @@ describe('account page', () => {
         }
     )
 
+    it('links each order to its order page', async () => {
+        orders = [{id: 'order_1', display_id: 42, status: 'completed', currency_code: 'eur', total: 21.8}]
+        wrapper = await mountSuspended(AccountPage)
+
+        expect(wrapper.find('a[href="/orders/order_1"]').exists()).toBe(true)
+    })
+
     it('falls back to the order id when it has no display id', async () => {
         orders = [{id: 'order_1', display_id: null, status: 'completed', currency_code: 'eur', total: 21.8}]
         wrapper = await mountAccount()
