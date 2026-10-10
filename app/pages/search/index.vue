@@ -19,7 +19,7 @@ interface SearchFilters {
   addedWithinDays: string
   inStock: boolean
   onSale: boolean
-  sort: ProductSort
+  sort: ProductSort | ''
 }
 
 const ADDED_WITHIN_OPTIONS = [
@@ -28,7 +28,8 @@ const ADDED_WITHIN_OPTIONS = [
   {days: '30', label: 'search.added30'},
   {days: '90', label: 'search.added90'}
 ]
-const SORT_OPTIONS: {value: ProductSort; label: string}[] = [
+const SORT_OPTIONS: {value: ProductSort | ''; label: string}[] = [
+  {value: '', label: 'search.sortDefault'},
   {value: 'newest', label: 'search.sortNewest'},
   {value: 'title', label: 'search.sortTitle'},
   {value: 'price_asc', label: 'search.sortPriceAsc'},
@@ -42,7 +43,7 @@ const EMPTY_FILTERS: Omit<SearchFilters, 'q' | 'category' | 'collection'> = {
   addedWithinDays: '',
   inStock: false,
   onSale: false,
-  sort: 'newest'
+  sort: ''
 }
 
 const availableCollections = ref<Collection[]>([])
@@ -113,7 +114,7 @@ const fetchProducts = async (reset = false) => {
     if (filters.addedWithinDays) queryParams['created_at[$gte]'] = daysAgoIso(Number(filters.addedWithinDays))
     if (filters.inStock) queryParams.in_stock = true
     if (filters.onSale) queryParams.on_sale = true
-    queryParams.sort = filters.sort
+    if (filters.sort) queryParams.sort = filters.sort
 
     const response = await fetchProductPage(queryParams)
 
@@ -163,12 +164,15 @@ onMounted(async () => {
     collectionSelect.value?.focus()
   }
 
-  availableCollections.value = await fetchCollections().catch(() => [])
+  const collectionsLoaded = fetchCollections()
+    .catch(() => [])
+    .then((collections) => (availableCollections.value = collections))
 
   if (regionId.value) {
     await fetchProducts(true)
     infiniteScroll.start()
   }
+  await collectionsLoaded
 })
 
 onUnmounted(() => {

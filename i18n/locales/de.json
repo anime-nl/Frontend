@@ -141,6 +141,7 @@
     "inStock": "Nur auf Lager",
     "onSale": "Nur Angebote",
     "sortLabel": "Sortieren",
+    "sortDefault": "Relevanz",
     "sortNewest": "Neueste zuerst",
     "sortTitle": "Name (A-Z)",
     "sortPriceAsc": "Preis: aufsteigend",

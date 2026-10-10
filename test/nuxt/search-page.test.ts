@@ -213,7 +213,7 @@ describe('search page', () => {
         wrapper = await mountSearch('')
 
         await vi.waitFor(() => expect(productRequests.length).toBeGreaterThan(0))
-        expect(wrapper.text()).toContain('Geen producten gevonden')
+        await vi.waitFor(() => expect(wrapper!.text()).toContain('Geen producten gevonden'))
     })
 
     it('still loads products when only the collections lookup fails', async () => {
@@ -241,11 +241,11 @@ describe('search page', () => {
         const waitForRequestWith = (expected: Record<string, unknown>) =>
             vi.waitFor(() => expect(lastRequest()).toMatchObject(expected), {timeout: 1000})
 
-        it('sorts by newest first until told otherwise', async () => {
+        it('leaves the order to Medusa until a sort is chosen, so keyword relevance is kept', async () => {
             wrapper = await mountSearch('')
 
-            await waitForRequestWith({sort: 'newest'})
-            expect(selectValue('sort-select')).toBe('newest')
+            await vi.waitFor(() => expect(productRequests.length).toBeGreaterThan(0))
+            expect(lastRequest()).not.toHaveProperty('sort')
         })
 
         it('sends the chosen sort order', async () => {
@@ -309,7 +309,7 @@ describe('search page', () => {
             await clearFiltersButton().trigger('click')
 
             expect((document.getElementById('min-price-input') as HTMLInputElement).value).toBe('')
-            expect(selectValue('sort-select')).toBe('newest')
+            expect(selectValue('sort-select')).toBe('')
             expect(selectValue('category-select')).toBe('')
         })
     })

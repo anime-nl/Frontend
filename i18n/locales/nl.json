@@ -141,6 +141,7 @@
     "inStock": "Alleen op voorraad",
     "onSale": "Alleen in de aanbieding",
     "sortLabel": "Sorteren",
+    "sortDefault": "Aanbevolen",
     "sortNewest": "Nieuwste eerst",
     "sortTitle": "Naam (A-Z)",
     "sortPriceAsc": "Prijs: laag naar hoog",
