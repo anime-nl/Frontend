@@ -27,10 +27,11 @@ let productsShouldFail = false
 let collectionsShouldFail = false
 let regionsShouldFail = false
 
-registerEndpoint('/api/product-types', () => ({
-    product_types: [
-        {id: 'ptyp_tcg', value: 'TCG'},
-        {id: 'ptyp_figures', value: 'Figures'}
+registerEndpoint('/api/categories', () => ({
+    product_categories: [
+        {id: 'pcat_tcg', handle: 'tcg', name: 'TCG', parent_category_id: null},
+        {id: 'pcat_singles', handle: 'singles', name: 'Singles', parent_category_id: 'pcat_tcg'},
+        {id: 'pcat_figures', handle: 'figures', name: 'Figures', parent_category_id: null}
     ]
 }))
 registerEndpoint('/api/collections', () => {
@@ -53,6 +54,7 @@ registerEndpoint('/api/products', (event) => {
 let wrapper: Awaited<ReturnType<typeof mountSearch>> | undefined
 
 const mountSearch = (query: string) => mountSuspended(SearchPage, {route: `/search?${query}`, attachTo: document.body})
+const clearFiltersButton = () => wrapper!.findAll('button').find((button) => button.text() === 'Filters wissen')!
 const selectValue = (id: string) => (document.getElementById(id) as HTMLSelectElement).value
 
 beforeEach(() => {
@@ -81,13 +83,13 @@ describe('search page', () => {
     it('selects the category from its handle', async () => {
         wrapper = await mountSearch('category=tcg')
 
-        expect(selectValue('category-select')).toBe('ptyp_tcg')
+        expect(selectValue('category-select')).toBe('pcat_tcg')
     })
 
     it('selects the category from its id', async () => {
-        wrapper = await mountSearch('category=ptyp_figures')
+        wrapper = await mountSearch('category=pcat_figures')
 
-        expect(selectValue('category-select')).toBe('ptyp_figures')
+        expect(selectValue('category-select')).toBe('pcat_figures')
     })
 
     it('leaves the category empty for an unknown category', async () => {
@@ -106,10 +108,21 @@ describe('search page', () => {
         }
     })
 
-    it('searches products with the id of the selected category', async () => {
+    it('lists a subcategory below its parent, labelled with its path', async () => {
+        wrapper = await mountSearch('')
+
+        const labels = [...document.querySelectorAll('#category-select option')].map((option) =>
+            option.textContent?.trim()
+        )
+        expect(labels).toEqual(['Alle categorieën', 'TCG', 'TCG › Singles', 'Figures'])
+    })
+
+    it('searches products in the selected category and its subcategories', async () => {
         wrapper = await mountSearch('category=tcg')
 
-        await vi.waitFor(() => expect(productRequests.map((request) => request.type_id)).toContain('ptyp_tcg'))
+        await vi.waitFor(() =>
+            expect(productRequests.map((request) => request.category_id)).toContainEqual(['pcat_tcg', 'pcat_singles'])
+        )
     })
 
     it('applies the filters of a new search link while already on the search page', async () => {
@@ -118,8 +131,8 @@ describe('search page', () => {
 
         await navigateTo('/search?category=figures&q=goku')
 
-        await vi.waitFor(() => expect(selectValue('category-select')).toBe('ptyp_figures'))
-        await vi.waitFor(() => expect(productRequests.at(-1)).toMatchObject({q: 'goku', type_id: 'ptyp_figures'}))
+        await vi.waitFor(() => expect(selectValue('category-select')).toBe('pcat_figures'))
+        await vi.waitFor(() => expect(productRequests.at(-1)).toMatchObject({q: 'goku', category_id: 'pcat_figures'}))
     })
 
     it('requests the calculated price for a region, so product cards can show a price', async () => {
@@ -153,7 +166,7 @@ describe('search page', () => {
         wrapper = await mountSearch('category=tcg')
 
         await vi.waitFor(() => expect(wrapper!.text()).toContain('Geen producten gevonden'))
-        await wrapper.find('button').trigger('click')
+        await clearFiltersButton().trigger('click')
 
         expect(selectValue('category-select')).toBe('')
         expect((document.getElementById('search-input') as HTMLInputElement).value).toBe('')
@@ -221,5 +234,83 @@ describe('search page', () => {
         )
         expect(productRequests).toHaveLength(0)
         expect(wrapper.text()).toContain('Geen producten gevonden')
+    })
+
+    describe('filters', () => {
+        const lastRequest = () => productRequests.at(-1)
+        const waitForRequestWith = (expected: Record<string, unknown>) =>
+            vi.waitFor(() => expect(lastRequest()).toMatchObject(expected), {timeout: 1000})
+
+        it('sorts by newest first until told otherwise', async () => {
+            wrapper = await mountSearch('')
+
+            await waitForRequestWith({sort: 'newest'})
+            expect(selectValue('sort-select')).toBe('newest')
+        })
+
+        it('sends the chosen sort order', async () => {
+            wrapper = await mountSearch('')
+            await wrapper.find('#sort-select').setValue('price_asc')
+
+            await waitForRequestWith({sort: 'price_asc'})
+        })
+
+        it('sends the price range', async () => {
+            wrapper = await mountSearch('')
+            await wrapper.find('#min-price-input').setValue('5')
+            await wrapper.find('#max-price-input').setValue('20.5')
+
+            await waitForRequestWith({min_price: '5', max_price: '20.5'})
+        })
+
+        it('sends no price range when the price fields are empty', async () => {
+            wrapper = await mountSearch('')
+
+            await vi.waitFor(() => expect(productRequests.length).toBeGreaterThan(0))
+            expect(lastRequest()).not.toHaveProperty('min_price')
+            expect(lastRequest()).not.toHaveProperty('max_price')
+        })
+
+        it('only asks for products added within the chosen number of days', async () => {
+            wrapper = await mountSearch('')
+            await wrapper.find('#added-select').setValue('30')
+
+            await vi.waitFor(
+                () => {
+                    const since = lastRequest()?.['created_at[$gte]']
+                    expect(typeof since).toBe('string')
+                    const daysAgo = (Date.now() - new Date(since as string).getTime()) / (24 * 60 * 60 * 1000)
+                    expect(daysAgo).toBeCloseTo(30, 1)
+                },
+                {timeout: 1000}
+            )
+        })
+
+        it('asks for products in stock only', async () => {
+            wrapper = await mountSearch('')
+            await wrapper.find('#in-stock-checkbox').trigger('click')
+
+            await waitForRequestWith({in_stock: 'true'})
+        })
+
+        it('asks for products on sale only', async () => {
+            wrapper = await mountSearch('')
+            await wrapper.find('#on-sale-checkbox').trigger('click')
+
+            await waitForRequestWith({on_sale: 'true'})
+        })
+
+        it('clears every filter, not only the search text and selects', async () => {
+            wrapper = await mountSearch('category=tcg')
+            await wrapper.find('#min-price-input').setValue('5')
+            await wrapper.find('#sort-select').setValue('title')
+            await vi.waitFor(() => expect(wrapper!.text()).toContain('Geen producten gevonden'), {timeout: 1000})
+
+            await clearFiltersButton().trigger('click')
+
+            expect((document.getElementById('min-price-input') as HTMLInputElement).value).toBe('')
+            expect(selectValue('sort-select')).toBe('newest')
+            expect(selectValue('category-select')).toBe('')
+        })
     })
 })

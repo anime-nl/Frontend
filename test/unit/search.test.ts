@@ -1,5 +1,12 @@
 import {describe, expect, it} from 'vitest'
-import {bySeriesLink, findCategoryId, productTypesAsCategories, withDescendantIds} from '../../app/utils/search'
+import {
+    bySeriesLink,
+    categoryOptions,
+    daysAgoIso,
+    findCategoryId,
+    productTypesAsCategories,
+    withDescendantIds
+} from '../../app/utils/search'
 
 const categories = [
     {id: 'pcat_tcg', handle: 'tcg', name: 'TCG'},
@@ -53,5 +60,27 @@ describe('productTypesAsCategories', () => {
 
     it('maps production\'s "Plushies" to the navbar\'s "plush" handle', () => {
         expect(productTypesAsCategories([{id: 'ptyp_2', value: 'Plushies'}])[0]?.handle).toBe('plush')
+    })
+})
+
+describe('categoryOptions', () => {
+    const tree = [
+        {id: 'pcat_singles', handle: 'singles', name: 'Singles', parent_category_id: 'pcat_tcg'},
+        {id: 'pcat_plush', handle: 'plush', name: 'Plush', parent_category_id: null},
+        {id: 'pcat_tcg', handle: 'tcg', name: 'TCG'}
+    ]
+
+    it('lists a subcategory right below its parent, labelled with its path', () => {
+        expect(categoryOptions(tree)).toEqual([
+            {id: 'pcat_plush', label: 'Plush'},
+            {id: 'pcat_tcg', label: 'TCG'},
+            {id: 'pcat_singles', label: 'TCG › Singles'}
+        ])
+    })
+})
+
+describe('daysAgoIso', () => {
+    it('returns the moment that many days before now', () => {
+        expect(daysAgoIso(30, new Date('2026-10-31T12:00:00.000Z'))).toBe('2026-10-01T12:00:00.000Z')
     })
 })

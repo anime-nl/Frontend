@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import type {StoreProduct} from '@medusajs/types'
+import type {StoreProduct, StoreProductCategory} from '@medusajs/types'
+import type {ProductSort} from '#shared/utils/productFilters'
 
 const {t} = useI18n()
 useSeoMeta({title: t('search.pageTitle'), description: t('search.pageDescription')})
@@ -9,10 +10,39 @@ interface Collection {
   title: string
 }
 
-interface ProductFilters {
+interface SearchFilters {
   q: string
   category: string
   collection: string
+  minPrice: string
+  maxPrice: string
+  addedWithinDays: string
+  inStock: boolean
+  onSale: boolean
+  sort: ProductSort
+}
+
+const ADDED_WITHIN_OPTIONS = [
+  {days: '', label: 'search.addedAny'},
+  {days: '7', label: 'search.added7'},
+  {days: '30', label: 'search.added30'},
+  {days: '90', label: 'search.added90'}
+]
+const SORT_OPTIONS: {value: ProductSort; label: string}[] = [
+  {value: 'newest', label: 'search.sortNewest'},
+  {value: 'title', label: 'search.sortTitle'},
+  {value: 'price_asc', label: 'search.sortPriceAsc'},
+  {value: 'price_desc', label: 'search.sortPriceDesc'}
+]
+const SELECT_CLASSES =
+  'w-full bg-default border border-sky-200/40 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary hover:border-primary transition-colors'
+const EMPTY_FILTERS: Omit<SearchFilters, 'q' | 'category' | 'collection'> = {
+  minPrice: '',
+  maxPrice: '',
+  addedWithinDays: '',
+  inStock: false,
+  onSale: false,
+  sort: 'newest'
 }
 
 const availableCollections = ref<Collection[]>([])
@@ -24,21 +54,23 @@ const page = ref(1)
 const LIMIT = 12
 
 const route = useRoute()
-const queryParam = (key: keyof ProductFilters) => {
+const queryParam = (key: 'q' | 'category' | 'collection') => {
   const value = route.query[key]
   return (Array.isArray(value) ? value[0] : value) ?? ''
 }
 
 const [{data: categoriesResponse}, {data: regionId}] = await Promise.all([
-  useFetch<{product_types: {id: string; value: string}[]}>('/api/product-types'),
+  useFetch<{product_categories: StoreProductCategory[]}>('/api/categories'),
   useDefaultRegionId()
 ])
-const availableCategories = computed(() => productTypesAsCategories(categoriesResponse.value?.product_types ?? []))
+const availableCategories = computed(() => categoriesResponse.value?.product_categories ?? [])
+const categoryChoices = computed(() => categoryOptions(availableCategories.value))
 
-const filters = reactive<ProductFilters>({
+const filters = reactive<SearchFilters>({
   q: queryParam('q'),
   category: findCategoryId(availableCategories.value, queryParam('category')),
-  collection: queryParam('collection')
+  collection: queryParam('collection'),
+  ...EMPTY_FILTERS
 })
 
 const loadMoreSentinel = useTemplateRef<HTMLElement>('loadMoreSentinel')
@@ -74,8 +106,14 @@ const fetchProducts = async (reset = false) => {
     }
 
     if (filters.q.trim()) queryParams.q = filters.q.trim()
-    if (filters.category) queryParams.type_id = [filters.category]
+    if (filters.category) queryParams.category_id = withDescendantIds(availableCategories.value, filters.category)
     if (filters.collection) queryParams.collection_id = [filters.collection]
+    if (filters.minPrice) queryParams.min_price = filters.minPrice
+    if (filters.maxPrice) queryParams.max_price = filters.maxPrice
+    if (filters.addedWithinDays) queryParams['created_at[$gte]'] = daysAgoIso(Number(filters.addedWithinDays))
+    if (filters.inStock) queryParams.in_stock = true
+    if (filters.onSale) queryParams.on_sale = true
+    queryParams.sort = filters.sort
 
     const response = await fetchProductPage(queryParams)
 
@@ -103,9 +141,7 @@ const applyRouteQuery = () => {
 }
 
 const resetFilters = () => {
-  filters.q = ''
-  filters.category = ''
-  filters.collection = ''
+  Object.assign(filters, {q: '', category: '', collection: '', ...EMPTY_FILTERS})
 }
 
 watch(
@@ -160,12 +196,7 @@ onUnmounted(() => {
             <label for="collection-select" class="block font-semibold mb-2 text-secondary">{{
               t('search.collectionLabel')
             }}</label>
-            <select
-              id="collection-select"
-              ref="collectionSelect"
-              v-model="filters.collection"
-              class="w-full bg-default border border-sky-200/40 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary hover:border-primary transition-colors"
-            >
+            <select id="collection-select" ref="collectionSelect" v-model="filters.collection" :class="SELECT_CLASSES">
               <option value="">{{ t('search.allCollections') }}</option>
               <option v-for="col in availableCollections" :key="col.id" :value="col.id">
                 {{ col.title }}
@@ -177,14 +208,63 @@ onUnmounted(() => {
             <label for="category-select" class="block font-semibold mb-2 text-secondary">{{
               t('search.categoryLabel')
             }}</label>
-            <select
-              id="category-select"
-              v-model="filters.category"
-              class="w-full bg-default border border-sky-200/40 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary hover:border-primary transition-colors"
-            >
+            <select id="category-select" v-model="filters.category" :class="SELECT_CLASSES">
               <option value="">{{ t('search.allCategories') }}</option>
-              <option v-for="cat in availableCategories" :key="cat.id" :value="cat.id">
-                {{ cat.name }}
+              <option v-for="cat in categoryChoices" :key="cat.id" :value="cat.id">
+                {{ cat.label }}
+              </option>
+            </select>
+          </div>
+
+          <div>
+            <span class="block font-semibold mb-2 text-secondary">{{ t('search.priceLabel') }}</span>
+            <div class="flex items-center gap-2">
+              <UInput
+                id="min-price-input"
+                v-model="filters.minPrice"
+                type="number"
+                min="0"
+                step="0.01"
+                :placeholder="t('search.minPriceLabel')"
+                :aria-label="t('search.minPriceLabel')"
+                class="w-full"
+              />
+              <span aria-hidden="true">-</span>
+              <UInput
+                id="max-price-input"
+                v-model="filters.maxPrice"
+                type="number"
+                min="0"
+                step="0.01"
+                :placeholder="t('search.maxPriceLabel')"
+                :aria-label="t('search.maxPriceLabel')"
+                class="w-full"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="added-select" class="block font-semibold mb-2 text-secondary">{{
+              t('search.addedLabel')
+            }}</label>
+            <select id="added-select" v-model="filters.addedWithinDays" :class="SELECT_CLASSES">
+              <option v-for="option in ADDED_WITHIN_OPTIONS" :key="option.days" :value="option.days">
+                {{ t(option.label) }}
+              </option>
+            </select>
+          </div>
+
+          <fieldset class="space-y-3">
+            <legend class="block font-semibold mb-2 text-secondary">{{ t('search.availabilityLabel') }}</legend>
+            <UCheckbox id="in-stock-checkbox" v-model="filters.inStock" :label="t('search.inStock')" />
+            <UCheckbox id="on-sale-checkbox" v-model="filters.onSale" :label="t('search.onSale')" />
+          </fieldset>
+
+          <div>
+            <label for="sort-select" class="block font-semibold mb-2 text-secondary">{{ t('search.sortLabel') }}</label>
+            <select id="sort-select" v-model="filters.sort" :class="SELECT_CLASSES">
+              <option v-for="option in SORT_OPTIONS" :key="option.value" :value="option.value">
+                {{ t(option.label) }}
               </option>
             </select>
           </div>

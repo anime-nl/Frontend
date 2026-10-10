@@ -44,3 +44,32 @@ export const productTypesAsCategories = (types: {id: string; value: string}[]): 
         const handle = type.value.toLowerCase()
         return {id: type.id, handle: handle === 'plushies' ? 'plush' : handle, name: type.value}
     })
+
+/**
+ * Lists the categories for the search page's category dropdown, each subcategory right below its parent and
+ * labelled with the path to it, so "Singles" under "TCG" shows as "TCG › Singles".
+ * @param categories All categories
+ * @param parentId Id of the category whose children to list, or null for the top level
+ * @param prefix Label of the parent, already followed by the separator
+ * @returns The dropdown options, depth first
+ */
+export function categoryOptions(
+    categories: SearchCategory[],
+    parentId: string | null = null,
+    prefix = ''
+): {id: string; label: string}[] {
+    return categories
+        .filter((category) => (category.parent_category_id ?? null) === parentId)
+        .flatMap((category) => [
+            {id: category.id, label: prefix + category.name},
+            ...categoryOptions(categories, category.id, `${prefix}${category.name} › `)
+        ])
+}
+
+/**
+ * @param days How many days back to look
+ * @param now The current time, overridable for tests
+ * @returns The ISO timestamp that many days before now, as used for Medusa's created_at filter
+ */
+export const daysAgoIso = (days: number, now = new Date()) =>
+    new Date(now.getTime() - days * 24 * 60 * 60 * 1000).toISOString()
