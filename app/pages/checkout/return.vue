@@ -45,6 +45,7 @@ const orderToken = computed(() => {
   return latest?.status === 'completed' ? latest.token : undefined
 })
 
+const nuxtApp = useNuxtApp()
 const cart = useCart()
 const customer = useCustomer()
 
@@ -55,9 +56,9 @@ const customer = useCustomer()
 async function onCompleted() {
   await cart.refresh()
   if (order.value && orderToken.value) {
-    await navigateTo(localePath({path: `/orders/${order.value.id}`, query: {token: orderToken.value}}), {
-      replace: true
-    })
+    const target = localePath({path: `/orders/${order.value.id}`, query: {token: orderToken.value}})
+    // After an await the Nuxt context is gone during server-side rendering, and navigateTo needs it (error E1001).
+    await nuxtApp.runWithContext(() => navigateTo(target, {replace: true}))
   }
 }
 
