@@ -1,9 +1,15 @@
-import type {StoreProduct, StoreProductCategory} from '@medusajs/types'
+import type {StoreProductCategory} from '@medusajs/types'
+
+export const CATEGORY_PAGE_SIZE = 24
+
+export interface CategoryProducts extends ProductListResponse {
+    query: Record<string, unknown>
+}
 
 /**
- * Returns products in a given category, including the price. Top-level categories are product types, subcategories are Medusa categories.
+ * Returns the first page of products in a given category, including the price. Top-level categories are product types, subcategories are Medusa categories.
  * @param handle Category handle (slug)
- * @returns List of products in the given category
+ * @returns The first page, the category's total product count and the query to fetch further pages with
  */
 export function useCategoryProducts(handle: string) {
     return useAsyncData(`category-products-${handle}`, async () => {
@@ -15,15 +21,15 @@ export function useCategoryProducts(handle: string) {
 
         const typeId = findCategoryId(productTypesAsCategories(types), handle)
         const category = categories.find((c) => c.handle === handle)
-        if (!typeId && !category) return []
+        if (!typeId && !category) return {products: [], count: 0, query: {}}
 
-        const {products} = await $fetch<{products: StoreProduct[]}>('/api/products', {
-            query: {
-                ...(typeId ? {type_id: [typeId]} : {category_id: withDescendantIds(categories, category!.id)}),
-                region_id: regions[0]?.id,
-                fields: 'title,thumbnail,*variants.calculated_price'
-            }
-        })
-        return products
+        const query = {
+            ...(typeId ? {type_id: [typeId]} : {category_id: withDescendantIds(categories, category!.id)}),
+            region_id: regions[0]?.id,
+            fields: 'title,thumbnail,*variants.calculated_price',
+            limit: CATEGORY_PAGE_SIZE
+        }
+        const {products, count} = await fetchProductPage({...query, offset: 0})
+        return {products, count, query}
     })
 }

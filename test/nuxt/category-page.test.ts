@@ -1,7 +1,27 @@
-import {afterEach, beforeEach, describe, expect, it} from 'vitest'
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
 import {mountSuspended, registerEndpoint} from '@nuxt/test-utils/runtime'
 import {getQuery} from 'h3'
 import CategoryPage from '~/components/categoryPage.vue'
+
+class FakeIntersectionObserver {
+    static instances: FakeIntersectionObserver[] = []
+    callback: IntersectionObserverCallback
+
+    constructor(callback: IntersectionObserverCallback) {
+        this.callback = callback
+        FakeIntersectionObserver.instances.push(this)
+    }
+
+    observe() {}
+
+    unobserve() {}
+
+    disconnect() {}
+
+    intersect() {
+        this.callback([{isIntersecting: true} as IntersectionObserverEntry], this as unknown as IntersectionObserver)
+    }
+}
 
 const productRequests: Record<string, unknown>[] = []
 
@@ -20,17 +40,26 @@ registerEndpoint('/api/product-types', () => ({
 registerEndpoint('/api/regions', () => ({regions: [{id: 'reg_nl'}]}))
 registerEndpoint('/api/products', (event) => {
     productRequests.push(getQuery(event))
-    return {products: [{id: 'prod_1', title: 'Charizard ex', thumbnail: null}]}
+    const offset = Number(getQuery(event).offset ?? 0)
+    return {
+        products: [{id: `prod_${offset + 1}`, title: `Charizard ex ${offset + 1}`, thumbnail: null}],
+        count: totalProducts
+    }
 })
 
+let totalProducts = 1
 let wrapper: Awaited<ReturnType<typeof mountSuspended>> | undefined
 
 beforeEach(() => {
     productRequests.length = 0
+    totalProducts = 1
+    FakeIntersectionObserver.instances.length = 0
+    vi.stubGlobal('IntersectionObserver', FakeIntersectionObserver)
 })
 
 afterEach(() => {
     wrapper?.unmount()
+    vi.unstubAllGlobals()
 })
 
 describe('category page', () => {
@@ -44,7 +73,7 @@ describe('category page', () => {
     it('shows the products of the category resolved from its handle', async () => {
         wrapper = await mountSuspended(CategoryPage, {props: {handle: 'singles', title: 'Singles'}})
 
-        expect(wrapper.text()).toContain('Charizard ex')
+        expect(wrapper.text()).toContain('Charizard ex 1')
         expect(productRequests[0]?.category_id).toBe('pcat_singles')
     })
 
@@ -73,5 +102,25 @@ describe('category page', () => {
         wrapper = await mountSuspended(CategoryPage, {props: {handle: 'singles', title: 'Singles'}})
 
         expect(wrapper.find('a').classes()).toContain('h-100')
+    })
+
+    it('loads the next page of the category once the sentinel scrolls into view', async () => {
+        totalProducts = 2
+        wrapper = await mountSuspended(CategoryPage, {props: {handle: 'singles', title: 'Singles'}})
+
+        FakeIntersectionObserver.instances[0]?.intersect()
+
+        await vi.waitFor(() => expect(wrapper?.text()).toContain('Charizard ex 2'))
+        expect(productRequests.at(-1)?.offset).toBe('1')
+        expect(productRequests.at(-1)?.category_id).toBe('pcat_singles')
+    })
+
+    it('does not request more products once all of them are shown', async () => {
+        wrapper = await mountSuspended(CategoryPage, {props: {handle: 'singles', title: 'Singles'}})
+
+        FakeIntersectionObserver.instances[0]?.intersect()
+        await new Promise((resolve) => setTimeout(resolve, 50))
+
+        expect(productRequests).toHaveLength(1)
     })
 })
