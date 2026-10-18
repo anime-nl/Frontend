@@ -16,6 +16,9 @@
   "product": {
     "addToCart": "In winkelwagen",
     "backorderNow": "Nu nabestellen",
+    "preorderNow": "Pre-order nu",
+    "preorderAlertTitle": "Beschikbaar als pre-order",
+    "preorderAlertDescription": "Dit artikel verschijnt op {date}. Je bestelling wordt verzonden zodra het artikel is uitgebracht en bij ons binnen is.",
     "backorderAlertTitle": "Beschikbaar op nabestelling",
     "backorderAlertDescription": "Dit artikel is momenteel niet op voorraad. Je bestelling wordt verzonden zodra het weer op voorraad is.",
     "descriptionHeading": "Beschrijving",
@@ -29,6 +32,7 @@
       "inStock": "Op voorraad",
       "inStockCount": "{count} op voorraad",
       "backorder": "Nabestelling",
+      "preorder": "Pre-order",
       "outOfStock": "Niet op voorraad"
     },
     "details": {
@@ -343,6 +347,10 @@
       "9": {
         "question": "Een product dat ik zoek staat niet in de webshop.",
         "answer": "Gebruik de zoekpagina om te zoeken op serie, collectie of categorie. Kun je het nog steeds niet vinden, laat het ons weten en we kijken wat we kunnen doen."
+      },
+      "10": {
+        "question": "Wat is een pre-order?",
+        "answer": "Een pre-order is een bestelling van een artikel dat nog niet is uitgebracht. Je rekent nu af en we verzenden het artikel zodra het uitkomt. De releasedatum staat op de productpagina."
       }
     },
     "sent": {

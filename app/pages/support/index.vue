@@ -12,7 +12,7 @@ useSeoMeta({
 const {supportEmail} = useRuntimeConfig().public
 
 const faq = computed<AccordionItem[]>(() =>
-  [1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => ({
+  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => ({
     label: t(`support.faq.${n}.question`),
     content: t(`support.faq.${n}.answer`)
   }))

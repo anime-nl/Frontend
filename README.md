@@ -118,3 +118,11 @@ After paying, `/checkout/return` completes the cart (asking again every few seco
 - `ORDER_LINK_SECRET` (Nuxt, build time like the other variables) signs the token: HMAC-SHA256 hex of the order id. **Medusa must use the exact same value**, because its confirmation email contains the same link. Without it, only signed-in customers can open an order page.
 - The confirmation email is sent by Medusa, not Nuxt: `medusa/src/subscribers/order-placed.ts` (in the Medusa repo) reacts to `order.placed` and hands the email to the SMTP notification provider in `medusa/src/modules/smtp-notification/`. It only activates when Medusa has `SMTP_HOST` (plus optional `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`), and needs `STOREFRONT_URL` and `ORDER_LINK_SECRET` to put the order link in the email. Locally the dev container sets all of these and Mailpit (http://localhost:8025) catches the email.
 - A placed order only gets an email if Medusa's event bus and worker actually process subscribers (check `MEDUSA_WORKER_MODE` and the Redis event bus).
+
+### Pre-orders
+
+A product is a pre-order while its metadata `preorder_release_date` (`YYYY-MM-DD`, set in the Medusa admin under the product's metadata) is in the future. Also enable **Allow backorder** on its variants, otherwise an out-of-stock variant cannot be bought. No migration or deploy is needed to start or end a pre-order.
+
+- The product page and product card show "Pre-order" and the release date, and the page's structured data says `PreOrder`.
+- The order confirmation email marks pre-order items and says they ship once released. That lives in the Medusa repo (`medusa/src/modules/smtp-notification/order-confirmation.ts` and `medusa/src/subscribers/order-placed.ts`).
+- Once the release date has passed the product is shown as a regular product (or backorder); nothing has to be switched off.

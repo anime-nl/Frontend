@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type {StoreProductVariant} from '@medusajs/types'
 import {formatCurrency} from '#shared/utils/currency'
+import {formatReleaseDate, getPreorderReleaseDate} from '#shared/utils/preorder'
 
 const route = useRoute()
 const toast = useToast()
@@ -62,6 +63,8 @@ const price = computed(() => {
   }
 })
 
+const releaseDate = computed(() => getPreorderReleaseDate(product.value))
+
 const stock = computed(() => {
   const variant = selectedVariant.value
   if (!variant) {
@@ -107,6 +110,12 @@ const stock = computed(() => {
   return {label: t('product.stock.outOfStock'), color: 'error' as const, purchasable: false, max: 0, isBackorder: false}
 })
 
+const isPreorder = computed(() => releaseDate.value !== null && stock.value.purchasable)
+const releaseDateLabel = computed(() =>
+  releaseDate.value ? formatReleaseDate(releaseDate.value, localeProperties.value.language!) : ''
+)
+const isBackorder = computed(() => stock.value.isBackorder && !isPreorder.value)
+
 watch(selectedVariant, () => {
   quantity.value = 1
 })
@@ -141,6 +150,11 @@ const breadcrumbs = computed(() => [
     : []),
   {label: product.value.title}
 ])
+
+const addToCartLabel = computed(() => {
+  if (isPreorder.value) return t('product.preorderNow')
+  return isBackorder.value ? t('product.backorderNow') : t('product.addToCart')
+})
 
 const adding = ref(false)
 
@@ -178,6 +192,7 @@ useSeoMeta({
 
 const offerAvailability = computed(() => {
   if (!stock.value.purchasable) return 'https://schema.org/OutOfStock'
+  if (isPreorder.value) return 'https://schema.org/PreOrder'
   return stock.value.isBackorder ? 'https://schema.org/BackOrder' : 'https://schema.org/InStock'
 })
 
@@ -199,6 +214,7 @@ const productJsonLd = computed(() => {
             price: calculated.calculated_amount,
             priceCurrency: calculated.currency_code!.toUpperCase(),
             availability: offerAvailability.value,
+            availabilityStarts: isPreorder.value ? releaseDate.value : undefined,
             url: requestUrl.href
           }
   }
@@ -272,7 +288,12 @@ useHead({
             <span v-if="price.original" class="text-xl text-slate-400 line-through">{{ price.original }}</span>
           </template>
           <span v-else class="text-lg text-slate-400">{{ t('products.priceUnavailable') }}</span>
-          <UBadge :color="stock.color" :label="stock.label" size="lg" variant="subtle" />
+          <UBadge
+            :color="isPreorder ? 'info' : stock.color"
+            :label="isPreorder ? t('product.stock.preorder') : stock.label"
+            size="lg"
+            variant="subtle"
+          />
         </div>
 
         <USeparator />
@@ -297,7 +318,7 @@ useHead({
           <UInputNumber v-model="quantity" :disabled="!stock.purchasable" :max="stock.max" :min="1" size="xl" />
           <UButton
             :disabled="!stock.purchasable"
-            :label="stock.isBackorder ? t('product.backorderNow') : t('product.addToCart')"
+            :label="addToCartLabel"
             :loading="adding"
             class="flex-1 justify-center"
             icon="i-lucide-shopping-cart"
@@ -307,7 +328,15 @@ useHead({
         </div>
 
         <UAlert
-          v-if="stock.isBackorder"
+          v-if="isPreorder"
+          color="info"
+          :description="t('product.preorderAlertDescription', {date: releaseDateLabel})"
+          icon="i-lucide-calendar-clock"
+          :title="t('product.preorderAlertTitle')"
+          variant="subtle"
+        />
+        <UAlert
+          v-else-if="isBackorder"
           color="warning"
           :description="t('product.backorderAlertDescription')"
           icon="i-lucide-clock"

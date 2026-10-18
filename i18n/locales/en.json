@@ -16,6 +16,9 @@
   "product": {
     "addToCart": "Add to cart",
     "backorderNow": "Backorder now",
+    "preorderNow": "Pre-order now",
+    "preorderAlertTitle": "Available as a pre-order",
+    "preorderAlertDescription": "This item is released on {date}. Your order will be shipped once the item has been released and has arrived with us.",
     "backorderAlertTitle": "Available on backorder",
     "backorderAlertDescription": "This item is currently out of stock. Your order will be shipped as soon as it is back in stock.",
     "descriptionHeading": "Description",
@@ -29,6 +32,7 @@
       "inStock": "In stock",
       "inStockCount": "{count} in stock",
       "backorder": "Backorder",
+      "preorder": "Pre-order",
       "outOfStock": "Out of stock"
     },
     "details": {
@@ -340,6 +344,10 @@
       "9": {
         "question": "A product I am looking for is not in the shop.",
         "answer": "Try the search page to look by series, collection or category. If you still cannot find it, let us know and we will see what we can do."
+      },
+      "10": {
+        "question": "What is a pre-order?",
+        "answer": "A pre-order is an order for an item that has not been released yet. You pay now and we ship the item as soon as it comes out. The release date is shown on the product page."
       }
     },
     "sent": {
