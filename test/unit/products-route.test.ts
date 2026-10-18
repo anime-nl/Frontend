@@ -25,7 +25,18 @@ describe('GET /api/products', () => {
         medusaFetch.mockResolvedValue({products: [{id: 'prod_1'}], count: 1})
 
         await expect(callRoute()).resolves.toEqual({products: [{id: 'prod_1'}], count: 1})
-        expect(medusaFetch).toHaveBeenCalledWith(expect.anything(), 'products', {query: {category_id: ['pcat_1']}})
+        expect(medusaFetch).toHaveBeenCalledWith(expect.anything(), 'products', {
+            query: {category_id: ['pcat_1'], fields: '+metadata'}
+        })
+    })
+
+    it('keeps the fields the caller asked for and adds the metadata, which holds the pre-order release date', async () => {
+        vi.stubGlobal('getQuery', () => ({fields: 'title,thumbnail'}))
+        medusaFetch.mockResolvedValue({products: [], count: 0})
+
+        await callRoute()
+
+        expect(medusaFetch.mock.calls[0]?.[2]).toEqual({query: {fields: 'title,thumbnail,+metadata'}})
     })
 
     it('answers 500 when Medusa fails', async () => {
@@ -54,7 +65,7 @@ describe('GET /api/products with filters Medusa cannot do', () => {
         await callRoute()
 
         expect(medusaFetch).toHaveBeenCalledWith(expect.anything(), 'products', {
-            query: {q: 'goku', order: '-created_at'}
+            query: {q: 'goku', order: '-created_at', fields: '+metadata'}
         })
     })
 
@@ -80,7 +91,7 @@ describe('GET /api/products with filters Medusa cannot do', () => {
         expect(medusaFetch).toHaveBeenCalledWith(expect.anything(), 'products', {
             query: {
                 category_id: ['pcat_1'],
-                fields: 'title,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder',
+                fields: 'title,+metadata,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder',
                 limit: 100,
                 offset: 0
             }

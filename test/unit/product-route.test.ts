@@ -23,6 +23,14 @@ async function callRoute() {
 }
 
 describe('GET /api/products/:id', () => {
+    it('asks Medusa for the metadata, which holds the pre-order release date', async () => {
+        medusaFetch.mockResolvedValue({product: {id: 'prod_1'}})
+
+        await callRoute()
+
+        expect(medusaFetch.mock.calls[0]![2].query.fields).toMatch(/(^|,)\+metadata(,|$)/)
+    })
+
     it('forwards the requested fields, region and sales channel as query params', async () => {
         medusaFetch.mockResolvedValue({product: {id: 'prod_1'}})
 

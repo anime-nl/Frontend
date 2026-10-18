@@ -1,6 +1,7 @@
 import type {StoreProduct, StoreRegion} from '@medusajs/types'
 
 const PRODUCT_FIELDS = [
+    '+metadata',
     '+variants.inventory_quantity',
     '*variants.calculated_price',
     '*variants.options',

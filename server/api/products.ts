@@ -9,8 +9,10 @@ import {
 } from '#shared/utils/productFilters'
 
 const SCAN_PAGE_SIZE = 100
+// Medusa leaves metadata out of product lists unless asked; it holds the pre-order release date
+const METADATA_FIELD = '+metadata'
 // Stock and price are only known per variant, so a filtered search needs these on top of what the page asked for
-const SCAN_FIELDS = '+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder'
+const SCAN_FIELDS = `${METADATA_FIELD},+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder`
 const MEDUSA_ORDER: Partial<Record<ProductSort, string>> = {newest: '-created_at', title: 'title'}
 const OUR_PARAMS = ['min_price', 'max_price', 'in_stock', 'on_sale', 'sort']
 
@@ -50,7 +52,8 @@ export default defineEventHandler(async (event) => {
         if (order) medusaQuery.order = order
 
         if (!needsFullScan(filters, sort)) {
-            return await medusaFetch<StoreProductListResponse>(event, 'products', {query: medusaQuery})
+            const fields = [medusaQuery.fields, METADATA_FIELD].filter(Boolean).join(',')
+            return await medusaFetch<StoreProductListResponse>(event, 'products', {query: {...medusaQuery, fields}})
         }
 
         const {limit, offset, fields, ...scanQuery} = medusaQuery
