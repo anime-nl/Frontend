@@ -5,7 +5,7 @@ export const ORDER_CONFIRMATION_TEMPLATE = 'order-confirmation'
 export interface OrderConfirmationData {
   displayId: number | string
   currencyCode: string
-  items: {title: string; quantity: number; total: number}[]
+  items: {title: string; quantity: number; total: number; preorderReleaseDate?: string}[]
   subtotal: number
   shippingTotal: number
   total: number
@@ -42,6 +42,13 @@ function escapeHtml(value: string): string {
 }
 
 /**
+ * @param releaseDate A release date as YYYY-MM-DD
+ * @returns The date written out in Dutch, e.g. "1 december 2026"
+ */
+const formatReleaseDate = (releaseDate: string) =>
+  new Intl.DateTimeFormat('nl-NL', {dateStyle: 'long', timeZone: 'UTC'}).format(new Date(`${releaseDate}T00:00:00Z`))
+
+/**
  * Renders the Dutch order confirmation email.
  * @param data The order details to show
  * @returns Subject plus HTML and plain-text bodies
@@ -53,10 +60,17 @@ export function renderOrderConfirmation(data: OrderConfirmationData): {subject: 
   const address = data.shippingAddress
   const addressLines = address ? [address.name, address.line1, `${address.postalCode} ${address.city}`] : []
 
+  const preorderLabel = (item: OrderConfirmationData['items'][number]) =>
+    item.preorderReleaseDate ? ` (pre-order, verwacht ${formatReleaseDate(item.preorderReleaseDate)})` : ''
+  const hasPreorder = data.items.some((item) => item.preorderReleaseDate)
+  const preorderNote =
+    'Pre-order artikelen worden verzonden zodra ze zijn uitgebracht en bij ons binnen zijn.'
+
   const text = [
     `Bedankt voor je bestelling bij AnimeNL! Bestelling #${data.displayId} is geplaatst en betaald.`,
     '',
-    ...data.items.map((item) => `${item.quantity}× ${item.title} - ${money(item.total)}`),
+    ...data.items.map((item) => `${item.quantity}× ${item.title}${preorderLabel(item)} - ${money(item.total)}`),
+    ...(hasPreorder ? ['', preorderNote] : []),
     '',
     `Subtotaal: ${money(data.subtotal)}`,
     `Verzending: ${money(data.shippingTotal)}`,
@@ -70,7 +84,7 @@ export function renderOrderConfirmation(data: OrderConfirmationData): {subject: 
   const rows = data.items
     .map(
       (item) =>
-        `<tr><td>${item.quantity}× ${escapeHtml(item.title)}</td><td style="text-align:right">${money(item.total)}</td></tr>`
+        `<tr><td>${item.quantity}× ${escapeHtml(item.title)}${escapeHtml(preorderLabel(item))}</td><td style="text-align:right">${money(item.total)}</td></tr>`
     )
     .join('')
   const html = `<!doctype html>
@@ -82,6 +96,7 @@ export function renderOrderConfirmation(data: OrderConfirmationData): {subject: 
 <tr><td>Verzending</td><td style="text-align:right">${money(data.shippingTotal)}</td></tr>
 <tr><td><strong>Totaal</strong></td><td style="text-align:right"><strong>${money(data.total)}</strong></td></tr>
 </table>
+${hasPreorder ? `<p>${preorderNote}</p>` : ''}
 ${addressLines.length ? `<h2>Bezorgadres</h2><p>${addressLines.map(escapeHtml).join('<br>')}</p>` : ''}
 ${data.orderLink ? `<p><a href="${escapeHtml(data.orderLink)}">Bekijk de status van je bestelling</a></p>` : ''}
 <p>Vragen? Mail ons op <a href="mailto:${escapeHtml(data.supportEmail)}">${escapeHtml(data.supportEmail)}</a>.</p>

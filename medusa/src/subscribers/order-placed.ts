@@ -5,6 +5,7 @@ import {
   buildOrderLink,
   type OrderConfirmationData
 } from '../modules/smtp-notification/order-confirmation'
+import {getPreorderReleaseDate} from '../utils/preorder'
 
 /**
  * Emails the customer a confirmation when an order is placed. Does nothing when SMTP is not configured,
@@ -35,6 +36,7 @@ export default async function orderPlacedHandler({event, container}: SubscriberA
       'items.product_title',
       'items.quantity',
       'items.total',
+      'items.variant.product.metadata',
       'shipping_address.*'
     ],
     filters: {id: event.data.id}
@@ -51,7 +53,16 @@ export default async function orderPlacedHandler({event, container}: SubscriberA
     displayId: order.display_id ?? order.id,
     currencyCode: order.currency_code,
     items: (order.items ?? []).flatMap((item) =>
-      item ? [{title: item.product_title ?? item.title, quantity: Number(item.quantity), total: Number(item.total)}] : []
+      item
+        ? [
+            {
+              title: item.product_title ?? item.title,
+              quantity: Number(item.quantity),
+              total: Number(item.total),
+              preorderReleaseDate: getPreorderReleaseDate(item.variant?.product?.metadata) ?? undefined
+            }
+          ]
+        : []
     ),
     subtotal: Number(order.item_subtotal),
     shippingTotal: Number(order.shipping_total),

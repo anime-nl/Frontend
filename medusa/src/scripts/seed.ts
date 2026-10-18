@@ -50,7 +50,12 @@ interface ProductSeed {
   images: number
   variants: VariantSeed[]
   optionTitle?: string
+  /** Makes the product a pre-order that is released this many days after seeding. */
+  preorderInDays?: number
 }
+
+/** @returns The date `days` from now as YYYY-MM-DD, the format of the `preorder_release_date` metadata. */
+const daysFromNow = (days: number) => new Date(Date.now() + days * 86_400_000).toISOString().slice(0, 10)
 
 const single = (sku: string, price: number, stock: Stock, salePrice?: number): VariantSeed[] => [
   { title: 'Default', sku, price, stock, salePrice, options: { Size: 'Default' } },
@@ -145,7 +150,8 @@ const PRODUCTS: ProductSeed[] = [
     size: [110, 110, 160],
     hue: 5,
     images: 2,
-    variants: single('4580590000124', 59.99, 8),
+    variants: single('4580590000124', 59.99, 'backorder'),
+    preorderInDays: 45,
   },
   {
     title: 'Hololive Gawr Gura Plush',
@@ -512,6 +518,9 @@ export default async function seed({ container }: ExecArgs) {
           description: product.description,
           handle: product.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
           status: ProductStatus.PUBLISHED,
+          metadata: product.preorderInDays
+            ? { preorder_release_date: daysFromNow(product.preorderInDays) }
+            : undefined,
           material: product.material,
           origin_country: 'cn',
           weight: product.weight,

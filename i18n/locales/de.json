@@ -16,6 +16,9 @@
   "product": {
     "addToCart": "In den Warenkorb",
     "backorderNow": "Jetzt nachbestellen",
+    "preorderNow": "Jetzt vorbestellen",
+    "preorderAlertTitle": "Als Vorbestellung verfügbar",
+    "preorderAlertDescription": "Dieser Artikel erscheint am {date}. Ihre Bestellung wird versandt, sobald der Artikel erschienen und bei uns eingetroffen ist.",
     "backorderAlertTitle": "Auf Nachbestellung verfügbar",
     "backorderAlertDescription": "Dieser Artikel ist derzeit nicht vorrätig. Ihre Bestellung wird versandt, sobald er wieder vorrätig ist.",
     "descriptionHeading": "Beschreibung",
@@ -29,6 +32,7 @@
       "inStock": "Auf Lager",
       "inStockCount": "{count} auf Lager",
       "backorder": "Nachbestellung",
+      "preorder": "Vorbestellung",
       "outOfStock": "Nicht auf Lager"
     },
     "details": {
@@ -355,6 +359,10 @@
       "9": {
         "question": "Ein Produkt, das ich suche, ist nicht im Shop.",
         "answer": "Nutzen Sie die Suchseite, um nach Serie, Kollektion oder Kategorie zu suchen. Wenn Sie es immer noch nicht finden, teilen Sie es uns mit und wir sehen, was wir tun können."
+      },
+      "10": {
+        "question": "Was ist eine Vorbestellung?",
+        "answer": "Eine Vorbestellung ist die Bestellung eines Artikels, der noch nicht erschienen ist. Sie bezahlen jetzt und wir versenden den Artikel, sobald er erscheint. Das Erscheinungsdatum steht auf der Produktseite."
       }
     },
     "sent": {

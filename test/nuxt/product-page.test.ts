@@ -16,6 +16,19 @@ const onBackorder = structuredClone(product.product)
 onBackorder.variants[0]!.inventory_quantity = 0
 onBackorder.variants[0]!.allow_backorder = true
 
+const futureRelease = '2999-12-01'
+
+const preorder = structuredClone(product.product) as typeof product.product & {metadata: Record<string, string>}
+preorder.metadata = {preorder_release_date: futureRelease}
+preorder.variants[0]!.allow_backorder = true
+preorder.variants[0]!.inventory_quantity = 0
+
+const releasedPreorder = structuredClone(preorder)
+releasedPreorder.metadata = {preorder_release_date: '2020-01-01'}
+
+const soldOutPreorder = structuredClone(preorder)
+soldOutPreorder.variants[0]!.allow_backorder = false
+
 const unlimitedStock = structuredClone(product.product)
 unlimitedStock.variants[0]!.manage_inventory = false
 
@@ -53,6 +66,9 @@ registerEndpoint('/api/products/prod_no_collection', () => ({product: noCollecti
 registerEndpoint('/api/products/prod_backorder', () => ({product: backorderableInStock, region_id: 'reg_nl'}))
 registerEndpoint('/api/products/prod_out_of_stock', () => ({product: outOfStock, region_id: 'reg_nl'}))
 registerEndpoint('/api/products/prod_on_backorder', () => ({product: onBackorder, region_id: 'reg_nl'}))
+registerEndpoint('/api/products/prod_preorder', () => ({product: preorder, region_id: 'reg_nl'}))
+registerEndpoint('/api/products/prod_released_preorder', () => ({product: releasedPreorder, region_id: 'reg_nl'}))
+registerEndpoint('/api/products/prod_sold_out_preorder', () => ({product: soldOutPreorder, region_id: 'reg_nl'}))
 registerEndpoint('/api/products/prod_unlimited', () => ({product: unlimitedStock, region_id: 'reg_nl'}))
 registerEndpoint('/api/products/prod_discounted', () => ({product: discounted, region_id: 'reg_nl'}))
 registerEndpoint('/api/products/prod_single_image', () => ({product: singleImage, region_id: 'reg_nl'}))
@@ -118,6 +134,38 @@ describe('product page', () => {
 
         const quantityInput = wrapper.findComponent({name: 'UInputNumber'})
         expect(quantityInput.props('max')).toBe(25)
+    })
+
+    describe('pre-order', () => {
+        it('offers a pre-order with the release date instead of a backorder', async () => {
+            wrapper = await mountProduct('prod_preorder')
+
+            expect(addToCartButton()!.props('label')).toBe('Pre-order nu')
+            expect(wrapper.text()).toContain('Beschikbaar als pre-order')
+            expect(wrapper.text()).toContain('1 december 2999')
+            expect(wrapper.text()).not.toContain('Nu nabestellen')
+        })
+
+        it('lets a pre-order be added to the cart', async () => {
+            wrapper = await mountProduct('prod_preorder')
+
+            await addToCartButton()!.trigger('click')
+            await vi.waitFor(() => expect(lastCartItemsBody).toBeDefined())
+        })
+
+        it('treats a product whose release date has passed as a regular backorder', async () => {
+            wrapper = await mountProduct('prod_released_preorder')
+
+            expect(addToCartButton()!.props('label')).toBe('Nu nabestellen')
+            expect(wrapper.text()).not.toContain('pre-order')
+        })
+
+        it('does not offer a pre-order that is sold out', async () => {
+            wrapper = await mountProduct('prod_sold_out_preorder')
+
+            expect(addToCartButton()!.props('disabled')).toBe(true)
+            expect(wrapper.text()).not.toContain('Beschikbaar als pre-order')
+        })
     })
 
     it('adds the selected variant and quantity to the cart', async () => {
@@ -254,6 +302,14 @@ describe('product page', () => {
             wrapper = await mountProduct('prod_out_of_stock')
 
             expect((await productJsonLd()).offers.availability).toBe('https://schema.org/OutOfStock')
+        })
+
+        it('marks a pre-order as PreOrder and gives the release date', async () => {
+            wrapper = await mountProduct('prod_preorder')
+
+            const {offers} = await productJsonLd()
+            expect(offers.availability).toBe('https://schema.org/PreOrder')
+            expect(offers.availabilityStarts).toBe(futureRelease)
         })
 
         it('marks a backorderable, out-of-stock product as BackOrder', async () => {

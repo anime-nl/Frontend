@@ -1,16 +1,20 @@
 <script lang="ts" setup>
 import {formatCurrency} from '#shared/utils/currency'
+import {getPreorderReleaseDate} from '#shared/utils/preorder'
 
 // Narrowed to the fields this card actually renders, so callers (and tests) don't need a full StoreProduct
 type ProductCardProduct = {
   id: string
   title: string
   thumbnail?: string | null
+  metadata?: Record<string, unknown> | null
   variants?: {calculated_price?: {calculated_amount: number | null; currency_code: string | null} | null}[] | null
 }
 
 const props = defineProps<{product: ProductCardProduct}>()
 const {t, localeProperties} = useI18n()
+
+const isPreorder = computed(() => getPreorderReleaseDate(props.product) !== null)
 
 const price = computed(() => {
   const calculated = props.product?.variants?.[0]?.calculated_price
@@ -29,6 +33,14 @@ const price = computed(() => {
           :src="product.thumbnail"
           :alt="product.title"
           class="object-cover absolute w-full h-full bottom-0 top-0 z-0"
+        />
+
+        <UBadge
+          v-if="isPreorder"
+          :label="t('product.stock.preorder')"
+          class="absolute top-3 left-3 z-10"
+          color="info"
+          variant="solid"
         />
 
         <div

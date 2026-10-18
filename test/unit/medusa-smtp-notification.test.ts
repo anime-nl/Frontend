@@ -118,6 +118,30 @@ describe('order.placed subscriber', () => {
         return {createNotifications, logger, run}
     }
 
+    it('flags items whose product is still a pre-order', async () => {
+        vi.stubEnv('SMTP_HOST', '127.0.0.1')
+        const preorderItem = {
+            title: 'Variant',
+            product_title: 'Zhongli figure',
+            quantity: 1,
+            total: 80,
+            variant: {product: {metadata: {preorder_release_date: '2999-12-01'}}}
+        }
+        const releasedItem = {
+            ...preorderItem,
+            product_title: 'Old figure',
+            variant: {product: {metadata: {preorder_release_date: '2020-01-01'}}}
+        }
+        const {createNotifications, run} = setup([{...order, items: [preorderItem, releasedItem]}])
+
+        await run()
+
+        expect(createNotifications.mock.calls[0]![0].data.items).toEqual([
+            {title: 'Zhongli figure', quantity: 1, total: 80, preorderReleaseDate: '2999-12-01'},
+            {title: 'Old figure', quantity: 1, total: 80, preorderReleaseDate: undefined}
+        ])
+    })
+
     it('creates an email notification with a signed order link', async () => {
         vi.stubEnv('SMTP_HOST', '127.0.0.1')
         vi.stubEnv('STOREFRONT_URL', 'https://animenl.nl')

@@ -24,6 +24,22 @@ describe('product card', () => {
         expect(wrapper.find('a').attributes('href')).toBe('/en/product/prod_1')
     })
 
+    it('shows a pre-order badge while the release date is in the future', async () => {
+        wrapper = await mountSuspended(ProductCard, {
+            props: {product: {id: 'prod_1', title: 'Zhongli', metadata: {preorder_release_date: '2999-12-01'}}}
+        })
+
+        expect(wrapper.text()).toContain('Pre-order')
+    })
+
+    it('shows no pre-order badge once the release date has passed', async () => {
+        wrapper = await mountSuspended(ProductCard, {
+            props: {product: {id: 'prod_1', title: 'Zhongli', metadata: {preorder_release_date: '2020-01-01'}}}
+        })
+
+        expect(wrapper.text()).not.toContain('Pre-order')
+    })
+
     it('shows the title', async () => {
         wrapper = await mountSuspended(ProductCard, {props: {product: {id: 'prod_1', title: 'Zhongli Keychain'}}})
 

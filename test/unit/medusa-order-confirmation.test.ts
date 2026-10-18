@@ -61,4 +61,23 @@ describe('renderOrderConfirmation', () => {
         expect(text).not.toContain('Bekijk de status')
         expect(text).not.toContain('Bezorgadres')
     })
+
+    it('marks pre-order items with their release date and explains when they ship', () => {
+        const {html, text} = renderOrderConfirmation({
+            ...order,
+            items: [{title: 'Zhongli figure', quantity: 1, total: 80, preorderReleaseDate: '2999-12-01'}]
+        })
+
+        for (const body of [html, text]) {
+            expect(body).toContain('Zhongli figure (pre-order, verwacht 1 december 2999)')
+            expect(body).toContain('Pre-order artikelen worden verzonden zodra ze zijn uitgebracht')
+        }
+    })
+
+    it('mentions nothing about pre-orders when no item is one', () => {
+        const {html, text} = renderOrderConfirmation(order)
+
+        expect(html).not.toContain('pre-order')
+        expect(text).not.toContain('pre-order')
+    })
 })
