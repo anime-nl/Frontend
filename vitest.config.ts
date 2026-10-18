@@ -7,7 +7,7 @@ export default defineConfig({
         coverage: {
             provider: 'v8',
             reporter: ['text', 'json-summary', 'html'],
-            // The Medusa backend under medusa/ isn't part of this app's deployment (see AGENTS.md), so it's excluded
+            // The Medusa backend under medusa/ is a separate repository (git submodule), so it's excluded
             include: ['app/**', 'server/**', 'shared/**'],
             thresholds: {
                 lines: 80,

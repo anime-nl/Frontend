@@ -37,7 +37,7 @@ services:
     build:
       context: .
       dockerfile: medusa.Dockerfile
-    command: sh ./start.sh
+    command: sh ./dev/start.sh
     volumes:
       - ../medusa:/app
       - medusa_node_modules:/app/node_modules
@@ -56,11 +56,16 @@ services:
       JWT_SECRET: supersecret
       COOKIE_SECRET: supersecret
       PUBLISHABLE_API_KEY: *publishable-key
-      S3_FILE_URL: http://localhost:9200/medusa
-      S3_ENDPOINT: http://seaweedfs:9000
-      S3_ACCESS_KEY_ID: minioadmin
-      S3_SECRET_ACCESS_KEY: minioadmin
-      S3_BUCKET: medusa
+      # Production stores files in MinIO, so its config reads MINIO_*; SeaweedFS speaks the same S3 API.
+      # MINIO_FILE_URL is the address the browser uses, MINIO_ENDPOINT the one Medusa uploads to.
+      MINIO_ENDPOINT: http://seaweedfs:9000
+      MINIO_FILE_URL: http://localhost:9200/medusa
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_BUCKET: medusa
+      REDIS_URL: redis://redis:6379
+      # Production registers Stripe next to Mollie and refuses to start without a key; this one takes no payments
+      STRIPE_API_KEY: sk_test_dev_dummy
       ADMIN_EMAIL: admin@animenl.local
       ADMIN_PASSWORD: supersecret
       # From .devcontainer/.env (not committed; see .devcontainer/.env.example)
@@ -80,12 +85,23 @@ services:
         condition: service_healthy
       seaweedfs:
         condition: service_started
+      redis:
+        condition: service_healthy
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:9000/health']
       interval: 10s
       timeout: 5s
       retries: 60
       start_period: 120s
+
+  # Production's Medusa uses Redis for its cache, event bus and workflow engine
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   postgres:
     image: postgres:16-alpine
@@ -102,7 +118,7 @@ services:
       retries: 10
 
   # S3-compatible storage. Runs without an identities config, so any credentials are accepted and
-  # anonymous reads work. Buckets are not created automatically: medusa/start.sh creates one.
+  # anonymous reads work. Buckets are not created automatically: medusa/dev/start.sh creates one.
   seaweedfs:
     image: chrislusf/seaweedfs:4.47
     command: server -s3 -s3.port=9000 -dir=/data

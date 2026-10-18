@@ -4,24 +4,32 @@
 
 The dev container starts a complete local stack with Docker Compose (`.devcontainer/docker-compose.yml`), so nothing you do touches production:
 
-| Service     | Purpose                                                           | URL                                                      |
-| ----------- | ----------------------------------------------------------------- | -------------------------------------------------------- |
-| `app`       | Nuxt dev container (this workspace)                               | http://localhost:3000                                    |
-| `medusa`    | Medusa v2 backend built from `./medusa`, with the admin dashboard | http://localhost:9000 (admin: http://localhost:9000/app) |
-| `postgres`  | Medusa database                                                   | internal                                                 |
-| `seaweedfs` | S3-compatible storage for product images                          | S3 API http://localhost:9100                             |
-| `mailpit`   | Catches the emails the site sends (support forms)                 | Inbox: http://localhost:8025                             |
+| Service     | Purpose                                                                                     | URL                                                      |
+| ----------- | ------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| `app`       | Nuxt dev container (this workspace)                                                         | http://localhost:3000                                    |
+| `medusa`    | Medusa v2 backend: the production repo, checked out in `./medusa`, with the admin dashboard | http://localhost:9000 (admin: http://localhost:9000/app) |
+| `postgres`  | Medusa database                                                                             | internal                                                 |
+| `seaweedfs` | S3-compatible storage for product images                                                    | S3 API http://localhost:9100                             |
+| `mailpit`   | Catches the emails the site sends (support forms)                                           | Inbox: http://localhost:8025                             |
 
 On first start the `medusa` service installs its dependencies, runs migrations, and seeds sample data: two regions (Netherlands, Belgium), the Webshop / Physical / Bol.com sales channels, and about 30 products covering in stock, low stock, backorder, out of stock, sale prices and multi-variant items. Product images are generated and uploaded to SeaweedFS. Seeding is skipped when the database already has products.
 
 - Admin login: `admin@animenl.local` / `supersecret`
-- File storage is SeaweedFS (S3 API on `localhost:9100`, no login needed; any credentials work). Medusa's bucket is `medusa`, created by `medusa/start.sh`.
+- File storage is SeaweedFS (S3 API on `localhost:9100`, no login needed; any credentials work). Medusa's bucket is `medusa`, created by `medusa/dev/start.sh`.
 - The Nuxt environment (`MEDUSA_URL`, `MEDUSA_SERVER_URL`, `MEDUSA_PUBLISHABLE_KEY`, `MEDUSA_SALES_CHANNEL_ID`) is set by the compose file and overrides any local `.env`. Copy `.env.example` to `.env` to run Nuxt outside the container.
 - Seeding also logs the ids of the Brievenbus and Pakket shipping profiles it creates. Copy `.env.example` to `.env` and set `MEDUSA_BRIEVENBUS_SHIPPING_PROFILE_ID`/`MEDUSA_PAKKET_SHIPPING_PROFILE_ID` to those values so checkout can group shipping options by profile locally; the compose file does not set them since they are regenerated on every reseed.
 - The browser never talks to Medusa directly; only the Nuxt server does, through `server/api/*` routes. Inside a container, `*.localhost` hostnames resolve to loopback rather than to other containers, so the Nuxt server uses `MEDUSA_SERVER_URL=http://medusa:9000/` (the compose service name) to reach Medusa; `medusa.localhost` is still how your host browser reaches the Medusa **admin dashboard** directly.
 - Google sign-in needs a Google OAuth client: copy `.devcontainer/.env.example` to `.devcontainer/.env` (gitignored, never commit real credentials) and fill in `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` from a Google Cloud Console Web application client whose Authorized redirect URIs include `http://localhost:3000/account/callback/google`. Without it, `medusa`'s `auth-google` provider fails to register and sign-in shows an error, but the rest of the site still works.
 - The `app` service depends on `medusa`, so opening the dev container starts the whole stack. The first start takes a few minutes while Medusa installs dependencies, migrates and seeds; follow it with `docker compose -f .devcontainer/docker-compose.yml logs -f medusa`.
 - To reset all data and reseed: `docker compose -f .devcontainer/docker-compose.yml down -v`, then rebuild the container.
+
+### Working on Medusa
+
+`medusa/` is a git submodule of the production repo, [`anime-nl/medusa-backend`](https://github.com/anime-nl/medusa-backend), so the dev container runs the same code as production (its Medusa version, Redis, MinIO-style storage config). Only `medusa/dev/` (`start.sh`, `seed.ts`) exists purely for local development.
+
+- After cloning: `git submodule update --init`.
+- To change Medusa: branch, commit and push **inside `medusa/`** (it is its own repo), open the PR there, then commit the updated `medusa` pointer here so this repo points at that commit. Its tests are Jest: `cd medusa && npm run test:unit`.
+- `git pull` here does not move the submodule; run `git submodule update` afterwards.
 
 ## Commands
 
@@ -98,15 +106,15 @@ To enable it:
 
 1. Create a Mollie account and, for local dev, grab a test API key from the Mollie dashboard (Developers > API keys, starts with `test_`); production needs a live key (starts with `live_`) once the account is verified.
 2. Set `MOLLIE_API_KEY` (in `.devcontainer/.env` locally, see `.devcontainer/.env.example`), `MOLLIE_REDIRECT_URL` (the page customers land on after paying, `https://animenl.nl/checkout/return` in production) and `MEDUSA_URL` (Medusa's own public base URL, used to build the webhook Mollie calls back — `https://<production-medusa-host>` in production).
-3. Re-seed (`bun run --cwd medusa seed`, or reset the dev database per the "Local development environment" section above) so the region picks up `pp_mollie-hosted-checkout_mollie` — or add it to an existing region's `payment_providers` in the Medusa admin.
+3. Re-seed (`cd medusa && npx medusa exec ./dev/seed.ts`, or reset the dev database per the "Local development environment" section above) so the region picks up `pp_mollie-hosted-checkout_mollie` — or add it to an existing region's `payment_providers` in the Medusa admin.
 4. Pay for a test order in Mollie's sandbox mode and confirm the order and payment appear in the Medusa admin.
 
-The plugin's `package.json` pins its `@medusajs/*` peer dependencies to `2.5.1`, well behind the `2.21.1` this repo runs — there is an [open upstream issue](https://github.com/variablevic/mollie-payments-medusa/issues/7) reporting a provider-not-found error on 2.7.0 because of it. Verified locally against a throwaway Medusa 2.21.1 instance that the provider still registers correctly and reaches Mollie's real API (see `docs/known-issues.md`), but re-check `GET /store/payment-providers?region_id=<id>` after any Medusa or plugin version bump.
+The plugin's `package.json` pins its `@medusajs/*` peer dependencies to `2.5.1`, well behind the Medusa version in use — there is an [open upstream issue](https://github.com/variablevic/mollie-payments-medusa/issues/7) reporting a provider-not-found error on 2.7.0 because of it. Verified locally against a throwaway Medusa 2.21.1 instance that the provider still registers correctly and reaches Mollie's real API (see `docs/known-issues.md`), but re-check `GET /store/payment-providers?region_id=<id>` after any Medusa or plugin version bump.
 
 ### Order confirmation and order page
 
 After paying, `/checkout/return` completes the cart (asking again every few seconds for about a minute while Mollie settles) and redirects to `/orders/[id]?token=...`, which shows the order and its placed → paid → fulfilled → shipped → delivered timeline. Guests can open it through the signed `token`; signed-in customers can open their own orders without one (linked from `/account`).
 
 - `ORDER_LINK_SECRET` (Nuxt, build time like the other variables) signs the token: HMAC-SHA256 hex of the order id. **Medusa must use the exact same value**, because its confirmation email contains the same link. Without it, only signed-in customers can open an order page.
-- The confirmation email is sent by Medusa, not Nuxt: `medusa/src/subscribers/order-placed.ts` reacts to `order.placed` and hands the email to the SMTP notification provider in `medusa/src/modules/smtp-notification/`. It only activates when Medusa has `SMTP_HOST` (plus optional `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`), and needs `STOREFRONT_URL` and `ORDER_LINK_SECRET` to put the order link in the email. Locally the dev container sets all of these and Mailpit (http://localhost:8025) catches the email.
-- Production Medusa is a separate repo (`anime-nl/medusa-backend`); the same files must be applied there, and a placed order only gets an email if Medusa's event bus and worker actually process subscribers (check `MEDUSA_WORKER_MODE` and the Redis event bus).
+- The confirmation email is sent by Medusa, not Nuxt: `medusa/src/subscribers/order-placed.ts` (in the Medusa repo) reacts to `order.placed` and hands the email to the SMTP notification provider in `medusa/src/modules/smtp-notification/`. It only activates when Medusa has `SMTP_HOST` (plus optional `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`), and needs `STOREFRONT_URL` and `ORDER_LINK_SECRET` to put the order link in the email. Locally the dev container sets all of these and Mailpit (http://localhost:8025) catches the email.
+- A placed order only gets an email if Medusa's event bus and worker actually process subscribers (check `MEDUSA_WORKER_MODE` and the Redis event bus).
