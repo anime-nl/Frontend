@@ -6,7 +6,7 @@ Format: **title** (where): what is wrong. Mark anything not yet reproduced as _u
 
 ## Open
 
-- **The dev container on production's Medusa (2.12.6, Redis, `MINIO_*` storage, Stripe registered) has never been booted** (`.devcontainer/docker-compose.yml`, `medusa/dev/`): it was set up in an environment without Docker, so only the production repo's Jest tests and a type-check ran. _Unverified_: that `dev/seed.ts` (written against 2.21.1) runs on 2.12.6, that the dummy `STRIPE_API_KEY` is accepted, that SeaweedFS accepts the S3 settings in production's config, and that images get `MINIO_FILE_URL` addresses. Boot the stack once and fix what breaks.
+- **The dev container on production's Medusa (2.12.6, Redis, `MINIO_*` storage) has never been booted** (`.devcontainer/docker-compose.yml`, `medusa/dev/`): it was set up in an environment without Docker, so only the production repo's Jest tests and a type-check ran. _Unverified_: that `dev/seed.ts` (written against 2.21.1) runs on 2.12.6, that SeaweedFS accepts the S3 settings in production's config, and that images get `MINIO_FILE_URL` addresses. Boot the stack once and fix what breaks.
 
 - **Search price, stock and sale filters read the whole catalog on every request** (`server/api/products.ts`): Medusa's store API cannot filter or sort on price or stock, so when any of those is used the route fetches every matching product (100 per request), filters and sorts them itself, then slices the page. That is fine for a catalog of a few hundred products but gets slow as it grows; fixing it needs a Medusa-side index or a custom store endpoint that filters in SQL. The search page's "Added" filter uses a product's `created_at`, since Medusa has no release date field.
 

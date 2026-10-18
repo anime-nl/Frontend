@@ -64,8 +64,6 @@ services:
       MINIO_SECRET_KEY: minioadmin
       MINIO_BUCKET: medusa
       REDIS_URL: redis://redis:6379
-      # Production registers Stripe next to Mollie and refuses to start without a key; this one takes no payments
-      STRIPE_API_KEY: sk_test_dev_dummy
       ADMIN_EMAIL: admin@animenl.local
       ADMIN_PASSWORD: supersecret
       # From .devcontainer/.env (not committed; see .devcontainer/.env.example)
