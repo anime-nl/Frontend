@@ -23,19 +23,20 @@ Uses [Bun](https://bun.sh). Run everything from the repo root, via the scripts i
 - Commit proactively: a request that changes something gets a commit, and a follow-up fix or adjustment on the same topic gets a new commit on that branch (never an amend).
 - A branch can be revisited later to continue the same feature, but never reopen (commit onto) a branch that has already been merged — start a new branch instead, even for closely related follow-up work.
 - Push to the remote only when asked.
+- `medusa/` is a git submodule with its own history. Medusa changes are committed and branched inside it (following that repo's conventions), then the submodule pointer is committed here. Never commit Medusa files to this repo.
 
 ## Layout
 
-| Path                   | What lives there                                                                      |
-| ---------------------- | ------------------------------------------------------------------------------------- |
-| `app/`                 | Nuxt app: `pages/`, `components/`, `assets/css/main.css`, `app.vue`                   |
-| `server/api/`          | Nitro API routes. The browser never talks to Medusa; it calls these routes            |
-| `server/utils/`        | Server helpers such as `medusaFetch`                                                  |
-| `shared/utils/`        | Code used by both app and server (for example the support form topics and validation) |
-| `test/`                | `unit/`, `nuxt/`, `e2e/` and `helpers/`. Tests never live next to source files        |
-| `medusa/`              | The Medusa backend used for local development. Not part of the production deployment  |
-| `.devcontainer/`       | Local dev stack: Nuxt, Medusa, Postgres, SeaweedFS (S3), Mailpit (catches emails)     |
-| `docs/known-issues.md` | Bugs and test debt that were found but not fixed yet                                  |
+| Path                   | What lives there                                                                                   |
+| ---------------------- | -------------------------------------------------------------------------------------------------- |
+| `app/`                 | Nuxt app: `pages/`, `components/`, `assets/css/main.css`, `app.vue`                                |
+| `server/api/`          | Nitro API routes. The browser never talks to Medusa; it calls these routes                         |
+| `server/utils/`        | Server helpers such as `medusaFetch`                                                               |
+| `shared/utils/`        | Code used by both app and server (for example the support form topics and validation)              |
+| `test/`                | `unit/`, `nuxt/`, `e2e/` and `helpers/`. Tests never live next to source files                     |
+| `medusa/`              | Git submodule of the production Medusa repo (`anime-nl/medusa-backend`). Not deployed with the app |
+| `.devcontainer/`       | Local dev stack: Nuxt, Medusa, Postgres, Redis, SeaweedFS (S3), Mailpit (catches emails)           |
+| `docs/known-issues.md` | Bugs and test debt that were found but not fixed yet                                               |
 
 Pages are file-based routes (`app/pages/support/[topic].vue` is `/support/:topic`), so anything that is not a page must stay out of `app/pages/`.
 

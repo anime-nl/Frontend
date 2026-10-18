@@ -1,6 +1,0 @@
-node_modules
-.medusa
-.cache
-.env
-dist
-uploads

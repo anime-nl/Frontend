@@ -3,7 +3,7 @@ import withNuxt from './.nuxt/eslint.config.mjs'
 
 export default withNuxt(
   {
-    // medusa/ is a separate backend used only for local dev (see AGENTS.md); it has its own
+    // medusa/ is the Medusa backend repository as a git submodule (see AGENTS.md); it has its own
     // toolchain and generated types, and isn't part of this app's deployment or lint scope
     ignores: ['medusa/**']
   },
