@@ -1,6 +1,6 @@
 import type {StoreCart} from '@medusajs/types'
 import {CART_ID_COOKIE} from '../../utils/cart'
-import {buildPaymentMetadata, MOLLIE_PROVIDER_ID} from '../../utils/payment'
+import {buildPaymentDescription, buildPaymentMetadata, MOLLIE_PROVIDER_ID} from '../../utils/payment'
 
 /** The subset of a Medusa payment session this route reads. `data` is the Mollie plugin's own response shape, which Medusa does not type. */
 interface PaymentSession {
@@ -42,7 +42,13 @@ export default defineEventHandler(async (event) => {
         } = await medusaFetch<{payment_collection: {payment_sessions: PaymentSession[]}}>(
             event,
             `payment-collections/${payment_collection.id}/payment-sessions`,
-            {method: 'POST', body: {provider_id: MOLLIE_PROVIDER_ID, data: {metadata: buildPaymentMetadata(cart)}}}
+            {
+                method: 'POST',
+                body: {
+                    provider_id: MOLLIE_PROVIDER_ID,
+                    data: {description: buildPaymentDescription(cart), metadata: buildPaymentMetadata(cart)}
+                }
+            }
         )
         session = payment_sessions.find((candidate) => candidate.provider_id === MOLLIE_PROVIDER_ID)
     } catch (error) {
