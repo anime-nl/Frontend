@@ -7,6 +7,16 @@ export const MOLLIE_PROVIDER_ID = 'pp_mollie-hosted-checkout_mollie'
 const MAX_METADATA_BYTES = 1000
 
 /**
+ * Builds the text Mollie shows the customer for a payment. The order does not exist yet while paying,
+ * so the cart is referenced; the order number replaces it once the order is placed.
+ * @param cart - The cart being paid
+ * @returns The payment description, such as `AnimeNL bestelling 3F9A2C7B`
+ */
+export function buildPaymentDescription(cart: StoreCart) {
+    return `AnimeNL bestelling ${cart.id.slice(-8).toUpperCase()}`
+}
+
+/**
  * Builds the order details Mollie shows next to a payment: who is paying, where it ships and what was ordered.
  * Items that do not fit in Mollie's metadata limit are left out and only counted in `more_items`.
  * @param cart - The cart being paid, with its items and shipping address loaded

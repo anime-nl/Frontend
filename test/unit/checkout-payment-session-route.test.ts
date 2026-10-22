@@ -70,7 +70,10 @@ describe('POST /api/checkout/payment-session', () => {
                 method: 'POST',
                 body: {
                     provider_id: 'pp_mollie-hosted-checkout_mollie',
-                    data: {metadata: expect.objectContaining({cart_id: 'cart_1'})}
+                    data: {
+                        description: expect.stringMatching(/^AnimeNL bestelling /),
+                        metadata: expect.objectContaining({cart_id: 'cart_1'})
+                    }
                 }
             }
         )

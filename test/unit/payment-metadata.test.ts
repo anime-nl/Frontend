@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest'
 import type {StoreCart} from '@medusajs/types'
-import {buildPaymentMetadata} from '../../server/utils/payment'
+import {buildPaymentDescription, buildPaymentMetadata} from '../../server/utils/payment'
 
 function cart(overrides: Partial<StoreCart> = {}) {
     return {
@@ -55,5 +55,11 @@ describe('buildPaymentMetadata', () => {
 
         expect(Buffer.byteLength(JSON.stringify(metadata))).toBeLessThanOrEqual(1000)
         expect((metadata.items as unknown[]).length + (metadata.more_items as number)).toBe(40)
+    })
+})
+
+describe('buildPaymentDescription', () => {
+    it('references the cart by its last eight characters in capitals', () => {
+        expect(buildPaymentDescription(cart({id: 'cart_01jxyzabcdef1234'}))).toBe('AnimeNL bestelling CDEF1234')
     })
 })
