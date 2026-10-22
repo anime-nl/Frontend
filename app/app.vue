@@ -23,8 +23,19 @@ useHead(() => ({
       icon="i-lucide-triangle-alert"
       :title="t('common.paymentIssues')"
       :actions="[
-        {label: t('common.paymentIssuesContactLink'), to: localePath('/support'), color: 'error', variant: 'link'}
+        {
+          label: t('common.paymentIssuesContactLink'),
+          to: localePath('/support'),
+          color: 'error',
+          variant: 'link',
+          class: 'whitespace-normal text-left'
+        }
       ]"
+      :ui="{
+        container: 'flex-col items-start gap-1 py-2 lg:h-auto lg:flex-row lg:items-center lg:gap-3',
+        center: 'items-start',
+        title: 'whitespace-normal'
+      }"
     />
 
     <UBanner class="z-0" close icon="i-lucide-info" :title="t('common.underConstruction')" />
