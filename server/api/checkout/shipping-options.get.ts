@@ -13,12 +13,13 @@ interface ProductShippingProfile {
 /**
  * Determines which shipping profile's options to show for a cart: Pakket if any line item needs
  * it (a Pakket parcel can carry Brievenbus-sized items too, but not the other way round), else
- * Brievenbus if every item fits it, else `undefined` for a profile the site does not recognize
- * yet, in which case every option is shown unfiltered rather than hiding all of them.
+ * Brievenbus if every item fits it, else Pakket for any unrecognized profile (safe fallback —
+ * prevents showing incompatible options that would cause cart completion to fail after payment).
+ * An empty cart returns undefined so all options remain visible.
  * @param itemProfileIds The shipping profile id of each cart line item's product
  * @param brievenbusProfileId The configured Brievenbus shipping profile id
  * @param pakketProfileId The configured Pakket shipping profile id
- * @returns The winning profile id, or undefined if none of the item profiles are recognized
+ * @returns The winning profile id, or undefined for an empty cart
  */
 function resolveShippingProfileId(
     itemProfileIds: string[],
@@ -28,7 +29,7 @@ function resolveShippingProfileId(
     if (itemProfileIds.length === 0) return undefined
     if (itemProfileIds.includes(pakketProfileId)) return pakketProfileId
     if (itemProfileIds.every((id) => id === brievenbusProfileId)) return brievenbusProfileId
-    return undefined
+    return pakketProfileId
 }
 
 /**

@@ -92,10 +92,16 @@ describe('GET /api/checkout/shipping-options', () => {
         await expect(callRoute()).resolves.toEqual({shipping_options: [POSTNL_PAKKET_OPTION, DPD_OPTION]})
     })
 
-    it('returns every option unfiltered when an item uses a profile that matches neither configured id', async () => {
+    it('returns only Pakket options when an item uses a profile that matches neither configured id', async () => {
         mockMedusa(itemsWithProfiles('sp_some_other_profile'))
 
-        await expect(callRoute()).resolves.toEqual({shipping_options: ALL_OPTIONS})
+        await expect(callRoute()).resolves.toEqual({shipping_options: [POSTNL_PAKKET_OPTION, DPD_OPTION]})
+    })
+
+    it('returns only Pakket options when the cart mixes a Brievenbus item with an unrecognized profile', async () => {
+        mockMedusa(itemsWithProfiles(BRIEVENBUS_PROFILE_ID, 'sp_some_other_profile'))
+
+        await expect(callRoute()).resolves.toEqual({shipping_options: [POSTNL_PAKKET_OPTION, DPD_OPTION]})
     })
 
     it("fetches the cart and each item product's shipping profile to resolve the winning profile", async () => {
