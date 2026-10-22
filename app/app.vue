@@ -3,6 +3,7 @@ const {
   public: {gaEnabled}
 } = useRuntimeConfig()
 const {t} = useI18n()
+const localePath = useLocalePath()
 
 const i18nHead = useLocaleHead()
 useHead(() => ({
@@ -15,6 +16,16 @@ useHead(() => ({
 <template>
   <UApp>
     <Navbar />
+
+    <UBanner
+      class="z-0"
+      color="warning"
+      icon="i-lucide-triangle-alert"
+      :title="t('common.paymentIssues')"
+      :actions="[
+        {label: t('common.paymentIssuesContactLink'), to: localePath('/support'), color: 'warning', variant: 'link'}
+      ]"
+    />
 
     <UBanner class="z-0" close icon="i-lucide-info" :title="t('common.underConstruction')" />
 

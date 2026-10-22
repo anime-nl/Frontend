@@ -2,6 +2,8 @@
   "common": {
     "appName": "AnimeNL",
     "underConstruction": "This website is still under construction! If you encounter any problems with the site, please contact us via the Support page.",
+    "paymentIssues": "We are currently experiencing issues with payments and orders.",
+    "paymentIssuesContactLink": "Use the contact form if you experience any issues.",
     "greeting": "Hello {name}",
     "countries": {
       "NL": "Netherlands",
