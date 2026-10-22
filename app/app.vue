@@ -23,7 +23,7 @@ useHead(() => ({
       icon="i-lucide-triangle-alert"
       :title="t('common.paymentIssues')"
       :actions="[
-        {label: t('common.paymentIssuesContactLink'), to: localePath('/support'), color: 'warning', variant: 'link'}
+        {label: t('common.paymentIssuesContactLink'), to: localePath('/support'), color: 'error', variant: 'link'}
       ]"
     />
 
