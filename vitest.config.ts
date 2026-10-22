@@ -4,6 +4,9 @@ import {defineVitestProject} from '@nuxt/test-utils/config'
 
 export default defineConfig({
     test: {
+        // Every worker holds a Nuxt environment or a full Nuxt build in memory. The default (one worker
+        // per core) exhausts the RAM of a typical dev machine
+        maxWorkers: 4,
         coverage: {
             provider: 'v8',
             reporter: ['text', 'json-summary', 'html'],
@@ -41,6 +44,8 @@ export default defineConfig({
                     name: 'e2e',
                     include: ['test/e2e/**/*.test.ts'],
                     environment: 'node',
+                    // Each file builds the whole app, so running them side by side multiplies the memory use
+                    fileParallelism: false,
                     testTimeout: 60_000,
                     hookTimeout: 240_000
                 }
