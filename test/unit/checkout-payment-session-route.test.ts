@@ -68,7 +68,10 @@ describe('POST /api/checkout/payment-session', () => {
             'payment-collections/pay_col_1/payment-sessions',
             {
                 method: 'POST',
-                body: {provider_id: 'pp_mollie-hosted-checkout_mollie'}
+                body: {
+                    provider_id: 'pp_mollie-hosted-checkout_mollie',
+                    data: {metadata: expect.objectContaining({cart_id: 'cart_1'})}
+                }
             }
         )
     })
