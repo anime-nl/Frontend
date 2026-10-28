@@ -4,7 +4,7 @@ import {SESSION_COOKIE} from '../../utils/session'
 
 /** Fields the order page needs on top of Medusa's defaults. */
 const ORDER_FIELDS =
-    '*items,*shipping_address,*shipping_methods,*fulfillments,+payment_status,+fulfillment_status,+email,+created_at'
+    '*items,*shipping_address,*shipping_methods,*fulfillments,*fulfillments.labels,+payment_status,+fulfillment_status,+email,+created_at'
 
 /**
  * Whether the signed-in customer owns the order. Medusa's customer-scoped order list is the only

@@ -80,6 +80,42 @@ describe('order page', () => {
         expect(page.text()).toContain('Utrecht')
     })
 
+    it('shows the shipping method', async () => {
+        orderResponse = {order: {...baseOrder, shipping_methods: [{id: 'sm_1', name: 'PostNL standaard'}]}}
+        const page = await mountOrderPage()
+
+        expect(page.text()).toContain('Verzendmethode')
+        expect(page.text()).toContain('PostNL standaard')
+    })
+
+    it('shows the shipped date and a track and trace link', async () => {
+        const fulfillment = {
+            shipped_at: '2026-10-11T09:00:00Z',
+            labels: [{tracking_number: '3S123', tracking_url: 'https://track.example/3S123'}]
+        }
+        orderResponse = {order: {...baseOrder, fulfillments: [fulfillment]}}
+        const page = await mountOrderPage()
+
+        expect(page.text()).toContain('Verzonden op')
+        expect(page.find('a[href="https://track.example/3S123"]').text()).toBe('3S123')
+    })
+
+    it('shows the tracking number as plain text when there is no link', async () => {
+        const fulfillment = {shipped_at: '2026-10-11T09:00:00Z', labels: [{tracking_number: '3S123'}]}
+        orderResponse = {order: {...baseOrder, fulfillments: [fulfillment]}}
+        const page = await mountOrderPage()
+
+        expect(page.text()).toContain('3S123')
+        expect(page.find('a[href*="3S123"]').exists()).toBe(false)
+    })
+
+    it('hides the shipments section before anything is shipped', async () => {
+        orderResponse = {order: {...baseOrder, fulfillments: [{shipped_at: null}]}}
+        const page = await mountOrderPage()
+
+        expect(page.text()).not.toContain('Zendingen')
+    })
+
     it('shows a not found message when the order cannot be loaded', async () => {
         orderResponse = undefined
         const page = await mountOrderPage()
