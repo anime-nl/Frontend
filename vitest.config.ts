@@ -19,6 +19,8 @@ export default defineConfig({
                 branches: 80
             }
         },
+        // Vitest refuses projects with different worker counts in the same group, and the projects below
+        // do not inherit maxWorkers (e2e runs one file at a time), so each one gets its own group
         projects: [
             {
                 resolve: {
@@ -35,6 +37,7 @@ export default defineConfig({
             await defineVitestProject({
                 test: {
                     name: 'nuxt',
+                    sequence: {groupOrder: 1},
                     include: ['test/nuxt/**/*.test.ts'],
                     environment: 'nuxt'
                 }
@@ -42,6 +45,7 @@ export default defineConfig({
             {
                 test: {
                     name: 'e2e',
+                    sequence: {groupOrder: 2},
                     include: ['test/e2e/**/*.test.ts'],
                     environment: 'node',
                     // Each file builds the whole app, so running them side by side multiplies the memory use
