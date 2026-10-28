@@ -458,6 +458,10 @@
     "shipping": "Versand",
     "total": "Gesamt",
     "shippingAddress": "Lieferadresse",
+    "shippingMethod": "Versandart",
+    "shipments": "Sendungen",
+    "shippedOn": "Versendet am {date}",
+    "trackAndTrace": "Sendungsverfolgung",
     "notFoundTitle": "Bestellung nicht gefunden",
     "notFoundBody": "Wir konnten diese Bestellung nicht finden. Nutzen Sie den Link aus Ihrer Bestätigungs-E-Mail oder melden Sie sich in Ihrem Konto an."
   }

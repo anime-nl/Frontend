@@ -446,6 +446,10 @@
     "shipping": "Verzending",
     "total": "Totaal",
     "shippingAddress": "Bezorgadres",
+    "shippingMethod": "Verzendmethode",
+    "shipments": "Zendingen",
+    "shippedOn": "Verzonden op {date}",
+    "trackAndTrace": "Track & trace",
     "notFoundTitle": "Bestelling niet gevonden",
     "notFoundBody": "We konden deze bestelling niet vinden. Gebruik de link uit je bevestigingsmail of log in op je account."
   }

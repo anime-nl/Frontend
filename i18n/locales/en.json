@@ -443,6 +443,10 @@
     "shipping": "Shipping",
     "total": "Total",
     "shippingAddress": "Shipping address",
+    "shippingMethod": "Shipping method",
+    "shipments": "Shipments",
+    "shippedOn": "Shipped on {date}",
+    "trackAndTrace": "Track & trace",
     "notFoundTitle": "Order not found",
     "notFoundBody": "We couldn't find this order. Use the link from your confirmation email or sign in to your account."
   }
