@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type {StoreOrder} from '@medusajs/types'
 import {formatCurrency} from '#shared/utils/currency'
+import {getOrderShipments, type OrderFulfillment} from '#shared/utils/orderShipments'
 
 const route = useRoute()
 const {t, localeProperties} = useI18n()
@@ -15,6 +16,7 @@ const {data, error} = await useFetch<{order: StoreOrder}>(`/api/orders/${route.p
 
 const order = computed(() => data.value?.order)
 const language = computed(() => localeProperties.value.language!)
+const shipments = computed(() => getOrderShipments(order.value?.fulfillments as OrderFulfillment[] | undefined))
 
 /**
  * Formats an amount of the order in the order's own currency.
@@ -74,6 +76,25 @@ function price(amount: number) {
             <dd>{{ price(order.total) }}</dd>
           </div>
         </dl>
+      </section>
+
+      <section v-if="order.shipping_methods?.length" class="flex flex-col gap-2">
+        <h2 class="text-xl font-bold">{{ t('order.shippingMethod') }}</h2>
+        <p v-for="method in order.shipping_methods" :key="method.id" class="text-slate-300">{{ method.name }}</p>
+      </section>
+
+      <section v-if="shipments.length" class="flex flex-col gap-4">
+        <h2 class="text-xl font-bold">{{ t('order.shipments') }}</h2>
+        <div v-for="(shipment, index) in shipments" :key="index" class="flex flex-col gap-1 text-slate-300">
+          <p>{{ t('order.shippedOn', {date: new Date(shipment.shippedAt).toLocaleDateString(language)}) }}</p>
+          <p v-for="tracking in shipment.tracking" :key="tracking.number">
+            {{ t('order.trackAndTrace') }}:
+            <a v-if="tracking.url" :href="tracking.url" target="_blank" rel="noopener" class="text-sky-300 underline">{{
+              tracking.number
+            }}</a>
+            <span v-else>{{ tracking.number }}</span>
+          </p>
+        </div>
       </section>
 
       <section v-if="order.shipping_address" class="flex flex-col gap-2">

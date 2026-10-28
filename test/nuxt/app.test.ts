@@ -23,4 +23,10 @@ describe('app', () => {
         expect(wrapper.find('a[href="/support"]').exists()).toBe(true)
         expect(wrapper.text()).toContain('nog in ontwikkeling')
     })
+
+    it('does not show a payment issues banner', async () => {
+        wrapper = await mountSuspended(App, {attachTo: document.body, route: '/'})
+
+        expect(wrapper.text()).not.toContain('betaalsystemen')
+    })
 })

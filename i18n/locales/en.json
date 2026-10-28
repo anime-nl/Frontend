@@ -2,8 +2,6 @@
   "common": {
     "appName": "AnimeNL",
     "underConstruction": "This website is still under construction! If you encounter any problems with the site, please contact us via the Support page.",
-    "paymentIssues": "On October 22nd we experienced issues with our payment systems. These have been resolved since.",
-    "paymentIssuesContactLink": "If you have questions, please use our contact form.",
     "greeting": "Hello {name}",
     "countries": {
       "NL": "Netherlands",
@@ -443,6 +441,10 @@
     "shipping": "Shipping",
     "total": "Total",
     "shippingAddress": "Shipping address",
+    "shippingMethod": "Shipping method",
+    "shipments": "Shipments",
+    "shippedOn": "Shipped on {date}",
+    "trackAndTrace": "Track & trace",
     "notFoundTitle": "Order not found",
     "notFoundBody": "We couldn't find this order. Use the link from your confirmation email or sign in to your account."
   }

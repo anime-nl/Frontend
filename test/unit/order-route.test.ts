@@ -41,6 +41,17 @@ describe('GET /api/orders/:id', () => {
         expect(medusaFetch).toHaveBeenCalledWith(expect.anything(), 'orders/order_1', expect.anything())
     })
 
+    it('requests the shipping methods and the tracking labels of the fulfillments', async () => {
+        getQuery.mockReturnValue({token: signOrderId('order_1', 'test-secret')})
+        medusaFetch.mockResolvedValue({order: {id: 'order_1'}})
+
+        await callRoute()
+
+        const {query} = medusaFetch.mock.calls[0]![2] as {query: {fields: string}}
+        expect(query.fields).toContain('*shipping_methods')
+        expect(query.fields).toContain('*fulfillments.labels')
+    })
+
     it('answers 404 for a token signed for another order', async () => {
         getQuery.mockReturnValue({token: signOrderId('order_2', 'test-secret')})
 
